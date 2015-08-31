@@ -77,7 +77,7 @@ gulp.task('connect',function(){
         root: "dist",
         port: 8080,
         livereload: true,
-        fallback: "index.html"
+        fallback: "dist/index.html"
     });
 });
 gulp.task('connect-reload',function(){
