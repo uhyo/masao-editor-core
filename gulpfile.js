@@ -76,8 +76,7 @@ gulp.task('connect',function(){
     connect.server({
         root: "dist",
         port: 8080,
-        livereload: true,
-        fallback: "dist/index.html"
+        livereload: true
     });
 });
 gulp.task('connect-reload',function(){
@@ -106,7 +105,7 @@ function jsxCompiler(watch){
     var opts={
         entries:[path.join(__dirname,"jsx/entrypoint.jsx")],
         extensions:[".js",".jsx"],
-        basedir:__dirname
+        basedir:__dirname,
     };
     if(watch){
         opts.cache={};
