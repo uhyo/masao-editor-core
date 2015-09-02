@@ -1,5 +1,7 @@
 var React=require('react');
 
+var Promise=require('native-promise-only');
+
 module.exports = React.createClass({
     displayName: "MapEdit",
     propTypes: {
@@ -23,8 +25,14 @@ module.exports = React.createClass({
         //flags
         this.drawing=false;
         this.drawRequest=null;
-        //Initial render
-        this.draw();
+        //load files
+        var pattern=loadImagePromise(this.props.pattern);
+        pattern.then((img)=>{
+            this.images={
+                pattern: img
+            };
+            this.draw();
+        });
     },
     draw(){
         if(this.drawing===true){
@@ -32,6 +40,7 @@ module.exports = React.createClass({
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
+            console.log("draw!");
             var {width, height} = this.getCanvasSize();
             var map=this.props.map, params=this.props.params, edit=this.props.edit;
             var {scroll_x, scroll_y} = edit;
@@ -64,4 +73,21 @@ module.exports = React.createClass({
 
 function cssColor(r,g,b){
     return `rgb(${r},${g},${b})`;
+}
+
+//load image
+function loadImagePromise(src){
+    return new Promise((fulfill,reject)=>{
+        var img=new Image();
+        img.src=src;
+        console.log("loading",src);
+        img.addEventListener("load",(e)=>{
+            console.log("fulfill");
+            fulfill(img);
+        });
+        img.addEventListener("error",(e)=>{
+            console.log("reject");
+            reject("Failed to load "+src);
+        });
+    });
 }
