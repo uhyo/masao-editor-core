@@ -6,7 +6,7 @@ module.exports = React.createClass({
     displayName:"Front",
     render(){
         return <div>
-            <Core/>
+            <Core filename_pattern="pattern.gif"/>
         </div>;
     }
 });
