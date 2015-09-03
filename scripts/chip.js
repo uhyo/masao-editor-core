@@ -284,3 +284,22 @@ var chipTable={
 
 
 exports.chipTable = chipTable;
+
+function cssColor(r,g,b){
+    return `rgb(${r},${g},${b})`;
+}
+exports.cssColor = cssColor;
+
+//ctxの(x,y)座標にchipをdrawする
+//pattern: パターン画像
+function drawChip(ctx,pattern,chip,x,y){
+    var t=chipTable[chip];
+    if(t==null){
+        return;
+    }
+    var sy=Math.floor(t.pattern/10), sx=t.pattern%10;
+    //その番号を描画
+    ctx.drawImage(pattern, sx*32, sy*32, 32, 32, x, y, 32,32);
+}
+
+exports.drawChip = drawChip;

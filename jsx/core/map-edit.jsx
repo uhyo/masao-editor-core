@@ -50,7 +50,7 @@ module.exports = React.createClass({
             /////draw
             //background color
             //TODO: ステージ対応
-            ctx.fillStyle=cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            ctx.fillStyle=chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillRect(0,0,width,height);
             //map
             for(let x=0;x < width; x++){
@@ -73,17 +73,13 @@ module.exports = React.createClass({
     },
     drawChip(ctx,c,x,y){
         //x,yにchipを描画
-        var t=chip.chipTable[c];
-        if(t==null){
-            return;
-        }
-        var sy=Math.floor(t.pattern/10), sx=t.pattern%10;
-        //その番号を描画
-        ctx.drawImage(this.images.pattern, sx*32, sy*32, 32, 32, x, y, 32,32);
+        chip.drawChip(ctx,this.images.pattern,c,x,y);
     },
     render(){
         var {width, height} = this.getCanvasSize();
-        return <canvas ref="canvas" width={width} height={height}/>;
+        return <div className="me-core-map-edit">
+            <canvas ref="canvas" width={width} height={height}/>
+        </div>;
     },
     getCanvasSize(){
         return {
@@ -92,8 +88,4 @@ module.exports = React.createClass({
         };
     },
 });
-
-function cssColor(r,g,b){
-    return `rgb(${r},${g},${b})`;
-}
 
