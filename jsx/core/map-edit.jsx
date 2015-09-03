@@ -80,13 +80,10 @@ function loadImagePromise(src){
     return new Promise((fulfill,reject)=>{
         var img=new Image();
         img.src=src;
-        console.log("loading",src);
         img.addEventListener("load",(e)=>{
-            console.log("fulfill");
             fulfill(img);
         });
         img.addEventListener("error",(e)=>{
-            console.log("reject");
             reject("Failed to load "+src);
         });
     });

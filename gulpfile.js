@@ -1,7 +1,7 @@
 var path=require('path');
 var util=require('util');
 var gulp=require('gulp');
-var connect=require('gulp-connect');
+var webserver=require('gulp-webserver');
 var gulputil=require('gulp-util');
 var gulpif=require('gulp-if');
 var duration=require('gulp-duration');
@@ -72,16 +72,12 @@ gulp.task('css',function(){
     .pipe(gulp.dest("dist/"));
 });
 
-gulp.task('connect',function(){
-    connect.server({
-        root: "dist",
-        port: 8080,
+gulp.task('webserver',function(){
+    gulp.src("dist")
+    .pipe(webserver({
+        port: 8000,
         livereload: true
-    });
-});
-gulp.task('connect-reload',function(){
-    return gulp.src("dist/*")
-    .pipe(connect.reload());
+    }));
 });
 
 gulp.task('clean',function(cb){
@@ -90,11 +86,10 @@ gulp.task('clean',function(cb){
     ],cb);
 });
 
-gulp.task('watch',['watch-jsx','css','html','connect'],function(){
+gulp.task('watch',['watch-jsx','css','html','webserver'],function(){
     //w
     gulp.watch("html/*.html",['html']);
     gulp.watch("css/*.scss",['css']);
-    gulp.watch("dist/*",['connect-reload']);
 });
 
 gulp.task('default',['jsx','css','mc_canvas','static']);
