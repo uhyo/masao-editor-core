@@ -3,11 +3,14 @@ var React=require('react');
 var chip=require('../../scripts/chip'),
     loadImage=require('../../scripts/load-image');
 
+var editActions=require('../../actions/edit');
+
 module.exports = React.createClass({
     displayName: "ChipSelect",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
-        params: React.PropTypes.object.isRequired
+        params: React.PropTypes.object.isRequired,
+        edit: React.PropTypes.object.isRequired
     },
     componentDidMount(){
         loadImage(this.props.pattern)
@@ -27,10 +30,9 @@ module.exports = React.createClass({
         ctx.fillStyle = chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_g);
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        var ks=Object.keys(chip.chipTable);
         var x=0,y=0,i=0;
-        while(i < ks.length){
-            chip.drawChip(ctx,this.pattern,ks[i],x,y);
+        while(i < chip.chipList.length){
+            chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y);
             i++;
             x+=32;
             if(x+32 > canvas.width){
@@ -38,13 +40,49 @@ module.exports = React.createClass({
                 y+=32;
             }
         }
+
+        //下のやつも描画
+        canvas=React.findDOMNode(this.refs.canvas2);
+        ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        chip.drawChip(ctx,this.pattern,this.props.edit.pen, 32,32);
     },
     render(){
         var w=8;
         var ks=Object.keys(chip.chipTable);
         var h=Math.ceil(ks.length/w);
+        var pen=this.props.edit.pen;
+        var name=null;
+        if(chip.chipTable[pen]!=null){
+            name=chip.chipTable[pen].name;
+        }
         return <div className="me-core-chip-select">
-            <canvas ref="canvas" width={w*32} height={h*32}/>
+            <div className="me-core-chip-list">
+                <canvas ref="canvas" width={w*32} height={h*32} onClick={this.handleClick}/>
+            </div>
+            <div className="me-core-chip-selected">
+                <div className="me-core-chip-selected-c">
+                    <canvas ref="canvas2" width="96" height="64"/>
+                </div>
+                <div className="me-core-chip-selected-d">
+                    <p>選択中： <code>{pen}</code> {name}</p>
+                </div>
+            </div>
         </div>;
+    },
+    handleClick(e){
+        //canvasをクリックした
+        var {target, pageX, pageY} = e;
+        var {offsetLeft, offsetTop}= target;
+        var x=pageX-offsetLeft, y=pageY-offsetTop;
+        var ks=Object.keys(chip.chipTable);
+
+        var haba = Math.floor(target.width/32);
+        var penidx = Math.floor(x/32) + Math.floor(y/32)*haba;
+
+        editActions.changePen({
+            pen: chip.chipList[penidx]
+        });
+        e.preventDefault();
     }
 });

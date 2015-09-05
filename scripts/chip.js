@@ -279,11 +279,16 @@ var chipTable={
     ">": {
         pattern: 19,
         name: "下り坂"
+    },
+    ".": {
+        pattern: 0,
+        name: "空白"
     }
 };
 
 
 exports.chipTable = chipTable;
+exports.chipList = Object.keys(chipTable);
 
 function cssColor(r,g,b){
     return `rgb(${r},${g},${b})`;

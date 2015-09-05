@@ -17,7 +17,7 @@ module.exports = React.createClass({
     render(){
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
         return <div className="me-core">
-            <ChipSelect pattern={this.props.filename_pattern} params={params} />
+            <ChipSelect pattern={this.props.filename_pattern} params={params} edit={edit}/>
             <MapEdit pattern={this.props.filename_pattern} map={map} params={params} edit={edit}/>
         </div>;
     }

@@ -1,9 +1,26 @@
 .me-core {
   display: flex;
+
+  p {
+    margin: 0;
+  }
 }
 .me-core-chip-select {
   padding: 4px;
+  width: 256px;
 }
 .me-core-map-edit {
   padding: 4px;
+}
+.me-core-chip-selected {
+  display: flex;
+
+  .me-core-chip-selected-c {
+    padding: 0;
+    flex: 96px 0 0;
+  }
+  .me-core-chip-selected-d {
+    flex: auto 1 1;
+    padding: 6px;
+  }
 }
