@@ -6,7 +6,8 @@ var mapStore=require('../../stores/map'),
     editStore=require('../../stores/edit');
 
 var MapEdit=require('./map-edit.jsx'),
-    ChipSelect=require('./chip-select.jsx');
+    ChipSelect=require('./chip-select.jsx'),
+    EditMode=require('./edit-mode.jsx');
 
 module.exports = React.createClass({
     displayName: "MasaoEditorCore",
@@ -17,8 +18,11 @@ module.exports = React.createClass({
     render(){
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
         return <div className="me-core">
-            <ChipSelect pattern={this.props.filename_pattern} params={params} edit={edit}/>
-            <MapEdit pattern={this.props.filename_pattern} map={map} params={params} edit={edit}/>
+            <EditMode edit={edit} />
+            <div className="me-core-main">
+                <ChipSelect pattern={this.props.filename_pattern} params={params} edit={edit}/>
+                <MapEdit pattern={this.props.filename_pattern} map={map} params={params} edit={edit}/>
+            </div>
         </div>;
     }
 });

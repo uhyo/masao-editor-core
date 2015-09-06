@@ -1,4 +1,4 @@
-.me-core {
+.me-core-main {
   display: flex;
 
   p {
@@ -22,5 +22,19 @@
   .me-core-chip-selected-d {
     flex: auto 1 1;
     padding: 6px;
+  }
+}
+.me-core-edit-mode {
+  display: flex;
+}
+.me-core-edit-mode-button {
+  padding: 6px;
+  background-color: #eeeeee;
+  transition: background-color 0.3s ease;
+
+  cursor: pointer;
+
+  &.me-core-edit-mode-current {
+    background-color: #66ee33;
   }
 }

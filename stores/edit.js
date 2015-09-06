@@ -45,6 +45,10 @@ module.exports = Reflux.createStore({
             mouse_sy: this.mouse_sy
         };
     },
+    onChangeMode({mode}){
+        this.mode=mode;
+        this.trigger(this.makeState());
+    },
     onChangePen({pen}){
         this.pen=pen;
         this.trigger(this.makeState());

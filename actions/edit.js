@@ -1,6 +1,10 @@
 //edit actions
 var Reflux=require('reflux');
 
+// edit.changeMode({
+//   mode: string
+// });
+//
 // edit.changePen({
 //   pen: string
 //});
@@ -13,6 +17,7 @@ var Reflux=require('reflux');
 // edit.mouseUp()
 
 module.exports = Reflux.createActions({
+    "changeMode": {},
     "changePen": {
         preEmit: (obj)=>{
             if(obj==null){
