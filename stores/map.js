@@ -1,7 +1,10 @@
 //map store
 var Reflux=require('reflux');
 
+var mapActions = require('../actions/map');
+
 module.exports = Reflux.createStore({
+    listenables: mapActions,
     init(){
         //init project
         this.map=this.initMap();
@@ -23,5 +26,18 @@ module.exports = Reflux.createStore({
     },
     getInitialState(){
         return this.map;
+    },
+
+    onUpdateMap({x,y,chip}){
+        if(this.map[y]){
+            this.map[y] = this.map[y].map((c,i)=>{
+                if(i==x){
+                    return chip;
+                }else{
+                    return c;
+                }
+            });
+            this.trigger(this.map);
+        }
     }
 });

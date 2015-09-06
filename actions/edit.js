@@ -4,6 +4,13 @@ var Reflux=require('reflux');
 // edit.changePen({
 //   pen: string
 //});
+//
+// edit.mouseDown({
+//   x: number,
+//   y: number
+//});
+//
+// edit.mouseUp()
 
 module.exports = Reflux.createActions({
     "changePen": {
@@ -15,5 +22,7 @@ module.exports = Reflux.createActions({
             }
             return;
         }
-    }
+    },
+    "mouseDown": {},
+    "mouseUp": {}
 });

@@ -1,8 +1,14 @@
 var React=require('react');
 
 var Promise=require('native-promise-only');
+var util=require('../../scripts/util');
+
 var chip=require('../../scripts/chip'),
     loadImage=require('../../scripts/load-image');
+
+var editActions=require('../../actions/edit'),
+    mapActions=require('../../actions/map');
+
 
 module.exports = React.createClass({
     displayName: "MapEdit",
@@ -36,9 +42,12 @@ module.exports = React.createClass({
             this.draw();
         });
     },
+    componentDidUpdate(){
+        this.draw();
+    },
     draw(){
         if(this.drawing===true){
-            cancelRequestAnimationFrame(this.drawRequest);
+            cancelAnimationFrame(this.drawRequest);
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
@@ -69,6 +78,7 @@ module.exports = React.createClass({
                     this.drawChip(ctx,c,x*32, y*32);
                 }
             }
+            this.drawing=false;
         });
     },
     drawChip(ctx,c,x,y){
@@ -78,7 +88,7 @@ module.exports = React.createClass({
     render(){
         var {width, height} = this.getCanvasSize();
         return <div className="me-core-map-edit">
-            <canvas ref="canvas" width={width} height={height}/>
+            <canvas ref="canvas" width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null}/>
         </div>;
     },
     getCanvasSize(){
@@ -86,6 +96,43 @@ module.exports = React.createClass({
             width: this.props.width*32,
             height: this.props.height*32
         };
+    },
+    handleMouseDown(e){
+        //マウスが下がった
+        e.preventDefault();
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
+        editActions.mouseDown({x: mx, y: my});
+
+        //マウスが上がったときの処理
+        var mouseUpHandler=(e)=>{
+            editActions.mouseUp();
+            //上がったらおわり
+            document.body.removeEventListener("mouseup",mouseUpHandler,false);
+        };
+        document.body.addEventListener("mouseup",mouseUpHandler,false);
+    },
+    handleMouseMove(e){
+        e.preventDefault();
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
+
+
+        var edit=this.props.edit, map=this.props.map;
+
+        if(edit.mode==="pen"){
+            //ペンモード
+            //座標
+            let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
+            //違ったらイベント発行
+            if(map[cy] && map[cy][cx]!==edit.pen){
+                mapActions.updateMap({
+                    x: cx,
+                    y: cy,
+                    chip: edit.pen
+                });
+            }
+        }
     },
 });
 
