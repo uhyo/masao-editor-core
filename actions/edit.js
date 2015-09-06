@@ -15,6 +15,11 @@ var Reflux=require('reflux');
 //});
 //
 // edit.mouseUp()
+//
+// edit.scroll({
+//   x: number,
+//   y: number
+// });
 
 module.exports = Reflux.createActions({
     "changeMode": {},
@@ -29,5 +34,6 @@ module.exports = Reflux.createActions({
         }
     },
     "mouseDown": {},
-    "mouseUp": {}
+    "mouseUp": {},
+    "scroll": {}
 });

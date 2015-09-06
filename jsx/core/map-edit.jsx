@@ -47,7 +47,7 @@ module.exports = React.createClass({
     },
     draw(){
         if(this.drawing===true){
-            cancelAnimationFrame(this.drawRequest);
+            return;
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
@@ -130,6 +130,26 @@ module.exports = React.createClass({
                     x: cx,
                     y: cy,
                     chip: edit.pen
+                });
+            }
+        }else if(edit.mode==="hand"){
+            //ハンドモード（つかんでスクロール）
+            let sx=edit.mouse_sx-mx+edit.scroll_sx, sy=edit.mouse_sy-my+edit.scroll_sy;
+            if(sx < 0){
+                sx=0;
+            }else if(sx > 165){
+                sx=165;
+            }
+            if(sy < 0){
+                sy=0;
+            }else if(sy > 20){
+                sy=20;
+            }
+            console.log(mx,my,sx,sy);
+            if(sx!==edit.scroll_x || sy!==edit.scroll_y){
+                editActions.scroll({
+                    x: sx,
+                    y: sy
                 });
             }
         }

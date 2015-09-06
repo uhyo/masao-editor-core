@@ -16,6 +16,9 @@ var editActions=require('../actions/edit');
  * # マウスが押下された場所（px単位）
  * mouse_sx: number
  * mouse_sy: number
+ * # マウスが押下されたときのスクロール状態
+ * scroll_sx: number
+ * scroll_sy: number
  */
 module.exports = Reflux.createStore({
     init(){
@@ -29,6 +32,8 @@ module.exports = Reflux.createStore({
         this.mouse_down=false;
         this.mouse_sx=null;
         this.mouse_sy=null;
+        this.scroll_sx=null;
+        this.scroll_sy=null;
     },
     getInitialState(){
         return this.makeState();
@@ -42,7 +47,9 @@ module.exports = Reflux.createStore({
             pen: this.pen,
             mouse_down: this.mouse_down,
             mouse_sx: this.mouse_sx,
-            mouse_sy: this.mouse_sy
+            mouse_sy: this.mouse_sy,
+            scroll_sx: this.scroll_sx,
+            scroll_sy: this.scroll_sy
         };
     },
     onChangeMode({mode}){
@@ -57,12 +64,19 @@ module.exports = Reflux.createStore({
         this.mouse_down=true;
         this.mouse_sx=x;
         this.mouse_sy=y;
+        this.scroll_sx=this.scroll_x;
+        this.scroll_sy=this.scroll_y;
         this.trigger(this.makeState());
     },
     onMouseUp(){
         this.mouse_down=false;
         this.mouse_sx=null;
         this.mouse_sy=null;
+        this.trigger(this.makeState());
+    },
+    onScroll({x,y}){
+        this.scroll_x=x;
+        this.scroll_y=y;
         this.trigger(this.makeState());
     }
 });
