@@ -2,6 +2,8 @@ var React=require('react');
 
 var editActions=require('../../actions/edit');
 
+var Select=require('./util/select.jsx');
+
 module.exports = React.createClass({
     displayName: "EditMode",
     propTypes: {
@@ -9,28 +11,24 @@ module.exports = React.createClass({
     },
     render(){
         var edit=this.props.edit;
-        var as={
-            pen: "ペンモード",
-            hand: "ハンドモード"
+        var contents=[
+            {
+                key:"pen",
+                value:"ペンモード"
+            },
+            {
+                key:"hand",
+                value:"ハンドモード"
+            }
+        ];
+        var valueLink={
+            value: this.props.edit.mode,
+            requestChange: (key)=>{
+                editActions.changeMode({
+                    mode: key
+                });
+            }
         };
-        return <div className="me-core-edit-mode">{
-            Object.keys(as).map((key)=>{
-                var c="me-core-edit-mode-button";
-                if(key===edit.mode){
-                    c+=" me-core-edit-mode-current";
-                }
-                return <div className={c} key={key} onClick={this.handleClick(key)}>{
-                    as[key]
-                }</div>;
-            })
-        }</div>;
+        return <Select contents={contents} valueLink={valueLink}/>;
     },
-    handleClick(key){
-        return (e)=>{
-            e.preventDefault();
-            editActions.changeMode({
-                mode: key
-            });
-        };
-    }
 });

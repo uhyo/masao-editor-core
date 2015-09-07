@@ -24,17 +24,19 @@
     padding: 6px;
   }
 }
-.me-core-edit-mode {
+
+// util
+.me-core-util-select {
   display: flex;
 }
-.me-core-edit-mode-button {
+.me-core-util-select-button {
   padding: 6px;
   background-color: #eeeeee;
   transition: background-color 0.3s ease;
 
   cursor: pointer;
 
-  &.me-core-edit-mode-current {
+  &.me-core-util-select-current {
     background-color: #66ee33;
   }
 }
