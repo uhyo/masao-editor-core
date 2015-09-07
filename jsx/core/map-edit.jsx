@@ -56,14 +56,16 @@ module.exports = React.createClass({
             var {scroll_x, scroll_y} = edit;
             var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
 
+            var width_c=Math.floor(width/32), height_c=Math.floor(height/32);
+
             /////draw
             //background color
             //TODO: ステージ対応
             ctx.fillStyle=chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillRect(0,0,width,height);
             //map
-            for(let x=0;x < width; x++){
-                for(let y=0;y < height; y++){
+            for(let x=0;x < width_c; x++){
+                for(let y=0;y < height_c; y++){
                     //TODO
                     let mx=scroll_x+x, my=scroll_y+y;
                     if(map[my]==null){
@@ -99,7 +101,7 @@ module.exports = React.createClass({
     },
     drawChip(ctx,c,x,y){
         //x,yにchipを描画
-        chip.drawChip(ctx,this.images.pattern,c,x,y);
+        chip.drawChip(ctx,this.images.pattern,c,x,y,true);
     },
     render(){
         var {width, height} = this.getCanvasSize();

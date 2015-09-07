@@ -41,19 +41,36 @@ var chipTable={
         name: "ポッピー（直進　3羽連続）"
     },
     K: {
-        pattern: 190,
+        pattern: {
+            chip: 190,
+            width: 96
+        },
         name: "動く床（上下移動）"
     },
     L: {
-        pattern: 190,
+        pattern: {
+            chip: 190,
+            width: 96
+        },
         name: "動く床（左右移動）"
     },
     M: {
-        pattern: 190,
+        pattern: {
+            chip: 190,
+            width: 96
+        },
         name: "動く床（左右移動×2）"
     },
     N: {
-        pattern: 184,
+        pattern: {
+            chip: 184,
+            x: 96,
+            y: 576,
+            dx: -32,
+            dy: 0,
+            width: 96,
+            height: 64
+        },
         name: "ドッスンスン"
     },
     O: {
@@ -145,63 +162,76 @@ var chipTable={
         name: "ブロック10"
     },
     k: {
-        pattern: 40,
+        pattern: [40,90],
         name: "？ブロック（コイン）"
     },
     l: {
-        pattern: 40,
+        pattern: [40,90],
         name: "？ブロック（コイン3枚）"
     },
     m: {
-        pattern: 40,
+        pattern: [40,42],
         name: "？ブロック（ファイヤーボール）"
     },
     n: {
-        pattern: 40,
+        pattern: [40,43],
         name: "？ブロック（バリア）"
     },
     o: {
-        pattern: 40,
+        pattern: [40,44],
         name: "？ブロック（タイム）"
     },
     p: {
-        pattern: 40,
+        pattern: [40,45],
         name: "？ブロック（ジェット）"
     },
     q: {
-        pattern: 40,
+        pattern: [40,46],
         name: "？ブロック（ヘルメット）"
     },
     r: {
-        pattern: 40,
+        pattern: [40,47],
         name: "？ブロック（しっぽ）"
     },
     s: {
-        pattern: 40,
+        pattern: [40,48],
         name: "？ブロック（ドリル）"
     },
     t: {
-        pattern: 40,
+        pattern: [40,49],
         name: "？ブロック（グレネード）"
     },
     u: {
-        pattern: 60,
-        name: "リンク土管1"
+        pattern: {
+            chip: 60,
+            width: 64
+        },
+        name: "リンク土管1",
+        width: 64
     },
     v: {
-        pattern: 60,
-        name: "リンク土管2"
+        pattern: {
+            chip: 62,
+            width: 64
+        },
+        name: "リンク土管2",
     },
     w: {
-        pattern: 60,
+        pattern: {
+            chip: 64,
+            width: 64
+        },
         name: "リンク土管3"
     },
     x: {
-        pattern: 60,
+        pattern: {
+            chip: 66,
+            width: 64
+        },
         name: "リンク土管4"
     },
     y: {
-        pattern: 40,
+        pattern: [40,59],
         name: "？ブロック（1up茸）"
     },
     z: {
@@ -297,14 +327,33 @@ exports.cssColor = cssColor;
 
 //ctxの(x,y)座標にchipをdrawする
 //pattern: パターン画像
-function drawChip(ctx,pattern,chip,x,y){
+function drawChip(ctx,pattern,chip,x,y,full){
+    if(chip==="."){
+        return;
+    }
     var t=chipTable[chip];
     if(t==null){
         return;
     }
-    var sy=Math.floor(t.pattern/10), sx=t.pattern%10;
-    //その番号を描画
-    ctx.drawImage(pattern, sx*32, sy*32, 32, 32, x, y, 32,32);
+    var p=t.pattern;
+    if(!Array.isArray(p)){
+        p=[p];
+    }
+    for(var i=0;i<p.length;i++){
+        let pi=p[i];
+        var chip = "number"===typeof pi ? pi : pi.chip;
+        let sx,sy;
+        //その番号を描画
+        if(full){
+            sy=pi.y || Math.floor(chip/10)*32, sx=pi.x || (chip%10)*32;
+            let width=pi.width || 32, height=pi.height || 32;
+            let xx = x+(pi.dx||0), yy=y+(pi.dy||0);
+            ctx.drawImage(pattern, sx, sy, width, height, xx, yy, width, height);
+        }else{
+            sy=Math.floor(chip/10)*32, sx=(chip%10)*32;
+            ctx.drawImage(pattern, sx, sy, 32, 32, x, y, 32, 32);
+        }
+    }
 }
 
 exports.drawChip = drawChip;

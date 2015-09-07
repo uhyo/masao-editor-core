@@ -32,7 +32,7 @@ module.exports = React.createClass({
 
         var x=0,y=0,i=0;
         while(i < chip.chipList.length){
-            chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y);
+            chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y,false);
             i++;
             x+=32;
             if(x+32 > canvas.width){
@@ -45,7 +45,7 @@ module.exports = React.createClass({
         canvas=React.findDOMNode(this.refs.canvas2);
         ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        chip.drawChip(ctx,this.pattern,this.props.edit.pen, 32,32);
+        chip.drawChip(ctx,this.pattern,this.props.edit.pen, 32,0,true);
     },
     render(){
         var w=8;
