@@ -78,6 +78,22 @@ module.exports = React.createClass({
                     this.drawChip(ctx,c,x*32, y*32);
                 }
             }
+            if(edit.grid){
+                //グリッドを描画
+                ctx.strokeStyle="rgba(0,0,0,.2)";
+                for(let x=1;x < width; x++){
+                    ctx.beginPath();
+                    ctx.moveTo(x*32,0);
+                    ctx.lineTo(x*32,height);
+                    ctx.stroke();
+                }
+                for(let y=1;y < height; y++){
+                    ctx.beginPath();
+                    ctx.moveTo(0,y*32);
+                    ctx.lineTo(width,y*32);
+                    ctx.stroke();
+                }
+            }
             this.drawing=false;
         });
     },
