@@ -7,7 +7,11 @@ var Reflux=require('reflux');
 //
 // edit.changePen({
 //   pen: string
-//});
+// });
+//
+// edit.changeGrid({
+//   grid: boolean
+// });
 //
 // edit.mouseDown({
 //   x: number,
@@ -33,6 +37,7 @@ module.exports = Reflux.createActions({
             return;
         }
     },
+    "changeGrid": {},
     "mouseDown": {},
     "mouseUp": {},
     "scroll": {}

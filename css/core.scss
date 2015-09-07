@@ -24,6 +24,13 @@
     padding: 6px;
   }
 }
+.me-core-edit-mode {
+  display: flex;
+
+  & > div {
+    margin: 0 6px;
+  }
+}
 
 // util
 .me-core-util-select {
@@ -37,6 +44,18 @@
   cursor: pointer;
 
   &.me-core-util-select-current {
-    background-color: #66ee33;
+    background-color: #66ff33;
+  }
+}
+
+.me-core-util-switch {
+  padding: 6px;
+  background-color: #eeeeee;
+  transition: background-color 0.3s ease;
+
+  cursor: pointer;
+
+  &.me-core-util-switch-yes {
+    background-color: #66ff33;
   }
 }

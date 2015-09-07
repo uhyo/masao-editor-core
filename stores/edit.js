@@ -11,6 +11,12 @@ var editActions=require('../actions/edit');
  * mode: string
  * # ペンの選択
  * pen: string
+ *
+ * ### エディットオプション
+ * # グリッド
+ * grid: boolean
+ *
+ * ### 編集状態
  * # マウスの押下状態
  * mouse_down: boolean
  * # マウスが押下された場所（px単位）
@@ -28,6 +34,8 @@ module.exports = Reflux.createStore({
         this.mode="pen";
         //ペン
         this.pen=".";
+        //グリッド
+        this.grid=false;
         //マウスの押下状態
         this.mouse_down=false;
         this.mouse_sx=null;
@@ -45,6 +53,7 @@ module.exports = Reflux.createStore({
             scroll_y: this.scroll_y,
             mode: this.mode,
             pen: this.pen,
+            grid: this.grid,
             mouse_down: this.mouse_down,
             mouse_sx: this.mouse_sx,
             mouse_sy: this.mouse_sy,
@@ -58,6 +67,10 @@ module.exports = Reflux.createStore({
     },
     onChangePen({pen}){
         this.pen=pen;
+        this.trigger(this.makeState());
+    },
+    onChangeGrid({grid}){
+        this.grid=grid;
         this.trigger(this.makeState());
     },
     onMouseDown({x,y}){
