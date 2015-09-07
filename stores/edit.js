@@ -12,6 +12,8 @@ var editActions=require('../actions/edit');
  * scroll_y: number
  * # エディットモード
  * mode: string
+ * # 一時的（現在）
+ * mode_current: string
  * # ペンの選択
  * pen: string
  *
@@ -58,6 +60,7 @@ module.exports = Reflux.createStore({
             scroll_x: this.scroll_x,
             scroll_y: this.scroll_y,
             mode: this.mode,
+            mode_current: this.mode_current,
             pen: this.pen,
             grid: this.grid,
             mouse_down: this.mouse_down,
@@ -79,12 +82,13 @@ module.exports = Reflux.createStore({
         this.grid=grid;
         this.trigger(this.makeState());
     },
-    onMouseDown({x,y}){
+    onMouseDown({x,y,mode}){
         this.mouse_down=true;
         this.mouse_sx=x;
         this.mouse_sy=y;
         this.scroll_sx=this.scroll_x;
         this.scroll_sy=this.scroll_y;
+        this.mode_current = mode || this.mode;
         this.trigger(this.makeState());
     },
     onMouseUp(){

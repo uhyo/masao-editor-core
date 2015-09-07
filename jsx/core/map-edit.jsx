@@ -35,7 +35,7 @@ module.exports = React.createClass({
         //draw grids
         let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
         let {view_width, view_height} = this.props.edit;
-        ctx.strokeStyle="rgba(0,0,0,.2)";
+        ctx.strokeStyle="rgba(0,0,0,.25)";
         for(let x=1;x < view_width; x++){
             ctx.beginPath();
             ctx.moveTo(x*32,0);
@@ -107,7 +107,7 @@ module.exports = React.createClass({
         };
         return <div className="me-core-map-edit" style={style}>
             <canvas ref="canvas" width={width} height={height}/>
-            <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null}/>
+            <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null} onContextMenu={this.handleContextMenu}/>
         </div>;
     },
     handleMouseDown(e){
@@ -115,9 +115,22 @@ module.exports = React.createClass({
         e.preventDefault();
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
-        editActions.mouseDown({x: mx, y: my});
-        if(this.props.edit.mode!=="hand"){
-            this.handleMouseMove(e);
+        var mode;
+        if(e.button===0){
+            //左クリック
+            mode=this.props.edit.mode;
+        }else if(e.button===1){
+            //中クリック
+            mode="hand";
+        }else if(e.button===2){
+            //右クリック
+            mode="eraser";
+        }else{
+            return;
+        }
+        editActions.mouseDown({x: mx, y: my, mode});
+        if(mode!=="hand"){
+            this.mouseMoves(mode, e.pageX, e.pageY);
         }
 
         //マウスが上がったときの処理
@@ -130,13 +143,15 @@ module.exports = React.createClass({
     },
     handleMouseMove(e){
         e.preventDefault();
+        this.mouseMoves(this.props.edit.mode_current, e.pageX, e.pageY);
+    },
+    mouseMoves(mode,pageX,pageY){
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
-        var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
-
+        var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
         var edit=this.props.edit, map=this.props.map;
 
-        if(edit.mode==="pen"){
+        if(mode==="pen"){
             //ペンモード
             //座標
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
@@ -148,7 +163,7 @@ module.exports = React.createClass({
                     chip: edit.pen
                 });
             }
-        }else if(edit.mode==="eraser"){
+        }else if(mode==="eraser"){
             //イレイサーモード
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
@@ -159,7 +174,7 @@ module.exports = React.createClass({
                     chip: "."
                 });
             }
-        }else if(edit.mode==="hand"){
+        }else if(mode==="hand"){
             //ハンドモード（つかんでスクロール）
             let sx=edit.mouse_sx-mx+edit.scroll_sx, sy=edit.mouse_sy-my+edit.scroll_sy;
             if(sx < 0){
@@ -180,5 +195,8 @@ module.exports = React.createClass({
             }
         }
     },
+    handleContextMenu(e){
+        e.preventDefault();
+    }
 });
 
