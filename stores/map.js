@@ -30,11 +30,21 @@ module.exports = Reflux.createStore({
 
     onUpdateMap({x,y,chip}){
         if(this.map[y]){
-            this.map[y] = this.map[y].map((c,i)=>{
-                if(i==x){
-                    return chip;
+            if(this.map[y][x]===chip){
+                //変わっていない
+                return;
+            }
+            this.map = this.map.map((a,i)=>{
+                if(i===y){
+                    return a.map((c,i)=>{
+                        if(i===x){
+                            return chip;
+                        }else{
+                            return c;
+                        }
+                    });
                 }else{
-                    return c;
+                    return a;
                 }
             });
             this.trigger(this.map);

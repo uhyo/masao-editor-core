@@ -39,7 +39,7 @@ module.exports = React.createClass({
             this.images={
                 pattern: img
             };
-            this.draw();
+            this.draw(null);
         });
         //draw grids
         let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
@@ -59,14 +59,15 @@ module.exports = React.createClass({
         }
     },
     componentDidUpdate(prevProps){
-        this.draw();
+        this.draw(prevProps);
     },
-    draw(){
+    draw(prevProps){
         if(this.drawing===true){
             return;
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
+            console.time("draw");
             var {width, height} = this.getCanvasSize();
             var map=this.props.map, params=this.props.params, edit=this.props.edit;
             var {scroll_x, scroll_y} = edit;
@@ -75,9 +76,10 @@ module.exports = React.createClass({
             var width_c=Math.floor(width/32), height_c=Math.floor(height/32);
 
             /////draw
-            //background color
             //TODO: ステージ対応
-            ctx.fillStyle=chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            //background color
+            let bgc=chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
             //map
             for(let x=0;x < width_c; x++){
@@ -85,7 +87,7 @@ module.exports = React.createClass({
                     //TODO
                     let mx=scroll_x+x, my=scroll_y+y;
                     if(map[my]==null){
-                        //領域外。TODO
+                        //領域外。
                         continue;
                     }
                     let c=map[my][mx];
@@ -97,6 +99,7 @@ module.exports = React.createClass({
                 }
             }
             this.drawing=false;
+            console.timeEnd("draw");
         });
     },
     drawChip(ctx,c,x,y){

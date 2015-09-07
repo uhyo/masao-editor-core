@@ -88,8 +88,10 @@ module.exports = Reflux.createStore({
         this.trigger(this.makeState());
     },
     onScroll({x,y}){
-        this.scroll_x=x;
-        this.scroll_y=y;
-        this.trigger(this.makeState());
+        if(x!==this.scroll_x || y!==this.scroll_y){
+            this.scroll_x=x;
+            this.scroll_y=y;
+            this.trigger(this.makeState());
+        }
     }
 });
