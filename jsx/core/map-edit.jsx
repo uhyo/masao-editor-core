@@ -25,7 +25,7 @@ module.exports = React.createClass({
     },
     getDefaultProps(){
         return {
-            width: 15,
+            width: 16,
             height: 10
         };
     },
@@ -41,8 +41,24 @@ module.exports = React.createClass({
             };
             this.draw();
         });
+        //draw grids
+        let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
+        let {width, height} = this.props;
+        ctx.strokeStyle="rgba(0,0,0,.2)";
+        for(let x=1;x < width; x++){
+            ctx.beginPath();
+            ctx.moveTo(x*32,0);
+            ctx.lineTo(x*32,height*32);
+            ctx.stroke();
+        }
+        for(let y=1;y < height; y++){
+            ctx.beginPath();
+            ctx.moveTo(0,y*32);
+            ctx.lineTo(width*32,y*32);
+            ctx.stroke();
+        }
     },
-    componentDidUpdate(){
+    componentDidUpdate(prevProps){
         this.draw();
     },
     draw(){
@@ -80,22 +96,6 @@ module.exports = React.createClass({
                     this.drawChip(ctx,c,x*32, y*32);
                 }
             }
-            if(edit.grid){
-                //グリッドを描画
-                ctx.strokeStyle="rgba(0,0,0,.2)";
-                for(let x=1;x < width; x++){
-                    ctx.beginPath();
-                    ctx.moveTo(x*32,0);
-                    ctx.lineTo(x*32,height);
-                    ctx.stroke();
-                }
-                for(let y=1;y < height; y++){
-                    ctx.beginPath();
-                    ctx.moveTo(0,y*32);
-                    ctx.lineTo(width,y*32);
-                    ctx.stroke();
-                }
-            }
             this.drawing=false;
         });
     },
@@ -105,8 +105,15 @@ module.exports = React.createClass({
     },
     render(){
         var {width, height} = this.getCanvasSize();
-        return <div className="me-core-map-edit">
-            <canvas ref="canvas" width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null}/>
+        var style={
+            width: width+"px"
+        };
+        var c2style={
+            opacity: this.props.edit.grid ? 1 : 0
+        };
+        return <div className="me-core-map-edit" style={style}>
+            <canvas ref="canvas" width={width} height={height}/>
+            <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null}/>
         </div>;
     },
     getCanvasSize(){
@@ -118,7 +125,7 @@ module.exports = React.createClass({
     handleMouseDown(e){
         //マウスが下がった
         e.preventDefault();
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
         editActions.mouseDown({x: mx, y: my});
         if(this.props.edit.mode!=="hand"){
@@ -135,7 +142,7 @@ module.exports = React.createClass({
     },
     handleMouseMove(e){
         e.preventDefault();
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
 
 

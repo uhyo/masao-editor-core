@@ -328,6 +328,7 @@ exports.cssColor = cssColor;
 //ctxの(x,y)座標にchipをdrawする
 //pattern: パターン画像
 function drawChip(ctx,pattern,chip,x,y,full){
+    console.log("drawchip");
     if(chip==="."){
         return;
     }

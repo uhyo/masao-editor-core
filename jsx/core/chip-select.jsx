@@ -19,8 +19,14 @@ module.exports = React.createClass({
             this.draw();
         });
     },
-    componentDidUpdate(){
-        this.draw();
+    componentDidUpdate(prevProps){
+        if(prevProps.pattern!==this.props.pattern || prevProps.params!==this.props.params){
+            loadImage(this.props.pattern)
+            .then((img)=>{
+                this.pattern = img;
+                this.draw();
+            });
+        }
     },
     draw(){
         var params=this.props.params;

@@ -10,7 +10,19 @@
   width: 256px;
 }
 .me-core-map-edit {
-  padding: 4px;
+  margin: 4px;
+  padding: 0;
+  position: relative;
+
+  & > canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+.me-core-map-edit-canvas2 {
+  transition: opacity 0.4s ease;
+  opacity: 1;
 }
 .me-core-chip-selected {
   display: flex;
