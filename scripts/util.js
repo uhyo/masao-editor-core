@@ -9,3 +9,8 @@ function getAbsolutePosition(elm){
     };
 }
 exports.getAbsolutePosition=getAbsolutePosition;
+
+function cssColor(r,g,b){
+    return `rgb(${r},${g},${b})`;
+}
+exports.cssColor = cssColor;

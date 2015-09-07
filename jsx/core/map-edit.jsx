@@ -78,7 +78,7 @@ module.exports = React.createClass({
             /////draw
             //TODO: ステージ対応
             //background color
-            let bgc=chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
             //map

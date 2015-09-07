@@ -1,6 +1,7 @@
 var React=require('react');
 
 var chip=require('../../scripts/chip'),
+    util=require('../../scripts/util'),
     loadImage=require('../../scripts/load-image');
 
 var editActions=require('../../actions/edit');
@@ -20,12 +21,14 @@ module.exports = React.createClass({
         });
     },
     componentDidUpdate(prevProps){
-        if(prevProps.pattern!==this.props.pattern || prevProps.params!==this.props.params){
+        if(prevProps.pattern!==this.props.pattern){
             loadImage(this.props.pattern)
             .then((img)=>{
                 this.pattern = img;
                 this.draw();
             });
+        }else if(prevProps.edit.pen!==this.props.edit.pen){
+            this.draw();
         }
     },
     draw(){
@@ -33,7 +36,7 @@ module.exports = React.createClass({
         var canvas=React.findDOMNode(this.refs.canvas);
         var ctx=canvas.getContext('2d');
         //まず背景を塗る
-        ctx.fillStyle = chip.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_g);
+        ctx.fillStyle = util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_g);
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         var x=0,y=0,i=0;
