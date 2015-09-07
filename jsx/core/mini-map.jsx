@@ -3,6 +3,8 @@ var React=require('react');
 var util=require('../../scripts/util'),
     chip=require('../../scripts/chip');
 
+var editActions=require('../../actions/edit');
+
 //色の対応
 var colors={
     masao: "#ff0000",
@@ -22,6 +24,11 @@ module.exports = React.createClass({
         map: React.PropTypes.arrayOf(
             React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired
         ).isRequired
+    },
+    getInitialState(){
+        return {
+            mouse_down: false
+        };
     },
     componentDidMount(){
         this.drawing=false;
@@ -56,6 +63,23 @@ module.exports = React.createClass({
                     }
                 }
             }
+            //グリッド
+            if(edit.grid===true){
+                ctx.strokeStyle="rgba(0,0,0,.15)";
+                ctx.lineWidth=1;
+                for(let y=edit.view_height;y < 60; y+=edit.view_height){
+                    ctx.beginPath();
+                    ctx.moveTo(0,y*2);
+                    ctx.lineTo(canvas.width,y*2);
+                    ctx.stroke();
+                }
+                for(let x=edit.view_width;x < 180; x+=edit.view_width){
+                    ctx.beginPath();
+                    ctx.moveTo(x*2,0);
+                    ctx.lineTo(x*2,canvas.height);
+                    ctx.stroke();
+                }
+            }
             //スクロールビュー
             let wkc=util.cssColor(255-params.backcolor_r, 255-params.backcolor_g, 255-params.backcolor_b);
             ctx.strokeStyle=wkc;
@@ -65,6 +89,48 @@ module.exports = React.createClass({
         });
     },
     render(){
-        return <canvas ref="canvas" width="360" height="60"/>;
-    }
+        var mousemove=null;
+        if(this.state.mouse_down===true){
+            mousemove=this.handleMouseMove;
+        }
+        return <canvas ref="canvas" width="360" height="60" onMouseDown={this.handleMouseDown} onMouseMove={mousemove}/>;
+    },
+    handleMouseDown(e){
+        this.setState({
+            mouse_down: true
+        });
+        this.handleMouseMove(e);
+
+        var handler=(e)=>{
+            e.preventDefault();
+            this.setState({
+                mouse_down: false
+            });
+            document.removeEventListener("mouseup",handler,false);
+        };
+        document.addEventListener("mouseup",handler,false);
+    },
+    handleMouseMove(e){
+        var edit=this.props.edit;
+        e.preventDefault();
+        //canvasの位置
+        let {x:left, y:top} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        let mx=e.pageX-left, my=e.pageY-top;
+        //そこを中心に
+        let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);
+        if(sx<0){
+            sx=0;
+        }else if(sx>164){
+            sx=164;
+        }
+        if(sy<0){
+            sy=0;
+        }else if(sy>20){
+            sy=20;
+        }
+        editActions.scroll({
+            x: sx,
+            y: sy
+        });
+    },
 });

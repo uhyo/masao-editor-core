@@ -34,18 +34,18 @@ module.exports = React.createClass({
         });
         //draw grids
         let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
-        let {width, height} = this.props;
+        let {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.2)";
-        for(let x=1;x < width; x++){
+        for(let x=1;x < view_width; x++){
             ctx.beginPath();
             ctx.moveTo(x*32,0);
-            ctx.lineTo(x*32,height*32);
+            ctx.lineTo(x*32,view_height*32);
             ctx.stroke();
         }
-        for(let y=1;y < height; y++){
+        for(let y=1;y < view_height; y++){
             ctx.beginPath();
             ctx.moveTo(0,y*32);
-            ctx.lineTo(width*32,y*32);
+            ctx.lineTo(view_width*32,y*32);
             ctx.stroke();
         }
     },
