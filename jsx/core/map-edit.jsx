@@ -19,15 +19,6 @@ module.exports = React.createClass({
         ).isRequired,
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
-
-        width: React.PropTypes.number,
-        height: React.PropTypes.number
-    },
-    getDefaultProps(){
-        return {
-            width: 16,
-            height: 10
-        };
     },
     componentDidMount(){
         //flags
@@ -68,12 +59,11 @@ module.exports = React.createClass({
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
-            var {width, height} = this.getCanvasSize();
             var map=this.props.map, params=this.props.params, edit=this.props.edit;
-            var {scroll_x, scroll_y} = edit;
+            var {scroll_x, scroll_y, view_width, view_height} = edit;
             var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
 
-            var width_c=Math.floor(width/32), height_c=Math.floor(height/32);
+            var width=view_width*32, height=view_height*32;
 
             /////draw
             //TODO: ステージ対応
@@ -82,8 +72,8 @@ module.exports = React.createClass({
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
             //map
-            for(let x=0;x < width_c; x++){
-                for(let y=0;y < height_c; y++){
+            for(let x=0;x < view_width; x++){
+                for(let y=0;y < view_height; y++){
                     //TODO
                     let mx=scroll_x+x, my=scroll_y+y;
                     if(map[my]==null){
@@ -107,7 +97,8 @@ module.exports = React.createClass({
         chip.drawChip(ctx,this.images.pattern,c,x,y,true);
     },
     render(){
-        var {width, height} = this.getCanvasSize();
+        var {view_width, view_height} = this.props.edit;
+        var width=view_width*32, height=view_height*32;
         var style={
             width: width+"px"
         };
@@ -118,12 +109,6 @@ module.exports = React.createClass({
             <canvas ref="canvas" width={width} height={height}/>
             <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null}/>
         </div>;
-    },
-    getCanvasSize(){
-        return {
-            width: this.props.width*32,
-            height: this.props.height*32
-        };
     },
     handleMouseDown(e){
         //マウスが下がった

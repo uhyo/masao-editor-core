@@ -60,7 +60,7 @@ module.exports = React.createClass({
             let wkc=util.cssColor(255-params.backcolor_r, 255-params.backcolor_g, 255-params.backcolor_b);
             ctx.strokeStyle=wkc;
             ctx.lineWidth=1;
-            ctx.strokeRect(edit.scroll_x*2+0.5, edit.scroll_y*2+0.5, 31, 19);
+            ctx.strokeRect(edit.scroll_x*2+0.5, edit.scroll_y*2+0.5, edit.view_width*2-1, edit.view_height*2-1);
             this.drawing=false;
         });
     },
