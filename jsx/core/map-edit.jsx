@@ -132,6 +132,17 @@ module.exports = React.createClass({
                     chip: edit.pen
                 });
             }
+        }else if(edit.mode==="eraser"){
+            //イレイサーモード
+            let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
+            //違ったらイベント発行
+            if(map[cy] && map[cy][cx]!=="."){
+                mapActions.updateMap({
+                    x: cx,
+                    y: cy,
+                    chip: "."
+                });
+            }
         }else if(edit.mode==="hand"){
             //ハンドモード（つかんでスクロール）
             let sx=edit.mouse_sx-mx+edit.scroll_sx, sy=edit.mouse_sy-my+edit.scroll_sy;

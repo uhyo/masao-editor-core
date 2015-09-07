@@ -17,6 +17,10 @@ module.exports = React.createClass({
                 value:"ペンモード"
             },
             {
+                key:"eraser",
+                value:"イレイサーモード"
+            },
+            {
                 key:"hand",
                 value:"ハンドモード"
             }
