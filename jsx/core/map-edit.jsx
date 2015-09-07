@@ -119,6 +119,9 @@ module.exports = React.createClass({
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
         editActions.mouseDown({x: mx, y: my});
+        if(this.props.edit.mode!=="hand"){
+            this.handleMouseMove(e);
+        }
 
         //マウスが上がったときの処理
         var mouseUpHandler=(e)=>{
@@ -172,7 +175,6 @@ module.exports = React.createClass({
             }else if(sy > 20){
                 sy=20;
             }
-            console.log(mx,my,sx,sy);
             if(sx!==edit.scroll_x || sy!==edit.scroll_y){
                 editActions.scroll({
                     x: sx,
