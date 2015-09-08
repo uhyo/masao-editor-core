@@ -52,7 +52,7 @@ module.exports = React.createClass({
 
             let x=0,y=0,i=0;
             while(i < chip.chipList.length){
-                chip.drawChip(ctx,this.images,chip.chipList[i],x,y,false);
+                chip.drawChip(ctx,this.images,params,chip.chipList[i],x,y,false);
                 i++;
                 x+=32;
                 if(x+32 > canvas.width){
@@ -66,7 +66,7 @@ module.exports = React.createClass({
         let canvas=React.findDOMNode(this.refs.canvas2);
         let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        chip.drawChip(ctx,this.images,this.props.edit.pen, 32,0,true);
+        chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
     },
     render(){
         var w=8;
@@ -74,8 +74,9 @@ module.exports = React.createClass({
         var h=Math.ceil(ks.length/w);
         var pen=this.props.edit.pen;
         var name=null;
-        if(chip.chipTable[pen]!=null){
-            name=chip.chipTable[pen].name;
+        let t=chip.chipFor(this.props.params,pen);
+        if(t!=null){
+            name=t.name;
         }
         return <div className="me-core-chip-select">
             <div className="me-core-chip-list">

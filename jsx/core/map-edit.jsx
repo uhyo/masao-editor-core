@@ -108,7 +108,7 @@ module.exports = React.createClass({
     },
     drawChip(ctx,c,x,y){
         //x,yにchipを描画
-        chip.drawChip(ctx,this.images,c,x,y,true);
+        chip.drawChip(ctx,this.images,this.props.params,c,x,y,true);
     },
     render(){
         var {view_width, view_height} = this.props.edit;

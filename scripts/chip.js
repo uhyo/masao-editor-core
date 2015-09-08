@@ -437,17 +437,89 @@ var chipTable={
 exports.chipTable = chipTable;
 exports.chipList = Object.keys(chipTable);
 
+//仕掛けのparamに応じたやつ
+var athleticTable = {
+    "2": {
+        pattern: {
+            chip: 180,
+            width: 96
+        },
+        name: "落ちる床（乗ると落ちる）",
+        category: "athletic"
+    },
+    "3": {
+        pattern: {
+            chip: 180,
+            width: 96
+        },
+        name: "落ちる床（ずっと乗っていると落ちる）",
+        category: "athletic"
+    },
+    "4": {
+        pattern: [{
+            chip: 190,
+            width: 96
+        },{
+            subx: 0,
+            suby: 16
+        }],
+        name: "動く床（左回り）",
+        category: "athletic"
+    },
+    "5": {
+        pattern: [{
+            chip: 190,
+            width: 96
+        },{
+            subx: 16,
+            suby: 16
+        }],
+        name: "動く床（右回り）",
+        category: "athletic"
+    },
+    "6": {
+        pattern: [198,{
+            subx: 48,
+            suby: 0
+        }],
+        name: "乗れるカイオール",
+        category: "athletic"
+    },
+    "7": {
+        pattern: 32,
+        name: "ジャンプ台",
+        category: "athletic"
+    },
+};
+
+//アスレチックのやつとparamの対応
+var athleticTypeParam = {
+    k: "coin1_type",
+    l: "coin3_type",
+    u: "dokan1_type",
+    v: "dokan2_type",
+    w: "dokan3_type",
+    x: "dokan4_type",
+    N: "dossunsun_type",
+    U: "firebar1_type",
+    V: "firebar2_type",
+    K: "ugokuyuka1_type",
+    L: "ugokuyuka2_type",
+    M: "ugokuyuka3_type"
+};
+
 //ctxの(x,y)座標にchipをdrawする
 //images: {
 //  pattern: パターン画像
+//  params: params
 //  chips: 補助チップ
 //}
-function drawChip(ctx,images,chip,x,y,full){
+function drawChip(ctx,images,params,chip,x,y,full){
     console.log("drawchip");
     if(chip==="."){
         return;
     }
-    var t=chipTable[chip];
+    var t=chipFor(params,chip);
     if(t==null){
         return;
     }
@@ -478,3 +550,16 @@ function drawChip(ctx,images,chip,x,y,full){
 }
 
 exports.drawChip = drawChip;
+
+//チップオブジェクト
+function chipFor(params,chip){
+    let pa=athleticTypeParam[chip];
+    if(pa!=null && params[pa]!=="1"){
+        //変わったアスレチックだ
+        return athleticTable[params[pa]];
+    }else{
+        return chipTable[chip];
+    }
+}
+
+exports.chipFor = chipFor;
