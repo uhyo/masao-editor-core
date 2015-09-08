@@ -157,12 +157,18 @@ var chipTable={
         category: "enemy"
     },
     U: {
-        pattern: 50,
+        pattern: [50,{
+            subx: 0,
+            suby: 16
+        }],
         name: "ファイヤーバー（左回り）",
         category: "athletic"
     },
     V: {
-        pattern: 50,
+        pattern: [50,{
+            subx: 16,
+            suby: 16
+        }],
         name: "ファイヤーバー（右回り）",
         category: "athletic"
     },
