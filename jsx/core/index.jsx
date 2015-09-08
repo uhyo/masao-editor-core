@@ -12,7 +12,7 @@ var MapEdit=require('./map-edit.jsx'),
     ScreenSelect=require('./screen-select.jsx'),
     ParamEdit=require('./param-edit.jsx');
 
-module.exports = React.createClass({
+var MasaoEditorCore = React.createClass({
     displayName: "MasaoEditorCore",
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit")],
     propTypes:{
@@ -33,8 +33,13 @@ module.exports = React.createClass({
             </div>
             {screen}
         </div>;
-    }
+    },
 });
+//exports stores
+MasaoEditorCore.mapStore = mapStore;
+MasaoEditorCore.paramStore = paramStore;
+MasaoEditorCore.editStore = editStore;
+module.exports = MasaoEditorCore;
 
 //各screen
 var MapScreen = React.createClass({
