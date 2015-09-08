@@ -36,7 +36,7 @@ module.exports = React.createClass({
         var canvas=React.findDOMNode(this.refs.canvas);
         var ctx=canvas.getContext('2d');
         //まず背景を塗る
-        ctx.fillStyle = util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_g);
+        ctx.fillStyle = util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         var x=0,y=0,i=0;

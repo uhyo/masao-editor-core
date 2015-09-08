@@ -46,7 +46,7 @@ module.exports = React.createClass({
             let canvas=React.findDOMNode(this.refs.canvas), ctx=canvas.getContext('2d');
             let params=this.props.params, edit=this.props.edit, map=this.props.map;
             //bg
-            let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_g);
+            let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,canvas.width,canvas.height);
             //draw
