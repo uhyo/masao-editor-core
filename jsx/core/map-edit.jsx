@@ -15,7 +15,11 @@ module.exports = React.createClass({
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
         map: React.PropTypes.arrayOf(
-            React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired
+            React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.string.isRequired
+                ).isRequired
+            ).isRequired
         ).isRequired,
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
@@ -30,7 +34,7 @@ module.exports = React.createClass({
             this.images={
                 pattern: img
             };
-            this.draw(null);
+            this.draw();
         });
         //draw grids
         let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
@@ -50,9 +54,16 @@ module.exports = React.createClass({
         }
     },
     componentDidUpdate(prevProps){
-        this.draw(prevProps);
+        //書き換える
+        if(prevProps.map!==this.props.map || prevProps.params!==this.props.params){
+            this.draw();
+        }
+        let pe=prevProps.edit, e=this.props.edit;
+        if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
+            this.draw();
+        }
     },
-    draw(prevProps){
+    draw(){
         if(this.drawing===true){
             return;
         }
@@ -66,7 +77,7 @@ module.exports = React.createClass({
             var width=view_width*32, height=view_height*32;
 
             /////draw
-            //TODO: ステージ対応
+            let mapdata=map[edit.stage-1];
             //background color
             let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillStyle=bgc;
@@ -76,11 +87,11 @@ module.exports = React.createClass({
                 for(let y=0;y < view_height; y++){
                     //TODO
                     let mx=scroll_x+x, my=scroll_y+y;
-                    if(map[my]==null){
+                    if(mapdata[my]==null){
                         //領域外。
                         continue;
                     }
-                    let c=map[my][mx];
+                    let c=mapdata[my][mx];
                     if(c==null){
                         //TODO
                         continue;
@@ -133,7 +144,6 @@ module.exports = React.createClass({
             let map=this.props.map, edit=this.props.edit;
             let mxx=mx+edit.scroll_x, myy=my+edit.scroll_y;
             let c=map[myy] ? map[myy][mxx] || "." : ".";
-            console.log(mxx,myy,c);
             editActions.changePen({
                 pen: c,
                 mode: true
@@ -161,14 +171,16 @@ module.exports = React.createClass({
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
         var edit=this.props.edit, map=this.props.map;
+        let mapdata=map[edit.stage-1];
 
         if(mode==="pen"){
             //ペンモード
             //座標
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(map[cy] && map[cy][cx]!==edit.pen){
+            if(mapdata[cy] && mapdata[cy][cx]!==edit.pen){
                 mapActions.updateMap({
+                    stage: edit.stage,
                     x: cx,
                     y: cy,
                     chip: edit.pen
@@ -178,8 +190,9 @@ module.exports = React.createClass({
             //イレイサーモード
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(map[cy] && map[cy][cx]!=="."){
+            if(mapdata[cy] && mapdata[cy][cx]!=="."){
                 mapActions.updateMap({
+                    stage: edit.stage,
                     x: cx,
                     y: cy,
                     chip: "."

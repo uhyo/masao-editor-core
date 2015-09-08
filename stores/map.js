@@ -1,15 +1,18 @@
 //map store
 var Reflux=require('reflux');
 
-var mapActions = require('../actions/map');
+var mapActions = require('../actions/map'),
+    editActions= require('../actions/edit');
 
 module.exports = Reflux.createStore({
-    listenables: mapActions,
+    listenables: [mapActions],
     init(){
         //init project
-        this.map=this.initMap();
+        this.map=[0,1,2,3].map((st)=>{
+            return this.initStage(st+1);
+        });
     },
-    initMap(){
+    initStage(stage){
         var result=[];
         for(let i=0;i < 30;i++){
             let r2=[];
@@ -18,36 +21,48 @@ module.exports = Reflux.createStore({
             }
             result.push(r2);
         }
-        //TODO: sample
-        result[25]="....12..I......".split("").concat(result[25].slice(15));
-        result[28]="A...B.G.33OOOOO".split("").concat(result[28].slice(15));
-        result[29]="abcdefghijzkmno".split("").concat(result[29].slice(15));
+        if(stage===1){
+            //TODO: sample
+            result[25]="....12..I......".split("").concat(result[25].slice(15));
+            result[28]="A...B.G.33OOOOO".split("").concat(result[28].slice(15));
+            result[29]="abcdefghijzkmno".split("").concat(result[29].slice(15));
+        }
         return result;
     },
     getInitialState(){
         return this.map;
     },
 
-    onUpdateMap({x,y,chip}){
-        if(this.map[y]){
-            if(this.map[y][x]===chip){
-                //変わっていない
-                return;
-            }
-            this.map = this.map.map((a,i)=>{
-                if(i===y){
-                    return a.map((c,i)=>{
-                        if(i===x){
-                            return chip;
-                        }else{
-                            return c;
-                        }
-                    });
-                }else{
-                    return a;
+    onUpdateMap({stage,x,y,chip}){
+        let st=this.map[stage-1];
+        if(st){
+            let row=st[y];
+            if(row){
+                if(row[x]===chip){
+                    //変わっていない
+                    return;
                 }
-            });
-            this.trigger(this.map);
+                this.map = this.map.map((st,i)=>{
+                    if(i===stage-1){
+                        return st.map((a,i)=>{
+                            if(i===y){
+                                return a.map((c,i)=>{
+                                    if(i===x){
+                                        return chip;
+                                    }else{
+                                        return c;
+                                    }
+                                });
+                            }else{
+                                return a;
+                            }
+                        });
+                    }else{
+                        return st;
+                    }
+                });
+                this.trigger(this.map);
+            }
         }
-    }
+    },
 });

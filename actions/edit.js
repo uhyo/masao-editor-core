@@ -5,6 +5,9 @@ var Reflux=require('reflux');
 //   screen: string
 // });
 
+// edit.changeStage({
+//   stage: number,
+// });
 // edit.changeMode({
 //   mode: string
 // });
@@ -31,6 +34,7 @@ var Reflux=require('reflux');
 
 module.exports = Reflux.createActions({
     "changeScreen": {},
+    "changeStage": {},
     "changeMode": {},
     "changePen": {
         preEmit: (obj)=>{

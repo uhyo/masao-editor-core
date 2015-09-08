@@ -8,7 +8,8 @@ var Select=require('./util/select.jsx'),
 module.exports = React.createClass({
     displayName: "EditMode",
     propTypes: {
-        edit: React.PropTypes.object.isRequired
+        edit: React.PropTypes.object.isRequired,
+        map: React.PropTypes.array.isRequired
     },
     render(){
         var edit=this.props.edit;
@@ -29,6 +30,23 @@ module.exports = React.createClass({
                 key:"spuit",
                 value:"スポイト"
             }
+        ], contents2=[
+            {
+                key: "1",
+                value: "ステージ1"
+            },
+            {
+                key: "2",
+                value: "ステージ2"
+            },
+            {
+                key: "3",
+                value: "ステージ3"
+            },
+            {
+                key: "4",
+                value: "ステージ4"
+            }
         ];
         var mode_valueLink={
             value: this.props.edit.mode,
@@ -46,12 +64,23 @@ module.exports = React.createClass({
                 });
             }
         };
+        var stage_valueLink={
+            value: String(this.props.edit.stage),
+            requestChange: (key)=>{
+                editActions.changeStage({
+                    stage: Number(key),
+                });
+            }
+        };
         return <div className="me-core-edit-mode">
             <div>
                 <Select contents={contents} valueLink={mode_valueLink}/>
             </div>
             <div>
                 <Switch label="グリッドを表示" valueLink={grid_valueLink}/>
+            </div>
+            <div>
+                <Select contents={contents2} valueLink={stage_valueLink}/>
             </div>
         </div>
     },

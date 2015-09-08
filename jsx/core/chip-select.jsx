@@ -17,7 +17,7 @@ module.exports = React.createClass({
         loadImage(this.props.pattern)
         .then((img)=>{
             this.pattern = img;
-            this.draw();
+            this.draw(true);
         });
     },
     componentDidUpdate(prevProps){
@@ -25,34 +25,37 @@ module.exports = React.createClass({
             loadImage(this.props.pattern)
             .then((img)=>{
                 this.pattern = img;
-                this.draw();
+                this.draw(true);
             });
         }else if(prevProps.edit.pen!==this.props.edit.pen){
-            this.draw();
+            this.draw(false);
         }
     },
-    draw(){
+    draw(full){
         var params=this.props.params;
-        var canvas=React.findDOMNode(this.refs.canvas);
-        var ctx=canvas.getContext('2d');
-        //まず背景を塗る
-        ctx.fillStyle = util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
-        ctx.fillRect(0,0,canvas.width,canvas.height);
+        if(full){
+            //チップセットを書き換える
+            let canvas=React.findDOMNode(this.refs.canvas);
+            let ctx=canvas.getContext('2d');
+            //まず背景を塗る
+            ctx.fillStyle = util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        var x=0,y=0,i=0;
-        while(i < chip.chipList.length){
-            chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y,false);
-            i++;
-            x+=32;
-            if(x+32 > canvas.width){
-                x=x%canvas.width;
-                y+=32;
+            let x=0,y=0,i=0;
+            while(i < chip.chipList.length){
+                chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y,false);
+                i++;
+                x+=32;
+                if(x+32 > canvas.width){
+                    x=x%canvas.width;
+                    y+=32;
+                }
             }
         }
 
         //下のやつも描画
-        canvas=React.findDOMNode(this.refs.canvas2);
-        ctx=canvas.getContext('2d');
+        let canvas=React.findDOMNode(this.refs.canvas2);
+        let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
         chip.drawChip(ctx,this.pattern,this.props.edit.pen, 32,0,true);
     },

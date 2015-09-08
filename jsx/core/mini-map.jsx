@@ -22,8 +22,12 @@ module.exports = React.createClass({
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
         map: React.PropTypes.arrayOf(
-            React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired
-        ).isRequired
+            React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.string.isRequired
+                ).isRequired
+            ).isRequired
+        ).isRequired,
     },
     getInitialState(){
         return {
@@ -45,13 +49,14 @@ module.exports = React.createClass({
         requestAnimationFrame(()=>{
             let canvas=React.findDOMNode(this.refs.canvas), ctx=canvas.getContext('2d');
             let params=this.props.params, edit=this.props.edit, map=this.props.map;
+            let mapdata=map[edit.stage-1];
             //bg
             let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,canvas.width,canvas.height);
             //draw
             for(let y=0;y < 30;y++){
-                let a=map[y];
+                let a=mapdata[y];
                 for(let x=0;x < 180;x++){
                     let c=a[x], t=chip.chipTable[c];
                     if(t){

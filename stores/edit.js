@@ -12,6 +12,8 @@ var editActions=require('../actions/edit');
  * # マップの表示位置
  * scroll_x: number
  * scroll_y: number
+ * # ステージ
+ * stage: number
  * # エディットモード
  * mode: string
  * # 一時的（現在）
@@ -38,7 +40,9 @@ module.exports = Reflux.createStore({
         this.screen = "map";
         this.view_width=16, this.view_height=10;
         //スクロール座標
-        this.scroll_x = 0, this.scroll_y = 20;
+        this.scroll_x=0, this.scroll_y=20;
+        //ステージ
+        this.stage=1;
         //モード
         this.mode="pen";
         //ペン
@@ -63,6 +67,7 @@ module.exports = Reflux.createStore({
             view_height: this.view_height,
             scroll_x: this.scroll_x,
             scroll_y: this.scroll_y,
+            stage: this.stage,
             mode: this.mode,
             mode_current: this.mode_current,
             pen: this.pen,
@@ -76,6 +81,10 @@ module.exports = Reflux.createStore({
     },
     onChangeScreen({screen}){
         this.screen=screen;
+        this.trigger(this.makeState());
+    },
+    onChangeStage({stage}){
+        this.stage=stage;
         this.trigger(this.makeState());
     },
     onChangeMode({mode}){

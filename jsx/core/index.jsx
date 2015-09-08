@@ -49,9 +49,9 @@ var MapScreen = React.createClass({
         var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern;
         return <div>
             <div className="me-core-map-info">
-                <EditMode edit={edit} />
-                <MiniMap params={params} edit={edit} map={map}/>
+                <EditMode edit={edit} map={map}/>
             </div>
+            <MiniMap params={params} edit={edit} map={map}/>
             <div className="me-core-main">
                 <ChipSelect pattern={pattern} params={params} edit={edit}/>
                 <MapEdit pattern={pattern} map={map} params={params} edit={edit}/>

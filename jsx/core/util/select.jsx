@@ -13,9 +13,15 @@ module.exports = React.createClass({
             requestChange: React.PropTypes.func.isRequired
         })
     },
+    getDefaultProps(){
+        return {
+            disabled: false
+        };
+    },
     render(){
         var valueLink=this.props.valueLink;
-        return <div className="me-core-util-select">{
+        var c="me-core-util-select";
+        return <div className={c}>{
             this.props.contents.map(({key,value})=>{
                 var c="me-core-util-select-button";
                 if(key===valueLink.value){
