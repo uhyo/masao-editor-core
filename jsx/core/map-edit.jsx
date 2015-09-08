@@ -14,6 +14,8 @@ module.exports = React.createClass({
     displayName: "MapEdit",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        chips: React.PropTypes.string.isRequired,
+
         map: React.PropTypes.arrayOf(
             React.PropTypes.arrayOf(
                 React.PropTypes.arrayOf(
@@ -29,10 +31,11 @@ module.exports = React.createClass({
         this.drawing=false;
         this.drawRequest=null;
         //load files
-        var pattern=loadImage(this.props.pattern);
-        pattern.then((img)=>{
+        Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
+        .then(([pattern, chips])=>{
             this.images={
-                pattern: img
+                pattern,
+                chips
             };
             this.draw();
         });
@@ -105,7 +108,7 @@ module.exports = React.createClass({
     },
     drawChip(ctx,c,x,y){
         //x,yにchipを描画
-        chip.drawChip(ctx,this.images.pattern,c,x,y,true);
+        chip.drawChip(ctx,this.images,c,x,y,true);
     },
     render(){
         var {view_width, view_height} = this.props.edit;

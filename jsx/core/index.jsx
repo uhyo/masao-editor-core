@@ -17,13 +17,14 @@ var MasaoEditorCore = React.createClass({
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit")],
     propTypes:{
         filename_pattern: React.PropTypes.string.isRequired,
+        filename_chips: React.PropTypes.string.isRequired
     },
     render(){
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
 
         var screen=null;
         if(edit.screen==="map"){
-            screen=<MapScreen pattern={this.props.filename_pattern} map={map} params={params} edit={edit}/>;
+            screen=<MapScreen pattern={this.props.filename_pattern} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit}/>;
         }
@@ -46,20 +47,22 @@ var MapScreen = React.createClass({
     displayName: "MapScreen",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        chips: React.PropTypes.string.isRequired,
+
         edit: React.PropTypes.object.isRequired,
         params: React.PropTypes.object.isRequired,
         map: React.PropTypes.array.isRequired
     },
     render(){
-        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern;
+        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, chips=this.props.chips;
         return <div>
             <div className="me-core-map-info">
                 <EditMode edit={edit} map={map}/>
             </div>
             <MiniMap params={params} edit={edit} map={map}/>
             <div className="me-core-main">
-                <ChipSelect pattern={pattern} params={params} edit={edit}/>
-                <MapEdit pattern={pattern} map={map} params={params} edit={edit}/>
+                <ChipSelect pattern={pattern} chips={chips} params={params} edit={edit}/>
+                <MapEdit pattern={pattern} chips={chips} map={map} params={params} edit={edit}/>
             </div>
         </div>;
     }

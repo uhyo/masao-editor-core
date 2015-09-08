@@ -16,17 +16,32 @@ var chipTable={
         category: "masao"
     },
     B: {
-        pattern: 140,
+        pattern: [{
+            chip: 140
+        },{
+            subx: 0,
+            suby: 0
+        }],
         name: "亀（足元に空白があると向きを変える）",
-        category: "enemy"
+        category: "enemy",
     },
     C: {
-        pattern: 140,
+        pattern: [{
+            chip: 140
+        },{
+            subx: 48,
+            suby: 0
+        }],
         name: "亀（足元に空白があると落ちる）",
         category: "enemy"
     },
     D: {
-        pattern: 140,
+        pattern: [{
+            chip: 140
+        },{
+            subx: 32,
+            suby: 0
+        }],
         name: "亀（足元に空白があると落ちる 3匹連続）"
     },
     E: {
@@ -45,17 +60,32 @@ var chipTable={
         category: "enemy"
     },
     H: {
-        pattern: 147,
+        pattern: [{
+            chip: 147
+        },{
+            subx: 16,
+            suby: 0
+        }],
         name: "ポッピー（上下移動）",
         category: "enemy"
     },
     I: {
-        pattern: 147,
+        pattern: [{
+            chip: 147
+        },{
+            subx: 48,
+            suby: 0
+        }],
         name: "ポッピー（直進）",
         category: "enemy"
     },
     J: {
-        pattern: 147,
+        pattern: [{
+            chip: 147
+        },{
+            subx: 32,
+            suby: 0
+        }],
         name: "ポッピー（直進　3羽連続）",
         category: "enemy"
     },
@@ -212,7 +242,10 @@ var chipTable={
         category: "block"
     },
     l: {
-        pattern: [40,90],
+        pattern: [40,90,{
+            subx: 32,
+            suby: 0
+        }],
         name: "？ブロック（コイン3枚）",
         category: "block"
     },
@@ -399,8 +432,11 @@ exports.chipTable = chipTable;
 exports.chipList = Object.keys(chipTable);
 
 //ctxの(x,y)座標にchipをdrawする
-//pattern: パターン画像
-function drawChip(ctx,pattern,chip,x,y,full){
+//images: {
+//  pattern: パターン画像
+//  chips: 補助チップ
+//}
+function drawChip(ctx,images,chip,x,y,full){
     console.log("drawchip");
     if(chip==="."){
         return;
@@ -418,14 +454,19 @@ function drawChip(ctx,pattern,chip,x,y,full){
         var chip = "number"===typeof pi ? pi : pi.chip;
         let sx,sy;
         //その番号を描画
-        if(full){
-            sy=pi.y || Math.floor(chip/10)*32, sx=pi.x || (chip%10)*32;
-            let width=pi.width || 32, height=pi.height || 32;
-            let xx = x+(pi.dx||0), yy=y+(pi.dy||0);
-            ctx.drawImage(pattern, sx, sy, width, height, xx, yy, width, height);
-        }else{
-            sy=Math.floor(chip/10)*32, sx=(chip%10)*32;
-            ctx.drawImage(pattern, sx, sy, 32, 32, x, y, 32, 32);
+        if(chip!=null){
+            if(full){
+                sy=pi.y || Math.floor(chip/10)*32, sx=pi.x || (chip%10)*32;
+                let width=pi.width || 32, height=pi.height || 32;
+                let xx = x+(pi.dx||0), yy=y+(pi.dy||0);
+                ctx.drawImage(images.pattern, sx, sy, width, height, xx, yy, width, height);
+            }else{
+                sy=Math.floor(chip/10)*32, sx=(chip%10)*32;
+                ctx.drawImage(images.pattern, sx, sy, 32, 32, x, y, 32, 32);
+            }
+        }else if(pi.subx!=null && pi.suby!=null){
+            //subを描画
+            ctx.drawImage(images.chips, pi.subx, pi.suby, 16, 16, x+16, y+16, 16, 16);
         }
     }
 }

@@ -1,5 +1,6 @@
 var React=require('react');
 
+var Promise=require('native-promise-only');
 var chip=require('../../scripts/chip'),
     util=require('../../scripts/util'),
     loadImage=require('../../scripts/load-image');
@@ -10,21 +11,29 @@ module.exports = React.createClass({
     displayName: "ChipSelect",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        chips: React.PropTypes.string.isRequired,
+
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired
     },
     componentDidMount(){
-        loadImage(this.props.pattern)
-        .then((img)=>{
-            this.pattern = img;
+        Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
+        .then(([pattern, chips])=>{
+            this.images = {
+                pattern,
+                chips
+            };
             this.draw(true);
         });
     },
     componentDidUpdate(prevProps){
-        if(prevProps.pattern!==this.props.pattern){
-            loadImage(this.props.pattern)
-            .then((img)=>{
-                this.pattern = img;
+        if(prevProps.pattern!==this.props.pattern || prevProps.chips!==this.props.chips){
+            Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
+            .then(([pattern, chips])=>{
+                this.images = {
+                    pattern,
+                    chips
+                };
                 this.draw(true);
             });
         }else if(prevProps.edit.pen!==this.props.edit.pen){
@@ -43,7 +52,7 @@ module.exports = React.createClass({
 
             let x=0,y=0,i=0;
             while(i < chip.chipList.length){
-                chip.drawChip(ctx,this.pattern,chip.chipList[i],x,y,false);
+                chip.drawChip(ctx,this.images,chip.chipList[i],x,y,false);
                 i++;
                 x+=32;
                 if(x+32 > canvas.width){
@@ -57,7 +66,7 @@ module.exports = React.createClass({
         let canvas=React.findDOMNode(this.refs.canvas2);
         let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        chip.drawChip(ctx,this.pattern,this.props.edit.pen, 32,0,true);
+        chip.drawChip(ctx,this.images,this.props.edit.pen, 32,0,true);
     },
     render(){
         var w=8;
