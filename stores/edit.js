@@ -3,8 +3,10 @@ var Reflux=require('reflux');
 var editActions=require('../actions/edit');
 
 /* edit store
+ * # スクリーン
+ * screen: string
  *
- * # 画面の大きさ
+ * # マップ編集画面の大きさ
  * view_width: number
  * view_height: number
  * # マップの表示位置
@@ -33,6 +35,7 @@ var editActions=require('../actions/edit');
  */
 module.exports = Reflux.createStore({
     init(){
+        this.screen = "map";
         this.view_width=16, this.view_height=10;
         //スクロール座標
         this.scroll_x = 0, this.scroll_y = 20;
@@ -55,6 +58,7 @@ module.exports = Reflux.createStore({
     listenables: editActions,
     makeState(){
         return {
+            screen: this.screen,
             view_width: this.view_width,
             view_height: this.view_height,
             scroll_x: this.scroll_x,
@@ -69,6 +73,10 @@ module.exports = Reflux.createStore({
             scroll_sx: this.scroll_sx,
             scroll_sy: this.scroll_sy
         };
+    },
+    onChangeScreen({screen}){
+        this.screen=screen;
+        this.trigger(this.makeState());
     },
     onChangeMode({mode}){
         this.mode=mode;
