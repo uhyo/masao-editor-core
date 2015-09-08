@@ -53,6 +53,10 @@
   }
 }
 
+.me-core-param-edit {
+  max-height: 600px;
+  overflow-y: scroll;
+}
 .me-core-param-param {
   label {
     display: block;
