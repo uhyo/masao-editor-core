@@ -9,7 +9,8 @@ var MapEdit=require('./map-edit.jsx'),
     ChipSelect=require('./chip-select.jsx'),
     EditMode=require('./edit-mode.jsx'),
     MiniMap=require('./mini-map.jsx'),
-    ScreenSelect=require('./screen-select.jsx');
+    ScreenSelect=require('./screen-select.jsx'),
+    ParamEdit=require('./param-edit.jsx');
 
 module.exports = React.createClass({
     displayName: "MasaoEditorCore",
@@ -23,6 +24,8 @@ module.exports = React.createClass({
         var screen=null;
         if(edit.screen==="map"){
             screen=<MapScreen pattern={this.props.filename_pattern} map={map} params={params} edit={edit}/>;
+        }else if(edit.screen==="params"){
+            screen=<ParamScreen params={params} edit={edit}/>;
         }
         return <div className="me-core">
             <div className="me-core-info">
@@ -37,7 +40,7 @@ module.exports = React.createClass({
 var MapScreen = React.createClass({
     displayName: "MapScreen",
     propTypes: {
-        patern: React.PropTypes.string.isRequired,
+        pattern: React.PropTypes.string.isRequired,
         edit: React.PropTypes.object.isRequired,
         params: React.PropTypes.object.isRequired,
         map: React.PropTypes.array.isRequired
@@ -53,6 +56,20 @@ var MapScreen = React.createClass({
                 <ChipSelect pattern={pattern} params={params} edit={edit}/>
                 <MapEdit pattern={pattern} map={map} params={params} edit={edit}/>
             </div>
+        </div>;
+    }
+});
+
+var ParamScreen = React.createClass({
+    displayName: "ParamScreen",
+    propTypes: {
+        edit: React.PropTypes.object.isRequired,
+        params: React.PropTypes.object.isRequired
+    },
+    render(){
+        var params=this.props.params, edit=this.props.edit;
+        return <div>
+            <ParamEdit params={params} edit={edit} />
         </div>;
     }
 });
