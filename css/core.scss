@@ -52,6 +52,21 @@
   }
 }
 
+.me-core-param-param {
+  label {
+    display: block;
+    border-bottom: 1px dashed #cccccc;
+    margin-bottom: 2px;
+
+    b, span {
+      display: inline-block;
+    }
+    b {
+      width: 300px;
+    }
+  }
+}
+
 // util
 .me-core-util-select {
   display: flex;
@@ -79,3 +94,5 @@
     background-color: #66ff33;
   }
 }
+
+

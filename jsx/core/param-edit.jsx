@@ -43,6 +43,17 @@ module.exports = React.createClass({
                         }
                     };
                     field=<input type="checkbox" checkedLink={checkedLink}/>;
+                }else if(obj.type==="boolean-reversed"){
+                    let checkedLink={
+                        value: params[key]==="2",
+                        requestChange:(checked)=>{
+                            paramActions.changeParam({
+                                param: key,
+                                value: checked ? "2" : "1"
+                            });
+                        }
+                    };
+                    field=<input type="checkbox" checkedLink={checkedLink}/>;
                 }else if(obj.type==="integer"){
                     let valueLink={
                         value: params[key],
@@ -68,9 +79,11 @@ module.exports = React.createClass({
                 }else{
                     return null;
                 }
-                return <div key={key} className="ms-core-param-param">
-                    <b>{obj.description}</b>
-                    <span>{field}</span>
+                return <div key={key} className="me-core-param-param">
+                    <label>
+                        <b>{obj.description}</b>
+                        <span>{field}</span>
+                    </label>
                 </div>;
             })
         }</div>;
