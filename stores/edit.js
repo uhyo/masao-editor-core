@@ -74,8 +74,11 @@ module.exports = Reflux.createStore({
         this.mode=mode;
         this.trigger(this.makeState());
     },
-    onChangePen({pen}){
+    onChangePen({pen,mode}){
         this.pen=pen;
+        if(mode===true){
+            this.mode="pen";
+        }
         this.trigger(this.makeState());
     },
     onChangeGrid({grid}){

@@ -128,6 +128,17 @@ module.exports = React.createClass({
         }else{
             return;
         }
+        if(mode==="spuit"){
+            //スポイトは1回限り
+            let map=this.props.map, edit=this.props.edit;
+            let mxx=mx+edit.scroll_x, myy=my+edit.scroll_y;
+            let c=map[myy] ? map[myy][mxx] || "." : ".";
+            console.log(mxx,myy,c);
+            editActions.changePen({
+                pen: c,
+                mode: true
+            });
+        }
         editActions.mouseDown({x: mx, y: my, mode});
         if(mode!=="hand"){
             this.mouseMoves(mode, e.pageX, e.pageY);

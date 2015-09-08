@@ -24,6 +24,10 @@ module.exports = React.createClass({
             {
                 key:"hand",
                 value:"ハンドモード"
+            },
+            {
+                key:"spuit",
+                value:"スポイト"
             }
         ];
         var mode_valueLink={
