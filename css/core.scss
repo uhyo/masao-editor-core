@@ -1,3 +1,6 @@
+$me-button-surface-color-off : #eeeeee;
+$me-button-surface-color-on  : #66ff33;
+$me-button-surface-color-hov : #88bb55;
 .me-core-main {
   display: flex;
 
@@ -6,6 +9,7 @@
   }
 }
 .me-core-info {
+  display: flex;
   padding-bottom: 4px;
   border-bottom: 1px solid #cccccc;
   margin-bottom: 4px;
@@ -78,25 +82,33 @@
 }
 .me-core-util-select-button {
   padding: 6px;
-  background-color: #eeeeee;
+  background-color: $me-button-surface-color-off;
   transition: background-color 0.3s ease;
 
   cursor: pointer;
 
+  &:hover {
+    background-color: $me-button-surface-color-hov;
+  }
+
   &.me-core-util-select-current {
-    background-color: #66ff33;
+    background-color: $me-button-surface-color-on;
   }
 }
 
 .me-core-util-switch {
   padding: 6px;
-  background-color: #eeeeee;
+  background-color: $me-button-surface-color-off;
   transition: background-color 0.3s ease;
 
   cursor: pointer;
 
+  &:hover {
+    background-color: $me-button-surface-color-hov;
+  }
+
   &.me-core-util-switch-yes {
-    background-color: #66ff33;
+    background-color: $me-button-surface-color-on;
   }
 }
 
