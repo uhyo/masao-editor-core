@@ -1,3 +1,4 @@
+"use strict";
 //load image script
 var Promise=require('native-promise-only');
 

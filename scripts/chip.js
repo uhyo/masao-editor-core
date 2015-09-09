@@ -1,3 +1,4 @@
+"use strict";
 //chipの情報
 
 //再利用

@@ -1,3 +1,4 @@
+"use strict";
 //util methods
 //
 //elementのabsolute position of HTMLElement
