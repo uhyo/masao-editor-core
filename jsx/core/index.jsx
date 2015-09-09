@@ -3,6 +3,8 @@ var React=require('react'),
 var extend=require('extend');
 
 
+var paramActions=require('../../actions/params');
+
 var mapStore=require('../../stores/map'),
     paramStore=require('../../stores/params'),
     editStore=require('../../stores/edit');
@@ -23,6 +25,8 @@ var MasaoEditorCore = React.createClass({
         filename_pattern: React.PropTypes.string.isRequired,
         filename_chips: React.PropTypes.string.isRequired,
 
+        defaultParams: React.PropTypes.object,
+
         text_save: React.PropTypes.string,
         text_testplay: React.PropTypes.string,
         requestSave: React.PropTypes.func,
@@ -34,6 +38,17 @@ var MasaoEditorCore = React.createClass({
             text_testplay: "テストプレイ"
         };
     },
+    componentWillMount(){
+        if(this.props.defaultParams){
+            //default
+            paramActions.changeParams(this.props.defaultParams);
+        }
+    },
+    componentWillReceiveProps(newProps){
+        if(this.props.defaultParams!==newProps.defaultParams && newProps.defaultParams != null){
+            paramActions.changeParams(newProps.defaultParams);
+        }
+    },
     render(){
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
 
@@ -44,7 +59,6 @@ var MasaoEditorCore = React.createClass({
             screen=<ParamScreen params={params} edit={edit}/>;
         }
         var button_save=null;
-        console.log(this.props);
         if(this.props.requestSave!=null){
             button_save=<div>
                 <Button label={this.props.text_save} onClick={this.handleSaveClick}/>

@@ -1,11 +1,12 @@
 //map store
 var Reflux=require('reflux');
+var extend=require('extend');
 
 var mapActions = require('../actions/map'),
-    editActions= require('../actions/edit');
+    paramActions=require('../actions/params');
 
 module.exports = Reflux.createStore({
-    listenables: [mapActions],
+    listenables: [mapActions,{changeParams: paramActions.changeParams}],
     init(){
         //init project
         this.map=[0,1,2,3].map((st)=>{
@@ -65,4 +66,27 @@ module.exports = Reflux.createStore({
             }
         }
     },
+    onChangeParams(params){
+        //mapに対する変更があったら検知する
+        var newMap=this.map.map((st)=>{
+            return st.map((row)=>{
+                return row.concat([]);
+            });
+        });
+        for (let h = 0; h < 4; h++) {
+            let ssfx = ["", "-s", "-t", "-f"][h];
+            for (let i = 0; i < 3; i++) {
+                for(let j=0; j < 30; j++){
+                    let p=params[`map${i}-${j}${ssfx}`];
+                    if(p!=null){
+                        for(let k=0; k < 60; k++){
+                            newMap[h][j][i*60+k] = p.charAt(k) || ".";
+                        }
+                    }
+                }
+            }
+        }
+        this.map=newMap;
+        this.trigger(newMap);
+    }
 });
