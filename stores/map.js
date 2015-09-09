@@ -23,12 +23,6 @@ module.exports = Reflux.createStore({
             }
             result.push(r2);
         }
-        if(stage===1){
-            //TODO: sample
-            result[25]="....12..I......".split("").concat(result[25].slice(15));
-            result[28]="A...B.G.33OOOOO".split("").concat(result[28].slice(15));
-            result[29]="abcdefghijzkmno".split("").concat(result[29].slice(15));
-        }
         return result;
     },
     getInitialState(){
