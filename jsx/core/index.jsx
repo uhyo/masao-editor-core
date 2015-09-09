@@ -1,5 +1,6 @@
 var React=require('react'),
     Reflux=require('reflux');
+var extend=require('extend');
 
 
 var mapStore=require('../../stores/map'),
@@ -43,6 +44,7 @@ var MasaoEditorCore = React.createClass({
             screen=<ParamScreen params={params} edit={edit}/>;
         }
         var button_save=null;
+        console.log(this.props);
         if(this.props.requestSave!=null){
             button_save=<div>
                 <Button label={this.props.text_save} onClick={this.handleSaveClick}/>
@@ -51,7 +53,7 @@ var MasaoEditorCore = React.createClass({
         var button_testplay=null;
         if(this.props.requestTestplay!=null){
             button_testplay=<div>
-                <Button label={this.props.text_testplay} onClick={this.handleSaveClick}/>
+                <Button label={this.props.text_testplay} onClick={this.handleTestplayClick}/>
             </div>;
         }
         return <div className="me-core">
@@ -64,6 +66,17 @@ var MasaoEditorCore = React.createClass({
             </div>
             {screen}
         </div>;
+    },
+    handleSaveClick(){
+        //paramにmapの内容を突っ込む
+        let mp=mapToParam(this.state.map);
+        let allParams = extend({},this.state.params, mp);
+        this.props.requestSave(allParams);
+    },
+    handleTestplayClick(){
+        let mp=mapToParam(this.state.map);
+        let allParams = extend({},this.state.params, mp);
+        this.props.requestTestplay(allParams);
     },
 });
 //exports stores
@@ -111,3 +124,26 @@ var ParamScreen = React.createClass({
         </div>;
     }
 });
+
+
+//map to param
+function mapToParam(map){
+    let result={};
+    for(let stage=0;stage<4;stage++){
+        let stagechar="";
+        if(stage===1){
+            stagechar="-s";
+        }else if(stage===2){
+            stagechar="-t";
+        }else if(stage===3){
+            stagechar="-f";
+        }
+        for(let y=0;y < 30; y++){
+            let j=map[stage][y].join("");
+            result[`map0-${y}${stagechar}`]=j.slice(0,60);
+            result[`map1-${y}${stagechar}`]=j.slice(60,120);
+            result[`map2-${y}${stagechar}`]=j.slice(120,180);
+        }
+    }
+    return result;
+}

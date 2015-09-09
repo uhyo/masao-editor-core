@@ -13,6 +13,10 @@ $me-button-surface-color-hov : #88bb55;
   padding-bottom: 4px;
   border-bottom: 1px solid #cccccc;
   margin-bottom: 4px;
+
+  & > div {
+    margin: 0 8px;
+  }
 }
 .me-core-map-info {
   display: flex;
@@ -96,7 +100,7 @@ $me-button-surface-color-hov : #88bb55;
   }
 }
 
-.me-core-util-switch {
+.me-core-util-switch, .me-core-util-button {
   padding: 6px;
   background-color: $me-button-surface-color-off;
   transition: background-color 0.3s ease;

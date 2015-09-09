@@ -18,6 +18,10 @@ module.exports = Reflux.createStore({
             [param]: value
         });
         this.trigger(this.params);
+    },
+    onChangeParams(obj){
+        this.params = extend({},this.params, obj);
+        this.trigger(this.params);
     }
 });
 
