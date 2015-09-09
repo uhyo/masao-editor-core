@@ -1,3 +1,4 @@
+"use strict";
 //edit actions
 var Reflux=require('reflux');
 

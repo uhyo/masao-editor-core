@@ -1,3 +1,4 @@
+"use strict";
 //map store
 var Reflux=require('reflux');
 var extend=require('extend');

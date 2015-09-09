@@ -1,3 +1,4 @@
+"use strict";
 //params store
 var Reflux=require('reflux'),
     extend=require('extend'),
