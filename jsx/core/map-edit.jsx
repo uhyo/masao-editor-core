@@ -83,7 +83,7 @@ module.exports = React.createClass({
             /////draw
             let mapdata=map[edit.stage-1];
             //background color
-            let bgc=util.cssColor(params.backcolor_r, params.backcolor_g, params.backcolor_b);
+            let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
             //map
