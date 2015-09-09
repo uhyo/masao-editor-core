@@ -1,3 +1,4 @@
+"use strict";
 //select box
 var React=require('react');
 

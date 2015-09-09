@@ -1,3 +1,4 @@
+"use strict";
 var React=require('react'),
     Reflux=require('reflux');
 var extend=require('extend');
