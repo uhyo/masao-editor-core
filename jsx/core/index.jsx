@@ -109,7 +109,22 @@ var MapScreen = React.createClass({
 
         edit: React.PropTypes.object.isRequired,
         params: React.PropTypes.object.isRequired,
-        map: React.PropTypes.array.isRequired
+        map: React.PropTypes.shape({
+            map: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired,
+            layer: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired
+        }),
     },
     render(){
         var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, chips=this.props.chips;
@@ -154,10 +169,14 @@ function mapToParam(map){
             stagechar="-f";
         }
         for(let y=0;y < 30; y++){
-            let j=map[stage][y].join("");
+            let j=map.map[stage][y].join("");
             result[`map0-${y}${stagechar}`]=j.slice(0,60);
             result[`map1-${y}${stagechar}`]=j.slice(60,120);
             result[`map2-${y}${stagechar}`]=j.slice(120,180);
+            let k=map.layer[stage][y].join("..");
+            result[`layer0-${y}${stagechar}`]=k.slice(0,120);
+            result[`layer1-${y}${stagechar}`]=k.slice(120,240);
+            result[`layer2-${y}${stagechar}`]=k.slice(240,360);
         }
     }
     return result;

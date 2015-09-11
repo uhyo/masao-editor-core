@@ -17,13 +17,22 @@ module.exports = React.createClass({
         pattern: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
-        map: React.PropTypes.arrayOf(
-            React.PropTypes.arrayOf(
+        map: React.PropTypes.shape({
+            map: React.PropTypes.arrayOf(
                 React.PropTypes.arrayOf(
-                    React.PropTypes.string.isRequired
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired,
+            layer: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
                 ).isRequired
             ).isRequired
-        ).isRequired,
+        }),
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
     },
@@ -59,12 +68,13 @@ module.exports = React.createClass({
     },
     componentDidUpdate(prevProps){
         //書き換える
-        if(prevProps.map!==this.props.map || prevProps.params!==this.props.params){
+        if(prevProps.map.map!==this.props.map.map || prevProps.params!==this.props.params){
             this.draw();
-        }
-        let pe=prevProps.edit, e=this.props.edit;
-        if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
-            this.draw();
+        }else{
+            let pe=prevProps.edit, e=this.props.edit;
+            if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
+                this.draw();
+            }
         }
     },
     draw(){
@@ -74,7 +84,7 @@ module.exports = React.createClass({
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
-            var map=this.props.map, params=this.props.params, edit=this.props.edit;
+            var map=this.props.map.map, params=this.props.params, edit=this.props.edit;
             var {scroll_x, scroll_y, view_width, view_height} = edit;
             var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
 
@@ -145,7 +155,7 @@ module.exports = React.createClass({
         }
         if(mode==="spuit"){
             //スポイトは1回限り
-            let map=this.props.map, edit=this.props.edit;
+            let map=this.props.map.map, edit=this.props.edit;
             let mxx=mx+edit.scroll_x, myy=my+edit.scroll_y;
             let c=map[myy] ? map[myy][mxx] || "." : ".";
             editActions.changePen({
@@ -174,7 +184,7 @@ module.exports = React.createClass({
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
-        var edit=this.props.edit, map=this.props.map;
+        var edit=this.props.edit, map=this.props.map.map;
         let mapdata=map[edit.stage-1];
 
         if(mode==="pen"){

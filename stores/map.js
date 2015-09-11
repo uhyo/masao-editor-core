@@ -11,22 +11,31 @@ module.exports = Reflux.createStore({
     init(){
         //init project
         this.map=[0,1,2,3].map((st)=>{
-            return this.initStage(st+1);
+            return this.initStage(st+1,".");
+        });
+        this.layer=[0,1,2,3].map((st)=>{
+            return this.initStage(st+1,"..");
         });
     },
-    initStage(stage){
+    initStage(stage,initial){
         var result=[];
         for(let i=0;i < 30;i++){
             let r2=[];
             for(let j=0;j < 180;j++){
-                r2.push(".");
+                r2.push(initial);
             }
             result.push(r2);
         }
         return result;
     },
     getInitialState(){
-        return this.map;
+        return this.getState();
+    },
+    getState(){
+        return {
+            map: this.map,
+            layer: this.layer
+        };
     },
 
     onUpdateMap({stage,x,y,chip}){
@@ -57,7 +66,7 @@ module.exports = Reflux.createStore({
                         return st;
                     }
                 });
-                this.trigger(this.map);
+                this.trigger(this.getState());
             }
         }
     },
@@ -82,6 +91,6 @@ module.exports = Reflux.createStore({
             }
         }
         this.map=newMap;
-        this.trigger(newMap);
+        this.trigger(this.getState());
     }
 });
