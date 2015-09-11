@@ -11,22 +11,31 @@ module.exports = Reflux.createStore({
     init(){
         //init project
         this.map=[0,1,2,3].map((st)=>{
-            return this.initStage(st+1);
+            return this.initStage(st+1,".");
+        });
+        this.layer=[0,1,2,3].map((st)=>{
+            return this.initStage(st+1,"..");
         });
     },
-    initStage(stage){
+    initStage(stage,initial){
         var result=[];
         for(let i=0;i < 30;i++){
             let r2=[];
             for(let j=0;j < 180;j++){
-                r2.push(".");
+                r2.push(initial);
             }
             result.push(r2);
         }
         return result;
     },
     getInitialState(){
-        return this.map;
+        return this.getState();
+    },
+    getState(){
+        return {
+            map: this.map,
+            layer: this.layer
+        };
     },
 
     onUpdateMap({stage,x,y,chip}){
@@ -57,13 +66,49 @@ module.exports = Reflux.createStore({
                         return st;
                     }
                 });
-                this.trigger(this.map);
+                this.trigger(this.getState());
+            }
+        }
+    },
+    onUpdateLayer({stage,x,y,chip}){
+        let st=this.layer[stage-1];
+        if(st){
+            let row=st[y];
+            if(row){
+                if(row[x]===chip){
+                    //変わっていない
+                    return;
+                }
+                this.layer = this.layer.map((st,i)=>{
+                    if(i===stage-1){
+                        return st.map((a,i)=>{
+                            if(i===y){
+                                return a.map((c,i)=>{
+                                    if(i===x){
+                                        return chip;
+                                    }else{
+                                        return c;
+                                    }
+                                });
+                            }else{
+                                return a;
+                            }
+                        });
+                    }else{
+                        return st;
+                    }
+                });
+                this.trigger(this.getState());
             }
         }
     },
     onChangeParams(params){
         //mapに対する変更があったら検知する
         var newMap=this.map.map((st)=>{
+            return st.map((row)=>{
+                return row.concat([]);
+            });
+        }), newLayer=this.layer.map((st)=>{
             return st.map((row)=>{
                 return row.concat([]);
             });
@@ -78,10 +123,16 @@ module.exports = Reflux.createStore({
                             newMap[h][j][i*60+k] = p.charAt(k) || ".";
                         }
                     }
+                    p=params[`layer${i}-${j}${ssfx}`];
+                    if(p!=null){
+                        for(let k=0;k < 120; k+=2){
+                            newLayer[h][j][i*60+k] = p.slice(k,k+2) || "..";
+                        }
+                    }
                 }
             }
         }
         this.map=newMap;
-        this.trigger(newMap);
+        this.trigger(this.getState());
     }
 });

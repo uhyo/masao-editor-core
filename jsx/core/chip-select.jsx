@@ -12,37 +12,42 @@ module.exports = React.createClass({
     displayName: "ChipSelect",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        mapchip: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired
     },
     componentDidMount(){
-        Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
-        .then(([pattern, chips])=>{
+        Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
+        .then(([pattern, mapchip, chips])=>{
             this.images = {
                 pattern,
+                mapchip,
                 chips
             };
             this.draw(true);
         });
     },
     componentDidUpdate(prevProps){
-        if(prevProps.pattern!==this.props.pattern || prevProps.chips!==this.props.chips){
-            Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
-            .then(([pattern, chips])=>{
+        if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
+            Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
+            .then(([pattern, mapchip, chips])=>{
                 this.images = {
                     pattern,
+                    mapchip,
                     chips
                 };
                 this.draw(true);
             });
-        }else if(prevProps.edit.pen!==this.props.edit.pen){
+        }else if(prevProps.edit.screen!==this.props.edit.screen){
+            this.draw(true);
+        }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
             this.draw(false);
         }
     },
     draw(full){
-        var params=this.props.params;
+        var params=this.props.params, screen=this.props.edit.screen;
         if(full){
             //チップセットを書き換える
             let canvas=React.findDOMNode(this.refs.canvas);
@@ -52,13 +57,27 @@ module.exports = React.createClass({
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
             let x=0,y=0,i=0;
-            while(i < chip.chipList.length){
-                chip.drawChip(ctx,this.images,params,chip.chipList[i],x,y,false);
-                i++;
-                x+=32;
-                if(x+32 > canvas.width){
-                    x=x%canvas.width;
-                    y+=32;
+            if(this.props.edit.screen==="layer"){
+                //レイヤー描画
+                let mapchip=this.images.mapchip;
+                while(i < 256){
+                    ctx.drawImage(mapchip, (i&15)*32, (i>>4)*32, 32, 32, x, y, 32, 32);
+                    i++;
+                    x+=32;
+                    if(x+32 > canvas.width){
+                        x=0;
+                        y+=32;
+                    }
+                }
+            }else{
+                while(i < chip.chipList.length){
+                    chip.drawChip(ctx,this.images,params,chip.chipList[i],x,y,false);
+                    i++;
+                    x+=32;
+                    if(x+32 > canvas.width){
+                        x=0;
+                        y+=32;
+                    }
                 }
             }
         }
@@ -67,19 +86,38 @@ module.exports = React.createClass({
         let canvas=React.findDOMNode(this.refs.canvas2);
         let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
+        if(screen==="layer"){
+            let pen_layer=this.props.edit.pen_layer;
+            if(pen_layer!==".."){
+                let idx=parseInt(pen_layer,16);
+                ctx.drawImage(this.images.mapchip, (idx&15)*32, (idx>>4)*32, 32, 32, 32, 0, 32, 32);
+            }
+        }else{
+            chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
+        }
     },
     render(){
-        var w=8;
+        var screen=this.props.edit.screen;
+        var w= screen==="layer" ? 16 : 8;
         var ks=Object.keys(chip.chipTable);
-        var h=Math.ceil(ks.length/w);
-        var pen=this.props.edit.pen;
-        var name=null;
-        let t=chip.chipFor(this.props.params,pen);
-        if(t!=null){
-            name=t.name;
+        var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
+        var pen, name;
+        if(screen==="layer"){
+            pen=this.props.edit.pen_layer;
+            if(pen===".."){
+                name="（空白）";
+            }else{
+                name="("+parseInt(pen,16)+")";
+            }
+        }else{
+            pen=this.props.edit.pen;
+            let t=chip.chipFor(this.props.params,pen);
+            if(t!=null){
+                name=t.name;
+            }
         }
-        return <div className="me-core-chip-select">
+        var c = screen==="layer" ? "me-core-chip-select-layer" : "me-core-chip-select-map";
+        return <div className={`me-core-chip-select ${c}`}>
             <div className="me-core-chip-list">
                 <canvas ref="canvas" width={w*32} height={h*32} onClick={this.handleClick}/>
             </div>
@@ -102,10 +140,15 @@ module.exports = React.createClass({
 
         var haba = Math.floor(target.width/32);
         var penidx = Math.floor(x/32) + Math.floor(y/32)*haba;
-
-        editActions.changePen({
-            pen: chip.chipList[penidx]
-        });
+        if(this.props.edit.screen==="layer"){
+            editActions.changePenLayer({
+                pen: penidx===0 ? ".." : ("0"+penidx.toString(16)).slice(-2)
+            });
+        }else{
+            editActions.changePen({
+                pen: chip.chipList[penidx]
+            });
+        }
         e.preventDefault();
     }
 });

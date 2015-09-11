@@ -172,11 +172,13 @@ module.exports = React.createClass({
     render(){
         //it's sample!
         return <div>
-            <Core filename_pattern="pattern.gif" filename_chips="images/chips.png" requestSave={this.handleRequestSave} requestTestplay={this.handleRequestTestplay} defaultParams={defaultValue}/>
+            <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" filename_chips="images/chips.png" requestSave={this.handleRequestSave} requestTestplay={this.handleRequestTestplay} defaultParams={defaultValue}/>
         </div>;
     },
-    handleRequestSave(){
+    handleRequestSave(params){
+        console.log(params);
     },
-    handleRequestTestplay(){
+    handleRequestTestplay(params){
+        console.log(params);
     }
 });

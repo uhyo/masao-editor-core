@@ -16,9 +16,17 @@ var Reflux=require('reflux');
 // edit.changePen({
 //   pen: string
 // });
+// edit.changePenLayer({
+//   pen: string
+// });
 //
 // edit.changeGrid({
 //   grid: boolean
+// });
+//
+// edit.changeRenderMode({
+//   render_map?: boolean,
+//   render_layer?: boolean
 // });
 //
 // edit.mouseDown({
@@ -47,7 +55,20 @@ module.exports = Reflux.createActions({
             return;
         }
     },
+    "changePenLayer": {
+        preEmit: (obj)=>{
+            if(obj==null){
+                return {
+                    pen: ".."
+                };
+            }else if(obj.pen==null){
+                return {pen: ".."};
+            }
+            return;
+        }
+    },
     "changeGrid": {},
+    "changeRenderMode": {},
     "mouseDown": {},
     "mouseUp": {},
     "scroll": {}

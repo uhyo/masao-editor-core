@@ -22,13 +22,22 @@ module.exports = React.createClass({
     propTypes: {
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
-        map: React.PropTypes.arrayOf(
-            React.PropTypes.arrayOf(
+        map: React.PropTypes.shape({
+            map: React.PropTypes.arrayOf(
                 React.PropTypes.arrayOf(
-                    React.PropTypes.string.isRequired
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired,
+            layer: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
                 ).isRequired
             ).isRequired
-        ).isRequired,
+        }),
     },
     getInitialState(){
         return {
@@ -49,7 +58,7 @@ module.exports = React.createClass({
         this.drawing=true;
         requestAnimationFrame(()=>{
             let canvas=React.findDOMNode(this.refs.canvas), ctx=canvas.getContext('2d');
-            let params=this.props.params, edit=this.props.edit, map=this.props.map;
+            let params=this.props.params, edit=this.props.edit, map=this.props.map.map;
             let mapdata=map[edit.stage-1];
             //bg
             let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);

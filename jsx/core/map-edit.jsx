@@ -15,15 +15,25 @@ module.exports = React.createClass({
     displayName: "MapEdit",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        mapchip: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
-        map: React.PropTypes.arrayOf(
-            React.PropTypes.arrayOf(
+        map: React.PropTypes.shape({
+            map: React.PropTypes.arrayOf(
                 React.PropTypes.arrayOf(
-                    React.PropTypes.string.isRequired
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired,
+            layer: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
                 ).isRequired
             ).isRequired
-        ).isRequired,
+        }),
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
     },
@@ -32,10 +42,11 @@ module.exports = React.createClass({
         this.drawing=false;
         this.drawRequest=null;
         //load files
-        Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
-        .then(([pattern, chips])=>{
+        Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
+        .then(([pattern, mapchip, chips])=>{
             this.images={
                 pattern,
+                mapchip,
                 chips
             };
             this.draw();
@@ -59,12 +70,17 @@ module.exports = React.createClass({
     },
     componentDidUpdate(prevProps){
         //書き換える
-        if(prevProps.map!==this.props.map || prevProps.params!==this.props.params){
+        if(prevProps.edit.screen!==this.props.edit.screen){
             this.draw();
+            return;
         }
-        let pe=prevProps.edit, e=this.props.edit;
-        if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
+        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map || this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer || prevProps.params!==this.props.params || prevProps.edit.render_map!==this.props.edit.render_map || prevProps.edit.render_layer!==this.props.edit.render_layer){
             this.draw();
+        }else{
+            let pe=prevProps.edit, e=this.props.edit;
+            if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
+                this.draw();
+            }
         }
     },
     draw(){
@@ -75,13 +91,14 @@ module.exports = React.createClass({
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
             var map=this.props.map, params=this.props.params, edit=this.props.edit;
+            var screen=edit.screen;
             var {scroll_x, scroll_y, view_width, view_height} = edit;
             var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
 
             var width=view_width*32, height=view_height*32;
 
-            /////draw
-            let mapdata=map[edit.stage-1];
+            let mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+
             //background color
             let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
             ctx.fillStyle=bgc;
@@ -91,16 +108,19 @@ module.exports = React.createClass({
                 for(let y=0;y < view_height; y++){
                     //TODO
                     let mx=scroll_x+x, my=scroll_y+y;
-                    if(mapdata[my]==null){
+                    if(mapData[my]==null){
                         //領域外。
                         continue;
                     }
-                    let c=mapdata[my][mx];
-                    if(c==null){
-                        //TODO
-                        continue;
+                    if(screen==="layer" || edit.render_layer===true){
+                        //レイヤーを描画
+                        let c=layerData[my][mx];
+                        this.drawLayer(ctx,c,x*32,y*32);
                     }
-                    this.drawChip(ctx,c,x*32, y*32);
+                    if(screen==="map" || edit.render_map===true){
+                        let c=mapData[my][mx];
+                        this.drawChip(ctx,c,x*32, y*32);
+                    }
                 }
             }
             this.drawing=false;
@@ -108,8 +128,19 @@ module.exports = React.createClass({
         });
     },
     drawChip(ctx,c,x,y){
-        //x,yにchipを描画
+        if(c==null){
+            return;
+        }
         chip.drawChip(ctx,this.images,this.props.params,c,x,y,true);
+    },
+    drawLayer(ctx,c,x,y){
+        //レイヤ
+        if(c===".."){
+            return;
+        }
+        let idx=parseInt(c,16);
+        let sx=(idx&15)*32, sy=Math.floor(idx>>4)*32;
+        ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
     },
     render(){
         var {view_width, view_height} = this.props.edit;
@@ -130,6 +161,7 @@ module.exports = React.createClass({
         e.preventDefault();
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
+        var screen=this.props.edit.screen;
         var mode;
         if(e.button===0){
             //左クリック
@@ -145,13 +177,22 @@ module.exports = React.createClass({
         }
         if(mode==="spuit"){
             //スポイトは1回限り
-            let map=this.props.map, edit=this.props.edit;
-            let mxx=mx+edit.scroll_x, myy=my+edit.scroll_y;
-            let c=map[myy] ? map[myy][mxx] || "." : ".";
-            editActions.changePen({
-                pen: c,
-                mode: true
-            });
+            let edit=this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
+            if(screen==="layer"){
+                let map=this.props.map.layer;
+                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || ".." : "..";
+                editActions.changePenLayer({
+                    pen: c,
+                    mode: true
+                });
+            }else{
+                let map=this.props.map.map;
+                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || "." : ".";
+                editActions.changePen({
+                    pen: c,
+                    mode: true
+                });
+            }
         }
         editActions.mouseDown({x: mx, y: my, mode});
         if(mode!=="hand"){
@@ -175,31 +216,33 @@ module.exports = React.createClass({
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
         var edit=this.props.edit, map=this.props.map;
-        let mapdata=map[edit.stage-1];
+        let screen=edit.screen;
+        let mapdata=screen==="layer" ? map.layer[edit.stage-1] : map.map[edit.stage-1];
+        let pen=screen==="layer" ? edit.pen_layer : edit.pen, pen_default=screen==="layer" ? ".." : ".";
 
         if(mode==="pen"){
             //ペンモード
             //座標
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!==edit.pen){
-                mapActions.updateMap({
+            if(mapdata[cy] && mapdata[cy][cx]!==pen){
+                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
                     stage: edit.stage,
                     x: cx,
                     y: cy,
-                    chip: edit.pen
+                    chip: pen
                 });
             }
         }else if(mode==="eraser"){
             //イレイサーモード
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!=="."){
-                mapActions.updateMap({
+            if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
+                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
                     stage: edit.stage,
                     x: cx,
                     y: cy,
-                    chip: "."
+                    chip: pen_default
                 });
             }
         }else if(mode==="hand"){

@@ -24,6 +24,7 @@ var MasaoEditorCore = React.createClass({
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit")],
     propTypes:{
         filename_pattern: React.PropTypes.string.isRequired,
+        filename_mapchip: React.PropTypes.string.isRequired,
         filename_chips: React.PropTypes.string.isRequired,
 
         defaultParams: React.PropTypes.object,
@@ -54,8 +55,8 @@ var MasaoEditorCore = React.createClass({
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
 
         var screen=null;
-        if(edit.screen==="map"){
-            screen=<MapScreen pattern={this.props.filename_pattern} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
+        if(edit.screen==="map" || edit.screen==="layer"){
+            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit}/>;
         }
@@ -105,22 +106,38 @@ var MapScreen = React.createClass({
     displayName: "MapScreen",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        mapchip: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
         edit: React.PropTypes.object.isRequired,
         params: React.PropTypes.object.isRequired,
-        map: React.PropTypes.array.isRequired
+        map: React.PropTypes.shape({
+            map: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired,
+            layer: React.PropTypes.arrayOf(
+                React.PropTypes.arrayOf(
+                    React.PropTypes.arrayOf(
+                        React.PropTypes.string.isRequired
+                    ).isRequired
+                ).isRequired
+            ).isRequired
+        }),
     },
     render(){
-        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, chips=this.props.chips;
+        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, mapchip=this.props.mapchip, chips=this.props.chips;
         return <div>
             <div className="me-core-map-info">
-                <EditMode edit={edit} map={map}/>
+                <EditMode edit={edit}/>
             </div>
             <MiniMap params={params} edit={edit} map={map}/>
             <div className="me-core-main">
-                <ChipSelect pattern={pattern} chips={chips} params={params} edit={edit}/>
-                <MapEdit pattern={pattern} chips={chips} map={map} params={params} edit={edit}/>
+                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit}/>
+                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit}/>
             </div>
         </div>;
     }
@@ -154,10 +171,14 @@ function mapToParam(map){
             stagechar="-f";
         }
         for(let y=0;y < 30; y++){
-            let j=map[stage][y].join("");
+            let j=map.map[stage][y].join("");
             result[`map0-${y}${stagechar}`]=j.slice(0,60);
             result[`map1-${y}${stagechar}`]=j.slice(60,120);
             result[`map2-${y}${stagechar}`]=j.slice(120,180);
+            let k=map.layer[stage][y].join("");
+            result[`layer0-${y}${stagechar}`]=k.slice(0,120);
+            result[`layer1-${y}${stagechar}`]=k.slice(120,240);
+            result[`layer2-${y}${stagechar}`]=k.slice(240,360);
         }
     }
     return result;
