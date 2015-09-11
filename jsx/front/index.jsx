@@ -176,9 +176,9 @@ module.exports = React.createClass({
         </div>;
     },
     handleRequestSave(params){
-        console.log(parmas);
+        console.log(params);
     },
     handleRequestTestplay(params){
-        console.log(parmas);
+        console.log(params);
     }
 });

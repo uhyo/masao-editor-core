@@ -16,6 +16,9 @@ var Reflux=require('reflux');
 // edit.changePen({
 //   pen: string
 // });
+// edit.changePenLayer({
+//   pen: string
+// });
 //
 // edit.changeGrid({
 //   grid: boolean
@@ -43,6 +46,18 @@ module.exports = Reflux.createActions({
                 return {pen: "."};
             }else if(obj.pen==null){
                 return {pen: "."};
+            }
+            return;
+        }
+    },
+    "changePenLayer": {
+        preEmit: (obj)=>{
+            if(obj==null){
+                return {
+                    pen: ".."
+                };
+            }else if(obj.pen==null){
+                return {pen: ".."};
             }
             return;
         }

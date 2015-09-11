@@ -157,6 +157,7 @@ module.exports = React.createClass({
         e.preventDefault();
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
+        var screen=this.props.edit.screen;
         var mode;
         if(e.button===0){
             //左クリック
@@ -172,13 +173,22 @@ module.exports = React.createClass({
         }
         if(mode==="spuit"){
             //スポイトは1回限り
-            let map=this.props.map.map, edit=this.props.edit;
-            let mxx=mx+edit.scroll_x, myy=my+edit.scroll_y;
-            let c=map[myy] ? map[myy][mxx] || "." : ".";
-            editActions.changePen({
-                pen: c,
-                mode: true
-            });
+            let edit=this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
+            if(screen==="layer"){
+                let map=this.props.map.layer;
+                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || ".." : "..";
+                editActions.changePenLayer({
+                    pen: c,
+                    mode: true
+                });
+            }else{
+                let map=this.props.map.map;
+                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || "." : ".";
+                editActions.changePen({
+                    pen: c,
+                    mode: true
+                });
+            }
         }
         editActions.mouseDown({x: mx, y: my, mode});
         if(mode!=="hand"){
@@ -201,32 +211,34 @@ module.exports = React.createClass({
         var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
-        var edit=this.props.edit, map=this.props.map.map;
-        let mapdata=map[edit.stage-1];
+        var edit=this.props.edit, map=this.props.map;
+        let screen=edit.screen;
+        let mapdata=screen==="layer" ? map.layer[edit.stage-1] : map.map[edit.stage-1];
+        let pen=screen==="layer" ? edit.pen_layer : edit.pen, pen_default=screen==="layer" ? ".." : ".";
 
         if(mode==="pen"){
             //ペンモード
             //座標
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!==edit.pen){
-                mapActions.updateMap({
+            if(mapdata[cy] && mapdata[cy][cx]!==pen){
+                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
                     stage: edit.stage,
                     x: cx,
                     y: cy,
-                    chip: edit.pen
+                    chip: pen
                 });
             }
         }else if(mode==="eraser"){
             //イレイサーモード
             let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
             //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!=="."){
-                mapActions.updateMap({
+            if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
+                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
                     stage: edit.stage,
                     x: cx,
                     y: cy,
-                    chip: "."
+                    chip: pen_default
                 });
             }
         }else if(mode==="hand"){

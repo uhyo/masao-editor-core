@@ -42,7 +42,7 @@ module.exports = React.createClass({
             });
         }else if(prevProps.edit.screen!==this.props.edit.screen){
             this.draw(true);
-        }else if(prevProps.edit.pen!==this.props.edit.pen){
+        }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
             this.draw(false);
         }
     },
@@ -86,20 +86,38 @@ module.exports = React.createClass({
         let canvas=React.findDOMNode(this.refs.canvas2);
         let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
+        if(screen==="layer"){
+            let pen_layer=this.props.edit.pen_layer;
+            if(pen_layer!==".."){
+                let idx=parseInt(pen_layer,16);
+                ctx.drawImage(this.images.mapchip, (idx&15)*32, (idx>>4)*32, 32, 32, 32, 0, 32, 32);
+            }
+        }else{
+            chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
+        }
     },
     render(){
         var screen=this.props.edit.screen;
         var w= screen==="layer" ? 16 : 8;
         var ks=Object.keys(chip.chipTable);
         var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
-        var pen=this.props.edit.pen;
-        var name=null;
-        let t=chip.chipFor(this.props.params,pen);
-        if(t!=null){
-            name=t.name;
+        var pen, name;
+        if(screen==="layer"){
+            pen=this.props.edit.pen_layer;
+            if(pen===".."){
+                name="（空白）";
+            }else{
+                name="("+parseInt(pen,16)+")";
+            }
+        }else{
+            pen=this.props.edit.pen;
+            let t=chip.chipFor(this.props.params,pen);
+            if(t!=null){
+                name=t.name;
+            }
         }
-        return <div className="me-core-chip-select">
+        var c = screen==="layer" ? "me-core-chip-select-layer" : "me-core-chip-select-map";
+        return <div className={`me-core-chip-select ${c}`}>
             <div className="me-core-chip-list">
                 <canvas ref="canvas" width={w*32} height={h*32} onClick={this.handleClick}/>
             </div>
@@ -122,10 +140,15 @@ module.exports = React.createClass({
 
         var haba = Math.floor(target.width/32);
         var penidx = Math.floor(x/32) + Math.floor(y/32)*haba;
-
-        editActions.changePen({
-            pen: chip.chipList[penidx]
-        });
+        if(this.props.edit.screen==="layer"){
+            editActions.changePenLayer({
+                pen: penidx===0 ? ".." : ("0"+penidx.toString(16)).slice(-2)
+            });
+        }else{
+            editActions.changePen({
+                pen: chip.chipList[penidx]
+            });
+        }
         e.preventDefault();
     }
 });

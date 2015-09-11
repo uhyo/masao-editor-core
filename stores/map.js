@@ -70,6 +70,38 @@ module.exports = Reflux.createStore({
             }
         }
     },
+    onUpdateLayer({stage,x,y,chip}){
+        let st=this.layer[stage-1];
+        if(st){
+            let row=st[y];
+            if(row){
+                if(row[x]===chip){
+                    //変わっていない
+                    return;
+                }
+                this.layer = this.layer.map((st,i)=>{
+                    if(i===stage-1){
+                        return st.map((a,i)=>{
+                            if(i===y){
+                                return a.map((c,i)=>{
+                                    if(i===x){
+                                        return chip;
+                                    }else{
+                                        return c;
+                                    }
+                                });
+                            }else{
+                                return a;
+                            }
+                        });
+                    }else{
+                        return st;
+                    }
+                });
+                this.trigger(this.getState());
+            }
+        }
+    },
     onChangeParams(params){
         //mapに対する変更があったら検知する
         var newMap=this.map.map((st)=>{
