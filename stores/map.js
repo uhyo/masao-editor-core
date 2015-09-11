@@ -108,6 +108,10 @@ module.exports = Reflux.createStore({
             return st.map((row)=>{
                 return row.concat([]);
             });
+        }), newLayer=this.layer.map((st)=>{
+            return st.map((row)=>{
+                return row.concat([]);
+            });
         });
         for (let h = 0; h < 4; h++) {
             let ssfx = ["", "-s", "-t", "-f"][h];
@@ -117,6 +121,12 @@ module.exports = Reflux.createStore({
                     if(p!=null){
                         for(let k=0; k < 60; k++){
                             newMap[h][j][i*60+k] = p.charAt(k) || ".";
+                        }
+                    }
+                    p=params[`layer${i}-${j}${ssfx}`];
+                    if(p!=null){
+                        for(let k=0;k < 120; k+=2){
+                            newLayer[h][j][i*60+k] = p.slice(k,k+2) || "..";
                         }
                     }
                 }
