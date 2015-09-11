@@ -133,6 +133,7 @@ module.exports = Reflux.createStore({
             }
         }
         this.map=newMap;
+        this.layer=newLayer;
         this.trigger(this.getState());
     }
 });
