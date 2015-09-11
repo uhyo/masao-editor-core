@@ -70,6 +70,18 @@ module.exports = React.createClass({
     },
     componentDidUpdate(prevProps){
         //書き換える
+        if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
+            //画像の再読み込みが必要
+            Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
+            .then(([pattern, mapchip, chips])=>{
+                this.images = {
+                    pattern,
+                    mapchip,
+                    chips
+                };
+                this.draw();
+            });
+        }
         if(prevProps.edit.screen!==this.props.edit.screen){
             this.draw();
             return;
