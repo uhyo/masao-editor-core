@@ -87,6 +87,9 @@ module.exports = React.createClass({
         if(this.drawing===true){
             return;
         }
+        if(this.images==null){
+            return;
+        }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
