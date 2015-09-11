@@ -7,7 +7,7 @@ var mapActions = require('../actions/map'),
     paramActions=require('../actions/params');
 
 module.exports = Reflux.createStore({
-    listenables: [mapActions,{changeParams: paramActions.changeParams}],
+    listenables: [mapActions,{resetParams: paramActions.resetParams}],
     init(){
         //init project
         this.map=[0,1,2,3].map((st)=>{
@@ -102,7 +102,7 @@ module.exports = Reflux.createStore({
             }
         }
     },
-    onChangeParams(params){
+    onResetParams(params){
         //mapに対する変更があったら検知する
         var newMap=this.map.map((st)=>{
             return st.map((row)=>{

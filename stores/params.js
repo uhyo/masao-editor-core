@@ -20,8 +20,8 @@ module.exports = Reflux.createStore({
         });
         this.trigger(this.params);
     },
-    onChangeParams(obj){
-        this.params = extend({},this.params, obj);
+    onResetParams(obj){
+        this.params = extend({}, obj);
         this.trigger(this.params);
     }
 });

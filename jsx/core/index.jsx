@@ -1,7 +1,8 @@
 "use strict";
 var React=require('react'),
     Reflux=require('reflux');
-var extend=require('extend');
+var extend=require('extend'),
+    masao=require('masao');
 
 
 var paramActions=require('../../actions/params');
@@ -43,12 +44,12 @@ var MasaoEditorCore = React.createClass({
     componentWillMount(){
         if(this.props.defaultParams){
             //default
-            paramActions.changeParams(this.props.defaultParams);
+            paramActions.resetParams(this.props.defaultParams);
         }
     },
     componentWillReceiveProps(newProps){
         if(this.props.defaultParams!==newProps.defaultParams && newProps.defaultParams != null){
-            paramActions.changeParams(newProps.defaultParams);
+            paramActions.resetParams(newProps.defaultParams);
         }
     },
     render(){

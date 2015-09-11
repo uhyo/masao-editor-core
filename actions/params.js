@@ -6,11 +6,12 @@ var Reflux=require('reflux');
  *   param: string
  *   value: string
  * });
- * changeParams({
+ *
+ * resetParams({
  *   [param1]: [value1],...
  * });
  */
 module.exports = Reflux.createActions([
     "changeParam",
-    "changeParams"
+    "resetParams"
 ]);
