@@ -24,6 +24,7 @@ var MasaoEditorCore = React.createClass({
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit")],
     propTypes:{
         filename_pattern: React.PropTypes.string.isRequired,
+        filename_mapchip: React.PropTypes.string.isRequired,
         filename_chips: React.PropTypes.string.isRequired,
 
         defaultParams: React.PropTypes.object,
@@ -54,8 +55,8 @@ var MasaoEditorCore = React.createClass({
         var map=this.state.map, params=this.state.params, edit=this.state.edit;
 
         var screen=null;
-        if(edit.screen==="map"){
-            screen=<MapScreen pattern={this.props.filename_pattern} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
+        if(edit.screen==="map" || edit.screen==="layer"){
+            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit}/>;
         }
@@ -105,6 +106,7 @@ var MapScreen = React.createClass({
     displayName: "MapScreen",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        mapchip: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
         edit: React.PropTypes.object.isRequired,
@@ -127,15 +129,15 @@ var MapScreen = React.createClass({
         }),
     },
     render(){
-        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, chips=this.props.chips;
+        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, mapchip=this.props.mapchip, chips=this.props.chips;
         return <div>
             <div className="me-core-map-info">
-                <EditMode edit={edit} map={map}/>
+                <EditMode edit={edit}/>
             </div>
             <MiniMap params={params} edit={edit} map={map}/>
             <div className="me-core-main">
-                <ChipSelect pattern={pattern} chips={chips} params={params} edit={edit}/>
-                <MapEdit pattern={pattern} chips={chips} map={map} params={params} edit={edit}/>
+                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit}/>
+                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit}/>
             </div>
         </div>;
     }

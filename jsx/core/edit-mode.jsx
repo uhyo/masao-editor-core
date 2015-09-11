@@ -9,8 +9,7 @@ var Select=require('./util/select.jsx'),
 module.exports = React.createClass({
     displayName: "EditMode",
     propTypes: {
-        edit: React.PropTypes.object.isRequired,
-        map: React.PropTypes.array.isRequired
+        edit: React.PropTypes.object.isRequired
     },
     render(){
         var edit=this.props.edit;

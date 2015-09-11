@@ -18,6 +18,10 @@ module.exports = React.createClass({
                 value:"マップ編集"
             },
             {
+                key:"layer",
+                value:"背景レイヤー編集"
+            },
+            {
                 key:"params",
                 value:"param編集"
             }

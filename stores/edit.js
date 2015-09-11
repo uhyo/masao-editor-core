@@ -5,7 +5,7 @@ var editActions=require('../actions/edit');
 
 /* edit store
  * # スクリーン
- * screen: string
+ * screen: string // ["map","layer","params"]
  *
  * # マップ編集画面の大きさ
  * view_width: number

@@ -15,6 +15,7 @@ module.exports = React.createClass({
     displayName: "MapEdit",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
+        mapchip: React.PropTypes.string.isRequired,
         chips: React.PropTypes.string.isRequired,
 
         map: React.PropTypes.shape({
@@ -41,10 +42,11 @@ module.exports = React.createClass({
         this.drawing=false;
         this.drawRequest=null;
         //load files
-        Promise.all([loadImage(this.props.pattern), loadImage(this.props.chips)])
-        .then(([pattern, chips])=>{
+        Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
+        .then(([pattern, mapchip, chips])=>{
             this.images={
                 pattern,
+                mapchip,
                 chips
             };
             this.draw();
@@ -68,7 +70,11 @@ module.exports = React.createClass({
     },
     componentDidUpdate(prevProps){
         //書き換える
-        if(prevProps.map.map!==this.props.map.map || prevProps.params!==this.props.params){
+        if(prevProps.edit.screen!==this.props.edit.screen){
+            this.draw();
+            return;
+        }
+        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map || this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer || prevProps.params!==this.props.params){
             this.draw();
         }else{
             let pe=prevProps.edit, e=this.props.edit;
@@ -84,14 +90,15 @@ module.exports = React.createClass({
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
-            var map=this.props.map.map, params=this.props.params, edit=this.props.edit;
+            var map=this.props.map, params=this.props.params, edit=this.props.edit;
+            var screen=edit.screen;
             var {scroll_x, scroll_y, view_width, view_height} = edit;
             var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
 
             var width=view_width*32, height=view_height*32;
 
             /////draw
-            let mapdata=map[edit.stage-1];
+            let mapdata= screen==="layer" ? map.layer[edit.stage-1] : map.map[edit.stage-1];
             //background color
             let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
             ctx.fillStyle=bgc;
@@ -110,16 +117,26 @@ module.exports = React.createClass({
                         //TODO
                         continue;
                     }
-                    this.drawChip(ctx,c,x*32, y*32);
+                    this.drawChip(ctx,screen,c,x*32, y*32);
                 }
             }
             this.drawing=false;
             console.timeEnd("draw");
         });
     },
-    drawChip(ctx,c,x,y){
+    drawChip(ctx,screen,c,x,y){
         //x,yにchipを描画
-        chip.drawChip(ctx,this.images,this.props.params,c,x,y,true);
+        if(screen==="layer"){
+            //レイヤ
+            if(c===".."){
+                return;
+            }
+            let idx=parseInt(c,16);
+            let sx=(idx&15)*32, sy=Math.floor(idx>>4)*32;
+            ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
+        }else{
+            chip.drawChip(ctx,this.images,this.props.params,c,x,y,true);
+        }
     },
     render(){
         var {view_width, view_height} = this.props.edit;
