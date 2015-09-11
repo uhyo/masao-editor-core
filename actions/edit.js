@@ -24,6 +24,11 @@ var Reflux=require('reflux');
 //   grid: boolean
 // });
 //
+// edit.changeRenderMode({
+//   render_map?: boolean,
+//   render_layer?: boolean
+// });
+//
 // edit.mouseDown({
 //   x: number,
 //   y: number
@@ -63,6 +68,7 @@ module.exports = Reflux.createActions({
         }
     },
     "changeGrid": {},
+    "changeRenderMode": {},
     "mouseDown": {},
     "mouseUp": {},
     "scroll": {}

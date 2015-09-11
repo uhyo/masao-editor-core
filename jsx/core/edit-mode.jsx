@@ -49,7 +49,7 @@ module.exports = React.createClass({
             }
         ];
         var mode_valueLink={
-            value: this.props.edit.mode,
+            value: edit.mode,
             requestChange: (key)=>{
                 editActions.changeMode({
                     mode: key
@@ -57,7 +57,7 @@ module.exports = React.createClass({
             }
         };
         var grid_valueLink={
-            value: this.props.edit.grid,
+            value: edit.grid,
             requestChange: (grid)=>{
                 editActions.changeGrid({
                     grid
@@ -65,19 +65,45 @@ module.exports = React.createClass({
             }
         };
         var stage_valueLink={
-            value: String(this.props.edit.stage),
+            value: String(edit.stage),
             requestChange: (key)=>{
                 editActions.changeStage({
                     stage: Number(key),
                 });
             }
         };
+
+        var renderSwitch;
+        if(this.props.edit.screen==="layer"){
+            let vl={
+                value: edit.render_map,
+                requestChange: (key)=>{
+                    editActions.changeRenderMode({
+                        render_map: key
+                    });
+                }
+            };
+            renderSwitch=<Switch label="マップも表示" valueLink={vl}/>;
+        }else{
+            let vl={
+                value: edit.render_layer,
+                requestChange: (key)=>{
+                    editActions.changeRenderMode({
+                        render_layer: key
+                    });
+                }
+            };
+            renderSwitch=<Switch label="背景レイヤーも表示" valueLink={vl}/>;
+        }
         return <div className="me-core-edit-mode">
             <div>
                 <Select contents={contents} valueLink={mode_valueLink}/>
             </div>
             <div>
                 <Switch label="グリッドを表示" valueLink={grid_valueLink}/>
+            </div>
+            <div>
+                {renderSwitch}
             </div>
             <div>
                 <Select contents={contents2} valueLink={stage_valueLink}/>

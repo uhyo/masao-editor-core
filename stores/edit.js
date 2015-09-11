@@ -26,6 +26,10 @@ var editActions=require('../actions/edit');
  * ### エディットオプション
  * # グリッド
  * grid: boolean
+ * # マップも表示
+ * render_map: boolean  
+ * # 背景レイヤーも表示
+ * render_layer: boolean
  *
  * ### 編集状態
  * # マウスの押下状態
@@ -52,6 +56,9 @@ module.exports = Reflux.createStore({
         this.pen_layer="..";
         //グリッド
         this.grid=false;
+        //もう一方も表示
+        this.render_map=false;
+        this.render_layer=false;
         //マウスの押下状態
         this.mouse_down=false;
         this.mouse_sx=null;
@@ -76,6 +83,8 @@ module.exports = Reflux.createStore({
             pen: this.pen,
             pen_layer: this.pen_layer,
             grid: this.grid,
+            render_map: this.render_map,
+            render_layer: this.render_layer,
             mouse_down: this.mouse_down,
             mouse_sx: this.mouse_sx,
             mouse_sy: this.mouse_sy,
@@ -111,6 +120,15 @@ module.exports = Reflux.createStore({
     },
     onChangeGrid({grid}){
         this.grid=grid;
+        this.trigger(this.makeState());
+    },
+    onChangeRenderMode({render_map, render_layer}){
+        if(render_map!=null){
+            this.render_map=render_map;
+        }
+        if(render_layer!=null){
+            this.render_layer=render_layer;
+        }
         this.trigger(this.makeState());
     },
     onMouseDown({x,y,mode}){
