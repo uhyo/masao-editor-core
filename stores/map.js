@@ -125,8 +125,8 @@ module.exports = Reflux.createStore({
                     }
                     p=params[`layer${i}-${j}${ssfx}`];
                     if(p!=null){
-                        for(let k=0;k < 120; k+=2){
-                            newLayer[h][j][i*60+k] = p.slice(k,k+2) || "..";
+                        for(let k=0;k < 60; k++){
+                            newLayer[h][j][i*60+k] = p.slice(k*2,k*2+2) || "..";
                         }
                     }
                 }
