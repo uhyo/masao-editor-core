@@ -75,9 +75,12 @@ var MasaoEditorCore = React.createClass({
     },
     handleExternal(req){
         //paramにmapの内容を突っ込む
-        let mp=mapToParam(this.state.map);
-        let allParams = extend({},this.state.params, mp);
-        req(allParams);
+        return (e)=>{
+            e.preventDefault();
+            let mp=mapToParam(this.state.map);
+            let allParams = extend({},this.state.params, mp);
+            req(allParams);
+        };
     },
 });
 //exports stores
