@@ -30,16 +30,10 @@ var MasaoEditorCore = React.createClass({
 
         defaultParams: React.PropTypes.object,
 
-        text_save: React.PropTypes.string,
-        text_testplay: React.PropTypes.string,
-        requestSave: React.PropTypes.func,
-        requestTestplay: React.PropTypes.func
-    },
-    getDefaultProps(){
-        return {
-            text_save: "保存",
-            text_testplay: "テストプレイ"
-        };
+        externalCommands: React.PropTypes.arrayOf(React.PropTypes.shape({
+            label: React.PropTypes.string.isRequired,
+            request: React.PropTypes.func.isRequired
+        }).isRequired),
     },
     componentWillMount(){
         if(this.props.defaultParams){
@@ -61,39 +55,29 @@ var MasaoEditorCore = React.createClass({
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit}/>;
         }
-        var button_save=null;
-        if(this.props.requestSave!=null){
-            button_save=<div>
-                <Button label={this.props.text_save} onClick={this.handleSaveClick}/>
-            </div>;
-        }
-        var button_testplay=null;
-        if(this.props.requestTestplay!=null){
-            button_testplay=<div>
-                <Button label={this.props.text_testplay} onClick={this.handleTestplayClick}/>
-            </div>;
+        var external_buttons=null;
+        if(this.props.externalCommands!=null){
+            external_buttons=this.props.externalCommands.map((com)=>{
+                return <div key={com.label}>
+                    <Button label={com.label} onClick={this.handleExternal(com.request)}/>
+                </div>;
+            });
         }
         return <div className="me-core">
             <div className="me-core-info">
                 <div>
                     <ScreenSelect edit={edit}/>
                 </div>
-                {button_save}
-                {button_testplay}
+                {external_buttons}
             </div>
             {screen}
         </div>;
     },
-    handleSaveClick(){
+    handleExternal(req){
         //paramにmapの内容を突っ込む
         let mp=mapToParam(this.state.map);
         let allParams = extend({},this.state.params, mp);
-        this.props.requestSave(allParams);
-    },
-    handleTestplayClick(){
-        let mp=mapToParam(this.state.map);
-        let allParams = extend({},this.state.params, mp);
-        this.props.requestTestplay(allParams);
+        req(allParams);
     },
 });
 //exports stores

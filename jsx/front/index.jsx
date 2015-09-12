@@ -171,8 +171,18 @@ module.exports = React.createClass({
     displayName:"Front",
     render(){
         //it's sample!
+        var commands=[
+            {
+                label: "保存",
+                request: this.handleRequestSave
+            },
+            {
+                label: "テストプレイ",
+                request: this.handleRequestTestplay
+            }
+        ];
         return <div>
-            <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" filename_chips="images/chips.png" requestSave={this.handleRequestSave} requestTestplay={this.handleRequestTestplay} defaultParams={defaultValue}/>
+            <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" filename_chips="images/chips.png" externalCommands={commands}/>
         </div>;
     },
     handleRequestSave(params){
