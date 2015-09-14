@@ -13,6 +13,12 @@ module.exports = React.createClass({
         edit: React.PropTypes.object.isRequired,
         params: React.PropTypes.object.isRequired
     },
+    componentDidUpdate(prevProps){
+        if(prevProps.edit.param_type !== this.props.edit.param_type){
+            let main=React.findDOMNode(this.refs.main);
+            main.scrollTop=0;
+        }
+    },
     render(){
         var data=masao.param.data, params=this.props.params;
         var param_type=this.props.edit.param_type;
@@ -37,7 +43,7 @@ module.exports = React.createClass({
 
         return <div className="me-core-param-edit">
             {typeMenu}
-            {
+            <div ref="main" className="me-core-param-edit-main">{
                 (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
                     let obj=data[key], type=obj.type;
                     //typeに応じて
@@ -111,7 +117,7 @@ module.exports = React.createClass({
                         </label>
                     </div>;
                 })
-            }
+            }</div>
         </div>;
     }
 });

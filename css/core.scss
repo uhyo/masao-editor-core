@@ -67,12 +67,12 @@ $me-button-surface-color-hov : #88bb55;
   }
 }
 
-.me-core-param-edit {
-  max-height: 600px;
-  overflow-y: scroll;
-}
 .me-core-param-edit-menu {
   margin: 5px;
+}
+.me-core-param-edit-main {
+  max-height: 600px;
+  overflow-y: scroll;
 }
 .me-core-param-param {
   label {
@@ -84,7 +84,10 @@ $me-button-surface-color-hov : #88bb55;
       display: inline-block;
     }
     b {
-      width: 300px;
+      width: 340px;
+    }
+    input[type="text"], input[type="number"], select {
+      min-width: 300px;
     }
   }
 }
