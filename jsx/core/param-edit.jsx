@@ -15,6 +15,7 @@ module.exports = React.createClass({
     },
     render(){
         var data=masao.param.data, params=this.props.params;
+        var param_type=this.props.edit.param_type;
         var keys=Object.keys(data);
         var paramTypesContents=[{
             key: "",
@@ -25,7 +26,7 @@ module.exports = React.createClass({
                 value: masao.paramTypes[key].name
             };
         })), paramTypeLink={
-            value: this.props.edit.param_type,
+            value: param_type,
             requestChange: (param_type)=>{
                 editActions.changeParamType({param_type});
             }
@@ -37,7 +38,7 @@ module.exports = React.createClass({
         return <div className="me-core-param-edit">
             {typeMenu}
             {
-                keys.map((key)=>{
+                (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
                     let obj=data[key], type=obj.type;
                     //typeに応じて
                     let field=null;
