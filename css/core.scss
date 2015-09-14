@@ -80,7 +80,7 @@ $me-button-surface-color-hov : #88bb55;
     border-bottom: 1px dashed #cccccc;
     margin-bottom: 2px;
 
-    b, span {
+    & > b,& > span {
       display: inline-block;
     }
     b {
@@ -126,6 +126,19 @@ $me-button-surface-color-hov : #88bb55;
   &.me-core-util-switch-yes {
     background-color: $me-button-surface-color-on;
   }
+}
+
+.me-core-util-color {
+  display: flex;
+}
+.me-core-util-color-box {
+  flex: auto 0 0;
+  width: 6rem;
+  padding: 2px;
+}
+.me-core-util-color-edit {
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 

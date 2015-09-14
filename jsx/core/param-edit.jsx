@@ -2,7 +2,8 @@
 var React=require('react'),
     masao=require('../../scripts/masao');
 
-var Select=require('./util/select.jsx');
+var Select=require('./util/select.jsx'),
+    Color=require('./util/color.jsx');
 
 var paramActions=require('../../actions/params'),
     editActions=require('../../actions/edit');
@@ -45,74 +46,96 @@ module.exports = React.createClass({
             {typeMenu}
             <div ref="main" className="me-core-param-edit-main">{
                 (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
-                    let obj=data[key], type=obj.type;
-                    //typeに応じて
-                    let field=null;
-                    if(obj.type==="enum"){
-                        let valueLink={
-                            value: params[key],
-                            requestChange:(v)=>{
-                                paramActions.changeParam({
-                                    param: key,
-                                    value: v
+                    let description, field;
+                    if(/@@@/.test(key)){
+                        //色コントロールを設置
+                        let key_red=key.replace("@@@","red"), key_green=key.replace("@@@","green"), key_blue=key.replace("@@@","blue");
+                        let colorLink={
+                            value: {
+                                red: Number(params[key_red]),
+                                green: Number(params[key_green]),
+                                blue: Number(params[key_blue])
+                            },
+                            requestChange: ({red, green, blue})=>{
+                                paramActions.changeParams({
+                                    [key_red]: String(red),
+                                    [key_green]: String(green),
+                                    [key_blue]: String(blue)
                                 });
                             }
                         };
-                        field=<select valueLink={valueLink}>{
-                            obj.enumValues.map((obj)=>{
-                                return <option key={obj.value} value={obj.value}>{obj.description}</option>;
-                            })
-                        }</select>;
-                    }else if(obj.type==="boolean"){
-                        let checkedLink={
-                            value: params[key]==="1",
-                            requestChange:(checked)=>{
-                                paramActions.changeParam({
-                                    param: key,
-                                    value: checked ? "1" : "2"
-                                });
-                            }
-                        };
-                        field=<input type="checkbox" checkedLink={checkedLink}/>;
-                    }else if(obj.type==="boolean-reversed"){
-                        let checkedLink={
-                            value: params[key]==="2",
-                            requestChange:(checked)=>{
-                                paramActions.changeParam({
-                                    param: key,
-                                    value: checked ? "2" : "1"
-                                });
-                            }
-                        };
-                        field=<input type="checkbox" checkedLink={checkedLink}/>;
-                    }else if(obj.type==="integer"){
-                        let valueLink={
-                            value: params[key],
-                            requestChange:(v)=>{
-                                paramActions.changeParam({
-                                    param: key,
-                                    value: v
-                                });
-                            }
-                        };
-                        field=<input type="number" step="1" min={obj.min} max={obj.max} valueLink={valueLink}/>;
-                    }else if(obj.type==="string"){
-                        let valueLink={
-                            value: params[key],
-                            requestChange:(v)=>{
-                                paramActions.changeParam({
-                                    param: key,
-                                    value: v
-                                });
-                            }
-                        };
-                        field=<input type="text" valueLink={valueLink}/>;
+                        field= <Color colorLink={colorLink}/>;
+                        description=data[key_red].description.replace(/（.+）$/,"");
                     }else{
-                        return null;
+                        let obj=data[key], type=obj.type;
+                        description=obj.description;
+                        //typeに応じて
+                        if(obj.type==="enum"){
+                            let valueLink={
+                                value: params[key],
+                                requestChange:(v)=>{
+                                    paramActions.changeParam({
+                                        param: key,
+                                        value: v
+                                    });
+                                }
+                            };
+                            field=<select valueLink={valueLink}>{
+                                obj.enumValues.map((obj)=>{
+                                    return <option key={obj.value} value={obj.value}>{obj.description}</option>;
+                                })
+                            }</select>;
+                        }else if(obj.type==="boolean"){
+                            let checkedLink={
+                                value: params[key]==="1",
+                                requestChange:(checked)=>{
+                                    paramActions.changeParam({
+                                        param: key,
+                                        value: checked ? "1" : "2"
+                                    });
+                                }
+                            };
+                            field=<input type="checkbox" checkedLink={checkedLink}/>;
+                        }else if(obj.type==="boolean-reversed"){
+                            let checkedLink={
+                                value: params[key]==="2",
+                                requestChange:(checked)=>{
+                                    paramActions.changeParam({
+                                        param: key,
+                                        value: checked ? "2" : "1"
+                                    });
+                                }
+                            };
+                            field=<input type="checkbox" checkedLink={checkedLink}/>;
+                        }else if(obj.type==="integer"){
+                            let valueLink={
+                                value: params[key],
+                                requestChange:(v)=>{
+                                    paramActions.changeParam({
+                                        param: key,
+                                        value: v
+                                    });
+                                }
+                            };
+                            field=<input type="number" step="1" min={obj.min} max={obj.max} valueLink={valueLink}/>;
+                        }else if(obj.type==="string"){
+                            let valueLink={
+                                value: params[key],
+                                requestChange:(v)=>{
+                                    paramActions.changeParam({
+                                        param: key,
+                                        value: v
+                                    });
+                                }
+                            };
+                            field=<input type="text" valueLink={valueLink}/>;
+                        }else{
+                            return null;
+                        }
                     }
                     return <div key={key} className="me-core-param-param">
                         <label>
-                            <b>{obj.description}</b>
+                            <b>{description}</b>
                             <span>{field}</span>
                         </label>
                     </div>;
