@@ -20,6 +20,10 @@ var Reflux=require('reflux');
 //   pen: string
 // });
 //
+// edit.changeParamType({
+//   param_type: string
+// });
+//
 // edit.changeGrid({
 //   grid: boolean
 // });
@@ -67,6 +71,7 @@ module.exports = Reflux.createActions({
             return;
         }
     },
+    "changeParamType": {},
     "changeGrid": {},
     "changeRenderMode": {},
     "mouseDown": {},

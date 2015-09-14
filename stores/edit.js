@@ -23,6 +23,9 @@ var editActions=require('../actions/edit');
  * pen: string
  * pen_layer: string
  *
+ * # どのparamTypeを編集しているか
+ * param_type: string
+ *
  * ### エディットオプション
  * # グリッド
  * grid: boolean
@@ -54,6 +57,8 @@ module.exports = Reflux.createStore({
         //ペン
         this.pen=".";
         this.pen_layer="..";
+        //param
+        this.param_type="";
         //グリッド
         this.grid=false;
         //もう一方も表示
@@ -82,6 +87,7 @@ module.exports = Reflux.createStore({
             mode_current: this.mode_current,
             pen: this.pen,
             pen_layer: this.pen_layer,
+            param_type: this.param_type,
             grid: this.grid,
             render_map: this.render_map,
             render_layer: this.render_layer,
@@ -116,6 +122,10 @@ module.exports = Reflux.createStore({
         if(mode===true){
             this.mode="pen";
         }
+        this.trigger(this.makeState());
+    },
+    onChangeParamType({param_type}){
+        this.param_type=param_type;
         this.trigger(this.makeState());
     },
     onChangeGrid({grid}){
