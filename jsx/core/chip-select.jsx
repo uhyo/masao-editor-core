@@ -48,6 +48,9 @@ module.exports = React.createClass({
         }
     },
     draw(full){
+        if(this.images==null){
+            return;
+        }
         var params=this.props.params, screen=this.props.edit.screen;
         var version=this.props.project.version;
         if(full){
