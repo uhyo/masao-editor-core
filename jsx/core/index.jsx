@@ -80,10 +80,16 @@ var MasaoEditorCore = React.createClass({
     handleExternal(req){
         //paramにmapの内容を突っ込む
         return (e)=>{
+            let project=this.state.project;
             e.preventDefault();
             let mp=mapToParam(this.state.map);
-            let allParams = extend({},this.state.params, mp);
-            req(allParams);
+            let version = project.version==="fx" ? "fx16" : project.version;
+            let allParams = masao.param.sanitize(extend({},this.state.params, mp),version);
+            let obj=masao.format.make({
+                params: allParams,
+                version
+            });
+            req(obj);
         };
     },
 });
