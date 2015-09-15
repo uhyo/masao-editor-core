@@ -129,13 +129,18 @@ var MapScreen = React.createClass({
     },
     render(){
         var map=this.props.map, params=this.props.params, edit=this.props.edit, project=this.props.project, pattern=this.props.pattern, mapchip=this.props.mapchip, chips=this.props.chips;
+        var are=null;
+        if(project.version==="2.8" && edit.screen==="layer"){
+            are=<p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>;
+        }
         return <div>
             <div className="me-core-map-info">
                 <EditMode edit={edit}/>
             </div>
             <MiniMap params={params} edit={edit} map={map}/>
+            {are}
             <div className="me-core-main">
-                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit}/>
+                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
                 <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>
             </div>
         </div>;
