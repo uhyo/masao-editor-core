@@ -2,7 +2,7 @@ var React=require('react');
 
 var projectActions=require('../../actions/project');
 
-var Select=require('./util/select');
+var Select=require('./util/select.jsx');
 
 module.exports = React.createClass({
     displayName: "ProjectEdit",
