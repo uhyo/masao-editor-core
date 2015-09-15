@@ -3,6 +3,8 @@ var Reflux=require('reflux');
 
 var projectActions=require('../actions/project');
 
+// version: ["2.8","fx16","kani2"]
+
 module.exports = Reflux.createStore({
     listenables: projectActions,
     init(){
