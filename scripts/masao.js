@@ -1,6 +1,7 @@
 var masao=require('masao');
 
 exports.param = masao.param;
+exports.format= masao.format;
 
 //paramの分類
 var paramTypes={
@@ -402,3 +403,14 @@ var paramTypes={
     },*/
 };
 exports.paramTypes = paramTypes;
+
+//対応可能なバージョンに変換
+function acceptVersion(version){
+    if(version==="2.7" || version==="2.8"){
+        return "2.8";
+    }else if(version==="kani" || version==="kani2"){
+        return "kani2";
+    }
+    return "fx16";
+}
+exports.acceptVersion = acceptVersion;

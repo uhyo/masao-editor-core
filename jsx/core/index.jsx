@@ -2,10 +2,11 @@
 var React=require('react'),
     Reflux=require('reflux');
 var extend=require('extend'),
-    masao=require('masao');
+    masao=require('../../scripts/masao');
 
 
-var paramActions=require('../../actions/params');
+var paramActions=require('../../actions/params'),
+    projectActions=require('../../actions/project');
 
 var mapStore=require('../../stores/map'),
     paramStore=require('../../stores/params'),
@@ -30,7 +31,7 @@ var MasaoEditorCore = React.createClass({
         filename_mapchip: React.PropTypes.string.isRequired,
         filename_chips: React.PropTypes.string.isRequired,
 
-        defaultParams: React.PropTypes.object,
+        defaultGame: React.PropTypes.object,
 
         externalCommands: React.PropTypes.arrayOf(React.PropTypes.shape({
             label: React.PropTypes.string.isRequired,
@@ -38,14 +39,16 @@ var MasaoEditorCore = React.createClass({
         }).isRequired),
     },
     componentWillMount(){
-        if(this.props.defaultParams){
+        if(this.props.defaultGame){
             //default
-            paramActions.resetParams(this.props.defaultParams);
+            paramActions.resetParams(this.props.defaultGame.params);
+            projectActions.changeVersion({version: masao.acceptVersion(this.props.defaultGame.version)});
         }
     },
     componentWillReceiveProps(newProps){
         if(this.props.defaultParams!==newProps.defaultParams && newProps.defaultParams != null){
             paramActions.resetParams(newProps.defaultParams);
+            projectActions.changeVersion({version: masao.acceptVersion(newProps.defaultGame.version)});
         }
     },
     render(){
