@@ -9,7 +9,8 @@ var paramActions=require('../../actions/params');
 
 var mapStore=require('../../stores/map'),
     paramStore=require('../../stores/params'),
-    editStore=require('../../stores/edit');
+    editStore=require('../../stores/edit'),
+    projectStore=require('../../stores/project');
 
 var MapEdit=require('./map-edit.jsx'),
     ChipSelect=require('./chip-select.jsx'),
@@ -17,12 +18,13 @@ var MapEdit=require('./map-edit.jsx'),
     MiniMap=require('./mini-map.jsx'),
     ScreenSelect=require('./screen-select.jsx'),
     ParamEdit=require('./param-edit.jsx'),
+    ProjectEdit=require('./project-edit.jsx'),
     Button=require('./util/button.jsx');
 
 
 var MasaoEditorCore = React.createClass({
     displayName: "MasaoEditorCore",
-    mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit")],
+    mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit"), Reflux.connect(projectStore,"project")],
     propTypes:{
         filename_pattern: React.PropTypes.string.isRequired,
         filename_mapchip: React.PropTypes.string.isRequired,
@@ -47,13 +49,15 @@ var MasaoEditorCore = React.createClass({
         }
     },
     render(){
-        var map=this.state.map, params=this.state.params, edit=this.state.edit;
+        var map=this.state.map, params=this.state.params, edit=this.state.edit, project=this.state.project;
 
         var screen=null;
         if(edit.screen==="map" || edit.screen==="layer"){
-            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={this.props.filename_chips} map={map} params={params} edit={edit}/>;
+            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={this.props.filename_chips} map={map} params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="params"){
-            screen=<ParamScreen params={params} edit={edit}/>;
+            screen=<ParamScreen params={params} edit={edit} project={project}/>;
+        }else if(edit.screen==="project"){
+            screen=<ProjectScreen project={project}/>;
         }
         var external_buttons=null;
         if(this.props.externalCommands!=null){
@@ -76,10 +80,16 @@ var MasaoEditorCore = React.createClass({
     handleExternal(req){
         //paramにmapの内容を突っ込む
         return (e)=>{
+            let project=this.state.project;
             e.preventDefault();
             let mp=mapToParam(this.state.map);
-            let allParams = extend({},this.state.params, mp);
-            req(allParams);
+            let version = project.version==="fx" ? "fx16" : project.version;
+            let allParams = masao.param.sanitize(extend({},this.state.params, mp),version);
+            let obj=masao.format.make({
+                params: allParams,
+                version
+            });
+            req(obj);
         };
     },
 });
@@ -115,17 +125,23 @@ var MapScreen = React.createClass({
                 ).isRequired
             ).isRequired
         }),
+        project: React.PropTypes.object.isRequired
     },
     render(){
-        var map=this.props.map, params=this.props.params, edit=this.props.edit, pattern=this.props.pattern, mapchip=this.props.mapchip, chips=this.props.chips;
+        var map=this.props.map, params=this.props.params, edit=this.props.edit, project=this.props.project, pattern=this.props.pattern, mapchip=this.props.mapchip, chips=this.props.chips;
+        var are=null;
+        if(project.version==="2.8" && edit.screen==="layer"){
+            are=<p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>;
+        }
         return <div>
             <div className="me-core-map-info">
                 <EditMode edit={edit}/>
             </div>
             <MiniMap params={params} edit={edit} map={map}/>
+            {are}
             <div className="me-core-main">
-                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit}/>
-                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit}/>
+                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
+                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>
             </div>
         </div>;
     }
@@ -135,12 +151,26 @@ var ParamScreen = React.createClass({
     displayName: "ParamScreen",
     propTypes: {
         edit: React.PropTypes.object.isRequired,
-        params: React.PropTypes.object.isRequired
+        params: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
     },
     render(){
-        var params=this.props.params, edit=this.props.edit;
+        var params=this.props.params, edit=this.props.edit, project=this.props.project;
         return <div>
-            <ParamEdit params={params} edit={edit} />
+            <ParamEdit params={params} edit={edit} project={project}/>
+        </div>;
+    }
+});
+
+var ProjectScreen = React.createClass({
+    displayName: "ProjectScreen",
+    propTypes: {
+        project: React.PropTypes.object.isRequired
+    },
+    render(){
+        var project=this.props.project;
+        return <div>
+            <ProjectEdit project={project}/>
         </div>;
     }
 });

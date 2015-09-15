@@ -35,7 +35,7 @@
     "gulp-uglify": "^1.4.0",
     "gulp-util": "^3.0.6",
     "gulp-webserver": "^0.9.1",
-    "masao": "^0.0.4",
+    "masao": "^0.0.6",
     "native-promise-only": "^0.8.1",
     "react": "^0.13.3",
     "reactify": "^1.1.1",

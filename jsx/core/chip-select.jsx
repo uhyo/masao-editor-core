@@ -16,7 +16,8 @@ module.exports = React.createClass({
         chips: React.PropTypes.string.isRequired,
 
         params: React.PropTypes.object.isRequired,
-        edit: React.PropTypes.object.isRequired
+        edit: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
     },
     componentDidMount(){
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
@@ -40,7 +41,7 @@ module.exports = React.createClass({
                 };
                 this.draw(true);
             });
-        }else if(prevProps.edit.screen!==this.props.edit.screen){
+        }else if(prevProps.edit.screen!==this.props.edit.screen || prevProps.project.version!==this.props.project.version){
             this.draw(true);
         }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
             this.draw(false);
@@ -48,6 +49,7 @@ module.exports = React.createClass({
     },
     draw(full){
         var params=this.props.params, screen=this.props.edit.screen;
+        var version=this.props.project.version;
         if(full){
             //チップセットを書き換える
             let canvas=React.findDOMNode(this.refs.canvas);
@@ -71,7 +73,10 @@ module.exports = React.createClass({
                 }
             }else{
                 while(i < chip.chipList.length){
-                    chip.drawChip(ctx,this.images,params,chip.chipList[i],x,y,false);
+                    let c=chip.chipList[i];
+                    if(version!=="2.8" || (c!=="{" && c!=="[" && c!=="]" && c!=="<" && c!==">")){
+                        chip.drawChip(ctx,this.images,params,c,x,y,false);
+                    }
                     i++;
                     x+=32;
                     if(x+32 > canvas.width){

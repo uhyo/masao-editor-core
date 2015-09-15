@@ -24,6 +24,10 @@ module.exports = React.createClass({
             {
                 key:"params",
                 value:"param編集"
+            },
+            {
+                key:"project",
+                value:"プロジェクト設定"
             }
         ];
         var valueLink={

@@ -12,7 +12,8 @@ module.exports = React.createClass({
     displayName: "ParamEdit",
     propTypes: {
         edit: React.PropTypes.object.isRequired,
-        params: React.PropTypes.object.isRequired
+        params: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
     },
     componentDidUpdate(prevProps){
         if(prevProps.edit.param_type !== this.props.edit.param_type){
@@ -21,7 +22,7 @@ module.exports = React.createClass({
         }
     },
     render(){
-        var data=masao.param.data, params=this.props.params;
+        var data=masao.param.data, params=this.props.params, project=this.props.project;
         var param_type=this.props.edit.param_type;
         var keys=Object.keys(data);
         var paramTypesContents=[{
@@ -46,10 +47,11 @@ module.exports = React.createClass({
             {typeMenu}
             <div ref="main" className="me-core-param-edit-main">{
                 (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
-                    let description, field;
+                    let description, field, obj;
                     if(/@@@/.test(key)){
                         //色コントロールを設置
                         let key_red=key.replace("@@@","red"), key_green=key.replace("@@@","green"), key_blue=key.replace("@@@","blue");
+                        obj=data[key_red];
                         let colorLink={
                             value: {
                                 red: Number(params[key_red]),
@@ -65,10 +67,20 @@ module.exports = React.createClass({
                             }
                         };
                         field= <Color colorLink={colorLink}/>;
-                        description=data[key_red].description.replace(/（.+）$/,"");
+                        description=obj.description.replace(/（.+）$/,"");
                     }else{
-                        let obj=data[key], type=obj.type;
+                        obj=data[key];
+                        let type=obj.type;
                         description=obj.description;
+                        //versionがあれか見る
+                        let version=obj.version, pv=project.version;
+                        if(pv==="fx16"){
+                            pv="fx";
+                        }
+                        if(version && version[pv]===false){
+                            //これは表示しない
+                            return null;
+                        }
                         //typeに応じて
                         if(obj.type==="enum"){
                             let valueLink={
@@ -80,8 +92,15 @@ module.exports = React.createClass({
                                     });
                                 }
                             };
+                            let enumValues=obj.enumValues;
+                            if(version && Array.isArray(version[pv])){
+                                //選択肢の制限
+                                enumValues=enumValues.filter((obj)=>{
+                                    return version[pv].indexOf(obj.value)>=0;
+                                });
+                            }
                             field=<select valueLink={valueLink}>{
-                                obj.enumValues.map((obj)=>{
+                                enumValues.map((obj)=>{
                                     return <option key={obj.value} value={obj.value}>{obj.description}</option>;
                                 })
                             }</select>;
