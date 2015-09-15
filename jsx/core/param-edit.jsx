@@ -12,7 +12,8 @@ module.exports = React.createClass({
     displayName: "ParamEdit",
     propTypes: {
         edit: React.PropTypes.object.isRequired,
-        params: React.PropTypes.object.isRequired
+        params: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
     },
     componentDidUpdate(prevProps){
         if(prevProps.edit.param_type !== this.props.edit.param_type){

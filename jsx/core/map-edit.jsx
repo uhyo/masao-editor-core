@@ -36,6 +36,7 @@ module.exports = React.createClass({
         }),
         params: React.PropTypes.object.isRequired,
         edit: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
     },
     componentDidMount(){
         //flags
