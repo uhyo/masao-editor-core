@@ -41,7 +41,7 @@ module.exports = React.createClass({
                 };
                 this.draw(true);
             });
-        }else if(prevProps.edit.screen!==this.props.edit.screen || prevProps.project.version!==this.props.project.version){
+        }else if(prevProps.edit.screen!==this.props.edit.screen || prevProps.project.version!==this.props.project.version || prevProps.edit.stage!==this.props.edit.stage){
             this.draw(true);
         }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
             this.draw(false);
@@ -58,7 +58,7 @@ module.exports = React.createClass({
             let canvas=React.findDOMNode(this.refs.canvas);
             let ctx=canvas.getContext('2d');
             //まず背景を塗る
-            ctx.fillStyle = util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
+            ctx.fillStyle = util.stageBackColor(params, this.props.edit);
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
             let x=0,y=0,i=0;

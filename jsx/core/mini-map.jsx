@@ -61,7 +61,7 @@ module.exports = React.createClass({
             let params=this.props.params, edit=this.props.edit, map=this.props.map.map;
             let mapdata=map[edit.stage-1];
             //bg
-            let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
+            let bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,canvas.width,canvas.height);
             //draw

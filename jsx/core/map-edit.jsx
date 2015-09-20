@@ -116,7 +116,7 @@ module.exports = React.createClass({
             let mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
 
             //background color
-            let bgc=util.cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
+            let bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
             //map
