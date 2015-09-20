@@ -432,12 +432,12 @@ var chipTable={
     "<": {
         pattern: 18,
         name: "上り坂",
-        category: "athletic"
+        category: "block"
     },
     ">": {
         pattern: 19,
         name: "下り坂",
-        category: "athletic"
+        category: "block"
     },
     ".": {
         pattern: 0,
@@ -2456,6 +2456,79 @@ function chipFor(params,chip){
     if(pa!=null && params[pa]!=="1"){
         //変わったアスレチックだ
         return athleticTable[params[pa]];
+    }else if(chip==="j" && params.layer_mode==="2"){
+        //ブロック10はレイヤーありのとき透明になる
+        return {
+            pattern: [{
+                subx: 0,
+                suby: 32,
+                width: 32,
+                height: 32,
+                dx: -16,
+                dy: -16
+            },{
+                subx: 80,
+                suby: 16
+            }],
+            name: "ブロック10（透明）",
+            category: "block"
+        };
+    }else if(chip==="[" && params.layer_mode==="2"){
+        //下から通れる床
+        return {
+            pattern: [{
+                subx: 128,
+                suby: 32,
+                width: 32,
+                height: 32,
+                dx: -16,
+                dy: -16
+            }],
+            name: "下から通れる床（透明）",
+            category: "block"
+        };
+    }else if(chip==="]" && params.layer_mode==="2"){
+        //ハシゴ
+        return {
+            pattern: [{
+                subx: 128,
+                suby: 0,
+                width: 32,
+                height: 32,
+                dx: -16,
+                dy: -16
+            }],
+            name: "ハシゴ（透明）",
+            category: "block"
+        };
+    }else if(chip==="<" && params.layer_mode==="2"){
+        //坂も透明になる
+        return {
+            pattern: [{
+                subx: 96,
+                suby: 0,
+                width: 32,
+                height: 32,
+                dx: -16,
+                dy: -16
+            }],
+            name: "上り坂（透明）",
+            category: "block"
+        };
+    }else if(chip===">" && params.layer_mode==="2"){
+        //坂も透明になる
+        return {
+            pattern: [{
+                subx: 96,
+                suby: 32,
+                width: 32,
+                height: 32,
+                dx: -16,
+                dy: -16
+            }],
+            name: "下り坂（透明）",
+            category: "block"
+        };
     }else{
         return chipTable[chip];
     }
