@@ -39,10 +39,13 @@ var MasaoEditorCore = React.createClass({
         }).isRequired),
     },
     componentWillMount(){
-        if(this.props.defaultGame){
+        let g=this.props.defaultGame;
+        if(g){
             //default
-            paramActions.resetParams(this.props.defaultGame.params);
-            projectActions.changeVersion({version: masao.acceptVersion(this.props.defaultGame.version)});
+            let v = masao.acceptVersion(g.version);
+            let params = masao.param.addDefaults(g.params, v);
+            paramActions.resetParams(params);
+            projectActions.changeVersion({version: v});
         }
     },
     componentWillReceiveProps(newProps){
