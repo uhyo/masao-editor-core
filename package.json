@@ -1,6 +1,6 @@
 {
   "name": "masao-editor-core",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Web Masao Editor.",
   "main": "dist/bundle.js",
   "module": "dist-es6/jsx/index.js",
