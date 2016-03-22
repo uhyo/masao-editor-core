@@ -44,6 +44,11 @@ var Reflux=require('reflux');
 //   x: number,
 //   y: number
 // });
+//
+//
+// edit.jsConfirm({
+//   confirm: boolean
+// });
 
 module.exports = Reflux.createActions({
     "changeScreen": {},
@@ -76,5 +81,6 @@ module.exports = Reflux.createActions({
     "changeRenderMode": {},
     "mouseDown": {},
     "mouseUp": {},
-    "scroll": {}
+    "scroll": {},
+    "jsConfirm": {}
 });

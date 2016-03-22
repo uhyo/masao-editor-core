@@ -18,6 +18,16 @@ $me-button-surface-color-hov : #88bb55;
     margin: 0 8px;
   }
 }
+.me-core-screen {
+  transition: height ease 0.4s;
+  overflow-y: hidden;
+}
+.me-core-screen-map {
+  height: 500px;
+}
+.me-core-screen-layer {
+  height: 700px;
+}
 .me-core-map-info {
   display: flex;
   margin-bottom: 4px;
@@ -67,6 +77,9 @@ $me-button-surface-color-hov : #88bb55;
   }
 }
 
+.me-core-screen-params {
+  height: 720px;
+}
 .me-core-param-edit-menu {
   margin: 5px;
 }
@@ -89,6 +102,62 @@ $me-button-surface-color-hov : #88bb55;
     input[type="text"], input[type="number"], select {
       min-width: 300px;
     }
+  }
+}
+
+//project
+.me-core-screen-project {
+  height: 100px;
+}
+
+//js
+.me-core-screen-js {
+  height: 350px;
+}
+.me-core-js-warning {
+  margin: 8px;
+  padding: 40px 32px;
+  min-height: 300px;
+
+  text-align: center;
+
+  background-color: #555555;
+  color: #ffffff;
+
+  p {
+    line-height: 1.5em;
+    margin: 0.4em 0;
+  }
+  strong {
+    font-weight: bold;
+
+    strong {
+      font-weight: normal;
+      font-size: 2.4em;
+    }
+  }
+  em {
+    font-style: normal;
+    color: #eeee22;
+  }
+}
+.me-core-js-warning-button {
+  width: 250px;
+  margin: 26px auto 0;
+  padding: 16px;
+  font-size: 16px;
+
+  background-color: #cccccc;
+  color: #333333;
+
+  cursor: pointer;
+}
+.me-core-js-edit {
+  textarea {
+    width: 100%;
+    height: 300px;
+    resize: none;
+
   }
 }
 

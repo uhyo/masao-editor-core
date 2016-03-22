@@ -6,6 +6,7 @@ var extend=require('extend'),
 
 
 var paramActions=require('../../actions/params'),
+    editActions=require('../../actions/edit'),
     projectActions=require('../../actions/project');
 
 var mapStore=require('../../stores/map'),
@@ -20,6 +21,8 @@ var MapEdit=require('./map-edit.jsx'),
     ScreenSelect=require('./screen-select.jsx'),
     ParamEdit=require('./param-edit.jsx'),
     ProjectEdit=require('./project-edit.jsx'),
+    JSWarning=require('./js-warning.jsx'),
+    JSEdit=require('./js-edit.jsx'),
     Button=require('./util/button.jsx');
 
 
@@ -27,18 +30,25 @@ var MasaoEditorCore = React.createClass({
     displayName: "MasaoEditorCore",
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit"), Reflux.connect(projectStore,"project")],
     propTypes:{
+        //options
+        jsWarning: React.PropTypes.bool,
+
+        //filenames
         filename_pattern: React.PropTypes.string.isRequired,
         filename_mapchip: React.PropTypes.string.isRequired,
         filename_chips: React.PropTypes.string.isRequired,
 
+        //default
         defaultGame: React.PropTypes.object,
 
+        //external
         externalCommands: React.PropTypes.arrayOf(React.PropTypes.shape({
             label: React.PropTypes.string.isRequired,
             request: React.PropTypes.func.isRequired
         }).isRequired),
     },
     componentWillMount(){
+        //g: masao-json-format draft-3
         let g=this.props.defaultGame;
         if(g){
             //default
@@ -46,6 +56,10 @@ var MasaoEditorCore = React.createClass({
             let params = masao.param.addDefaults(g.params, v);
             paramActions.resetParams(params);
             projectActions.changeVersion({version: v});
+            projectActions.changeScript({script: g.script});
+            editActions.jsConfirm({
+                confirm: g.script != null
+            });
         }
     },
     componentWillReceiveProps(newProps){
@@ -64,6 +78,8 @@ var MasaoEditorCore = React.createClass({
             screen=<ParamScreen params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="project"){
             screen=<ProjectScreen project={project}/>;
+        }else if(edit.screen==="js"){
+            screen=<JsScreen jsWarning={this.props.jsWarning} edit={edit} project={project}/>;
         }
         var external_buttons=null;
         if(this.props.externalCommands!=null){
@@ -80,7 +96,9 @@ var MasaoEditorCore = React.createClass({
                 </div>
                 {external_buttons}
             </div>
-            {screen}
+            <div className={`me-core-screen me-core-screen-${edit.screen}`}>
+                {screen}
+            </div>
         </div>;
     },
     handleExternal(req){
@@ -93,7 +111,8 @@ var MasaoEditorCore = React.createClass({
             let allParams = masao.param.sanitize(extend({},this.state.params, mp),version);
             let obj=masao.format.make({
                 params: allParams,
-                version
+                version,
+                script: project.script || null
             });
             req(obj);
         };
@@ -178,6 +197,34 @@ var ProjectScreen = React.createClass({
         return <div>
             <ProjectEdit project={project}/>
         </div>;
+    }
+});
+
+var JsScreen = React.createClass({
+    displayName: "JsScreen",
+    propTypes: {
+        jsWarning: React.PropTypes.bool,
+        edit: React.PropTypes.object.isRequired,
+        project: React.PropTypes.object.isRequired
+    },
+    render(){
+        const {jsWarning, edit, project}=this.props;
+
+        if(jsWarning && !edit.js_confirm){
+            //警告を表示
+            return <div>
+                <JSWarning onClick={this.handleConfirm}/>
+            </div>;
+        }else{
+            return <div>
+                <JSEdit project={project}/>
+            </div>;
+        }
+    },
+    handleConfirm(){
+        editActions.jsConfirm({
+            confirm: true
+        });
     }
 });
 

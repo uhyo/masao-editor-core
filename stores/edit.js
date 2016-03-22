@@ -5,7 +5,7 @@ var editActions=require('../actions/edit');
 
 /* edit store
  * # スクリーン
- * screen: string // ["map","layer","params"]
+ * screen: string // ["map","layer","params","js"]
  *
  * # マップ編集画面の大きさ
  * view_width: number
@@ -43,6 +43,9 @@ var editActions=require('../actions/edit');
  * # マウスが押下されたときのスクロール状態
  * scroll_sx: number
  * scroll_sy: number
+ *
+ * ### JSの警告をOKしたか
+ * js_comfirm: boolean
  */
 module.exports = Reflux.createStore({
     init(){
@@ -70,6 +73,8 @@ module.exports = Reflux.createStore({
         this.mouse_sy=null;
         this.scroll_sx=null;
         this.scroll_sy=null;
+        //JS
+        this.js_confirm=false;
     },
     getInitialState(){
         return this.makeState();
@@ -95,7 +100,8 @@ module.exports = Reflux.createStore({
             mouse_sx: this.mouse_sx,
             mouse_sy: this.mouse_sy,
             scroll_sx: this.scroll_sx,
-            scroll_sy: this.scroll_sy
+            scroll_sy: this.scroll_sy,
+            js_confirm: this.js_confirm
         };
     },
     onChangeScreen({screen}){
@@ -162,5 +168,9 @@ module.exports = Reflux.createStore({
             this.scroll_y=y;
             this.trigger(this.makeState());
         }
+    },
+    onJsConfirm({confirm}){
+        this.js_confirm=!!confirm;
+        this.trigger(this.makeState());
     }
 });

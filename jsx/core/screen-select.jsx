@@ -28,6 +28,10 @@ module.exports = React.createClass({
             {
                 key:"project",
                 value:"プロジェクト設定"
+            },
+            {
+                key:"js",
+                value:"拡張JS"
             }
         ];
         var valueLink={
