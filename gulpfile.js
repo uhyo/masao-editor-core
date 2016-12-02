@@ -7,7 +7,6 @@ var gulpif=require('gulp-if');
 var duration=require('gulp-duration');
 var browserify=require('browserify');
 var source=require('vinyl-source-stream');
-var reactify=require('reactify');
 var babelify=require('babelify');
 var uglifyify=require('uglifyify');
 var watchify=require('watchify');
@@ -112,8 +111,7 @@ function jsxCompiler(watch){
         b=watchify(b);
     }
     //chain
-    b.transform(babelify)
-    .transform(reactify)
+    b.transform(babelify, {presets: ['es2015', 'react']})
     .transform(uglifyify,{global:true});
 
     b.on('update',bundle);
