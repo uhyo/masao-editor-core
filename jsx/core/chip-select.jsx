@@ -55,7 +55,7 @@ module.exports = React.createClass({
         var version=this.props.project.version;
         if(full){
             //チップセットを書き換える
-            let canvas=React.findDOMNode(this.refs.canvas);
+            let canvas=this.refs.canvas;
             let ctx=canvas.getContext('2d');
             //まず背景を塗る
             ctx.fillStyle = util.stageBackColor(params, this.props.edit);
@@ -91,7 +91,7 @@ module.exports = React.createClass({
         }
 
         //下のやつも描画
-        let canvas=React.findDOMNode(this.refs.canvas2);
+        let canvas=this.refs.canvas2;
         let ctx=canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
         if(screen==="layer"){

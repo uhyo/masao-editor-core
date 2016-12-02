@@ -1,5 +1,6 @@
 "use strict";
 var React=require('react');
+var ReactDOM = require('react-dom');
 
 var Front=require('./front/index.jsx');
 
@@ -10,5 +11,5 @@ document.addEventListener("DOMContentLoaded",(e)=>{
 
     var root=<Front/>;
 
-    React.render(root,apparea);
+    ReactDOM.render(root,apparea);
 });

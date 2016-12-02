@@ -57,7 +57,7 @@ module.exports = React.createClass({
         }
         this.drawing=true;
         requestAnimationFrame(()=>{
-            let canvas=React.findDOMNode(this.refs.canvas), ctx=canvas.getContext('2d');
+            let canvas=this.refs.canvas, ctx=canvas.getContext('2d');
             let params=this.props.params, edit=this.props.edit, map=this.props.map.map;
             let mapdata=map[edit.stage-1];
             //bg
@@ -129,7 +129,7 @@ module.exports = React.createClass({
         var edit=this.props.edit;
         e.preventDefault();
         //canvasの位置
-        let {x:left, y:top} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas));
+        let {x:left, y:top} = util.getAbsolutePosition(this.refs.canvas);
         let mx=e.pageX-left, my=e.pageY-top;
         //そこを中心に
         let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);

@@ -17,7 +17,7 @@ module.exports = React.createClass({
     },
     componentDidUpdate(prevProps){
         if(prevProps.edit.param_type !== this.props.edit.param_type){
-            let main=React.findDOMNode(this.refs.main);
+            let main=this.refs.main;
             main.scrollTop=0;
         }
     },

@@ -53,7 +53,7 @@ module.exports = React.createClass({
             this.draw();
         });
         //draw grids
-        let ctx=React.findDOMNode(this.refs.canvas2).getContext('2d');
+        let ctx=this.refs.canvas2.getContext('2d');
         let {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.25)";
         for(let x=1;x < view_width; x++){
@@ -109,7 +109,7 @@ module.exports = React.createClass({
             var map=this.props.map, params=this.props.params, edit=this.props.edit;
             var screen=edit.screen;
             var {scroll_x, scroll_y, view_width, view_height} = edit;
-            var ctx=React.findDOMNode(this.refs.canvas).getContext("2d");
+            var ctx=this.refs.canvas.getContext("2d");
 
             var width=view_width*32, height=view_height*32;
 
@@ -175,7 +175,7 @@ module.exports = React.createClass({
     handleMouseDown(e){
         //マウスが下がった
         e.preventDefault();
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs.canvas2);
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
         var screen=this.props.edit.screen;
         var mode;
@@ -228,7 +228,7 @@ module.exports = React.createClass({
         this.mouseMoves(this.props.edit.mode_current, e.pageX, e.pageY);
     },
     mouseMoves(mode,pageX,pageY){
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(React.findDOMNode(this.refs.canvas2));
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs.canvas2);
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
         var edit=this.props.edit, map=this.props.map;
