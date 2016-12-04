@@ -126,22 +126,26 @@ module.exports = React.createClass({
         document.addEventListener("mouseup",handler,false);
     },
     handleMouseMove(e){
-        var edit=this.props.edit;
+        const edit=this.props.edit;
         e.preventDefault();
         //canvasの位置
-        let {x:left, y:top} = util.getAbsolutePosition(this.refs.canvas);
-        let mx=e.pageX-left, my=e.pageY-top;
+        const {x:left, y:top} = util.getAbsolutePosition(this.refs.canvas);
+        const mx=e.pageX-left, my=e.pageY-top;
         //そこを中心に
         let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);
-        if(sx<0){
-            sx=0;
-        }else if(sx>164){
-            sx=164;
+
+        // 右と下の上限 (TODO)
+        const r = 180 - edit.view_width;
+        const b = 30 - edit.view_height;
+        if(sx < 0){
+            sx = 0;
+        }else if(sx > r){
+            sx = r;
         }
-        if(sy<0){
-            sy=0;
-        }else if(sy>20){
-            sy=20;
+        if(sy < 0){
+            sy = 0;
+        }else if(sy > b){
+            sy = b;
         }
         editActions.scroll({
             x: sx,

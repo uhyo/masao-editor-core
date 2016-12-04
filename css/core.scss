@@ -35,6 +35,8 @@ $me-button-surface-color-hov : #88bb55;
 .me-core-map-edit {
   margin: 4px;
   padding: 0;
+}
+.me-core-map-edit-canvas-wrapper {
   position: relative;
 
   & > canvas {
@@ -47,6 +49,7 @@ $me-button-surface-color-hov : #88bb55;
   transition: opacity 0.4s ease;
   opacity: 1;
 }
+
 .me-core-chip-selected {
   display: flex;
 
@@ -141,4 +144,35 @@ $me-button-surface-color-hov : #88bb55;
   flex-flow: column nowrap;
 }
 
+.me-core-util-resizable-wrapper {
+  width: 100%;
+  height: 100%;
+}
+.me-core-util-resizable-handle-right {
+  position: absolute;
+  width: 6px;
+  height: 100%;
+  top: 0;
+  right: -6px;
+  background-color: #dddddd;
+  border: 1px outset #eeeeee;
+}
+.me-core-util-resizable-handle-bottom {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  left: 0;
+  bottom: -6px;
+  background-color: #dddddd;
+  border: 1px outset #eeeeee;
+}
+.me-core-util-resizable-handle-corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  right: -6px;
+  bottom: -6px;
+  background-color: #dddddd;
+  border: 1px outset #eeeeee;
+}
 

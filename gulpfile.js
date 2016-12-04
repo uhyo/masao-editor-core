@@ -111,8 +111,10 @@ function jsxCompiler(watch){
         b=watchify(b);
     }
     //chain
-    b.transform(babelify, {presets: ['es2015', 'react']})
-    .transform(uglifyify,{global:true});
+    b.transform(babelify, {presets: ['es2015', 'react']});
+    if (process.env.NODE_ENV === 'production'){
+        b.transform(uglifyify,{global:true});
+    }
 
     b.on('update',bundle);
     bundle();

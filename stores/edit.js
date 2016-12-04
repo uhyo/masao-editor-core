@@ -110,6 +110,15 @@ module.exports = Reflux.createStore({
         this.mode=mode;
         this.trigger(this.makeState());
     },
+    onChangeView({width, height}){
+        this.view_width = width;
+        this.view_height = height;
+        // マップの大きさを超えないように (TODO)
+        this.scroll_x = Math.min(this.scroll_x, 180 - this.view_width);
+        this.scroll_y = Math.min(this.scroll_y, 30 - this.view_height);
+
+        this.trigger(this.makeState());
+    },
     onChangePen({pen,mode}){
         this.pen=pen;
         if(mode===true){

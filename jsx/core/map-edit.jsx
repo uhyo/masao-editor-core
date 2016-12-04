@@ -1,6 +1,8 @@
 "use strict";
 var React=require('react');
 
+import Resizable from './util/resizable';
+
 var Promise=require('native-promise-only');
 var util=require('../../scripts/util');
 
@@ -87,11 +89,19 @@ module.exports = React.createClass({
             this.draw();
             return;
         }
-        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map || this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer || prevProps.params!==this.props.params || prevProps.edit.render_map!==this.props.edit.render_map || prevProps.edit.render_layer!==this.props.edit.render_layer){
+        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map ||
+           this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer ||
+           prevProps.params!==this.props.params ||
+           prevProps.edit.render_map!==this.props.edit.render_map ||
+           prevProps.edit.render_layer!==this.props.edit.render_layer){
             this.draw();
         }else{
             let pe=prevProps.edit, e=this.props.edit;
-            if(pe.scroll_x!==e.scroll_x || pe.scroll_y!==e.scroll_y || pe.stage!==e.stage){
+            if(pe.scroll_x!==e.scroll_x ||
+               pe.scroll_y!==e.scroll_y ||
+               pe.stage!==e.stage ||
+               pe.view_width!==e.view_width ||
+               pe.view_height!==e.view_height){
                 this.draw();
             }
         }
@@ -167,10 +177,21 @@ module.exports = React.createClass({
         var c2style={
             opacity: this.props.edit.grid ? 1 : 0
         };
+
         return <div className="me-core-map-edit" style={style}>
-            <canvas ref="canvas" width={width} height={height}/>
-            <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null} onContextMenu={this.handleContextMenu}/>
+            <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
+                <div className="me-core-map-edit-canvas-wrapper">
+                    <canvas ref="canvas" width={width} height={height}/>
+                    <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null} onContextMenu={this.handleContextMenu}/>
+                </div>
+            </Resizable>
         </div>;
+    },
+    handleResize(width, height){
+        editActions.changeView({
+            width: Math.floor(width/32),
+            height: Math.floor(height/32),
+        });
     },
     handleMouseDown(e){
         //マウスが下がった

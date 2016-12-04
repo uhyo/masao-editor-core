@@ -1,29 +1,29 @@
 "use strict";
-var React=require('react'),
-    Reflux=require('reflux');
-var extend=require('extend'),
-    masao=require('../../scripts/masao');
+const React=require('react'),
+      Reflux=require('reflux');
+const extend=require('extend'),
+      masao=require('../../scripts/masao');
 
 
-var paramActions=require('../../actions/params'),
-    projectActions=require('../../actions/project');
+const paramActions=require('../../actions/params'),
+      projectActions=require('../../actions/project');
 
-var mapStore=require('../../stores/map'),
-    paramStore=require('../../stores/params'),
-    editStore=require('../../stores/edit'),
-    projectStore=require('../../stores/project');
+const mapStore=require('../../stores/map'),
+      paramStore=require('../../stores/params'),
+      editStore=require('../../stores/edit'),
+      projectStore=require('../../stores/project');
 
-var MapEdit=require('./map-edit.jsx'),
-    ChipSelect=require('./chip-select.jsx'),
-    EditMode=require('./edit-mode.jsx'),
-    MiniMap=require('./mini-map.jsx'),
-    ScreenSelect=require('./screen-select.jsx'),
-    ParamEdit=require('./param-edit.jsx'),
-    ProjectEdit=require('./project-edit.jsx'),
-    Button=require('./util/button.jsx');
+const MapEdit=require('./map-edit.jsx'),
+      ChipSelect=require('./chip-select.jsx'),
+      EditMode=require('./edit-mode.jsx'),
+      MiniMap=require('./mini-map.jsx'),
+      ScreenSelect=require('./screen-select.jsx'),
+      ParamEdit=require('./param-edit.jsx'),
+      ProjectEdit=require('./project-edit.jsx'),
+      Button=require('./util/button.jsx');
 
 
-var MasaoEditorCore = React.createClass({
+const MasaoEditorCore = React.createClass({
     displayName: "MasaoEditorCore",
     mixins:[Reflux.connect(mapStore,"map"), Reflux.connect(paramStore,"params"), Reflux.connect(editStore,"edit"), Reflux.connect(projectStore,"project")],
     propTypes:{
@@ -106,7 +106,7 @@ MasaoEditorCore.editStore = editStore;
 module.exports = MasaoEditorCore;
 
 //各screen
-var MapScreen = React.createClass({
+const MapScreen = React.createClass({
     displayName: "MapScreen",
     propTypes: {
         pattern: React.PropTypes.string.isRequired,
@@ -153,7 +153,7 @@ var MapScreen = React.createClass({
     }
 });
 
-var ParamScreen = React.createClass({
+const ParamScreen = React.createClass({
     displayName: "ParamScreen",
     propTypes: {
         edit: React.PropTypes.object.isRequired,
@@ -168,7 +168,7 @@ var ParamScreen = React.createClass({
     }
 });
 
-var ProjectScreen = React.createClass({
+const ProjectScreen = React.createClass({
     displayName: "ProjectScreen",
     propTypes: {
         project: React.PropTypes.object.isRequired

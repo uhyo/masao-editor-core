@@ -13,6 +13,10 @@ var Reflux=require('reflux');
 //   mode: string
 // });
 //
+// edit.changeView({
+//   width: number,
+//   height: number
+// })
 // edit.changePen({
 //   pen: string
 // });
@@ -49,6 +53,7 @@ module.exports = Reflux.createActions({
     "changeScreen": {},
     "changeStage": {},
     "changeMode": {},
+    "changeView": {},
     "changePen": {
         preEmit: (obj)=>{
             if(obj==null){
