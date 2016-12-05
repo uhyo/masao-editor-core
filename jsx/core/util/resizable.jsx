@@ -3,6 +3,8 @@ var React=require('react');
 
 const Resizable = require('react-resizable-box');
 
+import styles from './resizable.css';
+
 export default class ResizableBox extends React.Component{
     constructor(props){
         super(props);
@@ -43,12 +45,12 @@ export default class ResizableBox extends React.Component{
             width={width} height={height} minWidth={minWidth} minHeight={minHeight} grid={gr}
             isResizable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
             onResize={this.onResize}>
-            <div className="me-core-util-resizable-wrapper">
+            <div className={styles.wrapper}>
                 {children}
             </div>
-            <div className="me-core-util-resizable-handle-right"/>
-            <div className="me-core-util-resizable-handle-bottom"/>
-            <div className="me-core-util-resizable-handle-corner"/>
+            <div className={styles.handleRight}/>
+            <div className={styles.handleBottom}/>
+            <div className={styles.handleCorner}/>
         </Resizable>;
     }
 };

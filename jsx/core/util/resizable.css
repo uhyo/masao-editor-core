@@ -1,0 +1,39 @@
+/* wrapper of resizable content. */
+.wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+/* visible handles. */
+.handle {
+  box-sizing: border-box;
+  background-color: #dddddd;
+  border: 1px outset #eeeeee;
+}
+.handleRight {
+  composes: handle;
+
+  position: absolute;
+  width: 6px;
+  height: 100%;
+  top: 0;
+  right: -6px;
+}
+.handleBottom {
+  composes: handle;
+
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  left: 0;
+  bottom: -6px;
+}
+.handleCorner {
+  composes: handle;
+
+  position: absolute;
+  width: 6px;
+  height: -6px;
+  right: -6px;
+  bottom: -6px;
+}

@@ -11,6 +11,9 @@ var babelify=require('babelify');
 var uglifyify=require('uglifyify');
 var watchify=require('watchify');
 var uglify=require('gulp-uglify');
+const cssModulesify = require('css-modulesify');
+
+
 var del=require('del');
 var changed=require('gulp-changed');
 var sass=require('gulp-sass');
@@ -112,6 +115,10 @@ function jsxCompiler(watch){
     }
     //chain
     b.transform(babelify, {presets: ['es2015', 'react']});
+    b.plugin(cssModulesify, {
+        rootDir: __dirname,
+        output: 'dist/cssm.css',
+    });
     if (process.env.NODE_ENV === 'production'){
         b.transform(uglifyify,{global:true});
     }
