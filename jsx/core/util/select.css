@@ -1,0 +1,11 @@
+.wrapper {
+  display: flex;
+}
+
+.button {
+  composes: switch from './switch.css';
+}
+
+.button-current {
+  composes: switch-yes from './switch.css';
+}

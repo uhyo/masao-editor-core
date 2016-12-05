@@ -2,6 +2,8 @@
 //select box
 var React=require('react');
 
+import styles from './select.css';
+
 module.exports = React.createClass({
     displayName: "Select",
     propTypes: {
@@ -21,13 +23,9 @@ module.exports = React.createClass({
     },
     render(){
         var valueLink=this.props.valueLink;
-        var c="me-core-util-select";
-        return <div className={c}>{
+        return <div className={styles.wrapper}>{
             this.props.contents.map(({key,value})=>{
-                var c="me-core-util-select-button";
-                if(key===valueLink.value){
-                    c+=" me-core-util-select-current";
-                }
+                const c = key === valueLink.value ? styles['button-current'] : styles.button;
                 return <div key={key} className={c} onClick={this.handleClick(key)}>{value}</div>;
             })
         }</div>;

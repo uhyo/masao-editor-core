@@ -1,6 +1,8 @@
 "use strict";
 var React=require('react');
 
+import styles from './switch.css';
+
 module.exports = React.createClass({
     displayName: "Switch",
     propTypes: {
@@ -11,10 +13,7 @@ module.exports = React.createClass({
         }).isRequired
     },
     render(){
-        var c="me-core-util-switch";
-        if(this.props.valueLink.value===true){
-            c+=" me-core-util-switch-yes";
-        }
+        const c = this.props.valueLink.value === true ? styles['switch-yes'] : styles['switch'];
         return <div className={c} onClick={this.handleClick}>{this.props.label}</div>;
     },
     handleClick(e){

@@ -1,5 +1,7 @@
 var React=require('react');
 
+import styles from './color.css';
+
 //color select control
 module.exports = React.createClass({
     displayName: "Color",
@@ -49,9 +51,9 @@ module.exports = React.createClass({
                 });
             }
         };
-        return <span className="me-core-util-color">
-            <span className="me-core-util-color-box" style={style}>{colorValue}</span>
-            <span className="me-core-util-color-edit">
+        return <span className={styles.wrapper}>
+            <span className={styles.box} style={style}>{colorValue}</span>
+            <span className={styles.edit}>
                 <span>
                     R: <input type="range" step="1" min="0" max="255" valueLink={valueLinkRed}/>
                 </span>
