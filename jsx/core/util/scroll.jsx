@@ -13,6 +13,7 @@ export default class Scroll extends React.Component{
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handlePushButton = this.handlePushButton.bind(this);
 
         this.mouse_flag = false;
         // Free Scroll
@@ -53,11 +54,19 @@ export default class Scroll extends React.Component{
         return <div className={styles.outerWrapper}>
             <div className={styles.wrapper}>
                 <div className={styles.content}>{children}</div>
-                <div ref="hor" className={styles.hor} onMouseDown={this.handleMouseDown}>
-                    <div ref="horTip" className={styles.horTip} style={horStyle} />
+                <div className={styles.horWrap}>
+                    <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
+                    <div ref="hor" className={styles.hor} onMouseDown={this.handleMouseDown}>
+                        <div ref="horTip" className={styles.horTip} style={horStyle} />
+                    </div>
+                    <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
                 </div>
-                <div ref="ver" className={styles.ver} onMouseDown={this.handleMouseDown}>
-                    <div ref="verTip" className={styles.verTip} style={verStyle} />
+                <div className={styles.verWrap}>
+                    <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
+                    <div ref="ver" className={styles.ver} onMouseDown={this.handleMouseDown}>
+                        <div ref="verTip" className={styles.verTip} style={verStyle} />
+                    </div>
+                    <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
                 </div>
             </div>
         </div>;
@@ -129,6 +138,24 @@ export default class Scroll extends React.Component{
             this.mouse_flag = true;
             document.addEventListener('mousemove', this.handleMouseMove, false);
             document.addEventListener('mouseup', this.handleMouseUp, false);
+        }
+    }
+    handlePushButton(e){
+        e.preventDefault();
+        const dir = e.target.dataset.dir;
+        switch (dir){
+            case 'left':
+                this.setScroll(this.props.x-1, null);
+                break;
+            case 'right':
+                this.setScroll(this.props.x+1, null);
+                break;
+            case 'up':
+                this.setScroll(null, this.props.y-1);
+                break;
+            case 'down':
+                this.setScroll(null, this.props.y+1);
+                break;
         }
     }
 
