@@ -41,17 +41,19 @@ export default class ResizableBox extends React.Component{
             children,
         } = this.props;
         const gr = grid ? [grid.x, grid.y] : void 0;
-        return <Resizable
-            width={width} height={height} minWidth={minWidth} minHeight={minHeight} grid={gr}
-            isResizable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
-            onResize={this.onResize}>
-            <div className={styles.wrapper}>
-                {children}
-            </div>
-            <div className={styles.handleRight}/>
-            <div className={styles.handleBottom}/>
-            <div className={styles.handleCorner}/>
-        </Resizable>;
+        return <div className={styles.wrapper}>
+            <Resizable
+                width={width} height={height} minWidth={minWidth} minHeight={minHeight} grid={gr}
+                isResizable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
+                onResize={this.onResize}>
+                <div className={styles.container}>
+                    {children}
+                </div>
+                <div className={styles.handleRight}/>
+                <div className={styles.handleBottom}/>
+                <div className={styles.handleCorner}/>
+            </Resizable>
+        </div>;
     }
 };
 ResizableBox.propTypes = {

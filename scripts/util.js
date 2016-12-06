@@ -6,7 +6,10 @@ function getAbsolutePosition(elm){
     var r=elm.getBoundingClientRect();
     return {
         x: r.left+window.scrollX,
-        y: r.top+window.scrollY
+        y: r.top+window.scrollY,
+        // ついでにwidthとheightも返す
+        width: r.width,
+        height: r.height,
     };
 }
 exports.getAbsolutePosition=getAbsolutePosition;

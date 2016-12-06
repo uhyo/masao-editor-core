@@ -1,0 +1,97 @@
+@value width: 16px;
+/* Scroll component の wrapper */
+.outerWrapper {
+  padding: 0 width width 0;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.content {
+}
+
+/* common bar style */
+.bar-wrap {
+  position: absolute;
+
+  display: flex;
+}
+.bar {
+  position: relative;
+
+  flex: auto 1 0;
+  background-color: #e9e9e9;
+
+  user-select: none;
+}
+.tip {
+  position: absolute;
+  background-color: #999999;
+
+  user-select: none;
+}
+/* horizontal bar */
+.horWrap {
+  composes: bar-wrap;
+
+  width: 100%;
+  height: width;
+  left: 0;
+  bottom: calc(-1 * width);
+
+  flex-flow: row nowrap;
+}
+.hor {
+  composes: bar;
+
+}
+
+/* vertical bar */
+.verWrap {
+  composes: bar-wrap;
+
+  width: width;
+  height: 100%;
+  right: calc(-1 * width);
+  top: 0;
+
+  flex-flow: column nowrap;
+}
+.ver {
+  composes: bar;
+}
+
+.horTip {
+  composes: tip;
+  height: width;
+}
+
+.verTip {
+  composes: tip;
+  width: width;
+}
+
+/* push button */
+.push-button {
+  flex: width 0 0;
+  box-sizing: border-box;
+  width: width;
+  height: width;
+
+  background-color: #d4d4d4;
+  border: 1px outset #eeeeee;
+}
+
+.leftButton {
+  composes: push-button;
+}
+.rightButton {
+  composes: push-button;
+}
+.upButton {
+  composes: push-button;
+}
+.downButton {
+  composes: push-button;
+}
