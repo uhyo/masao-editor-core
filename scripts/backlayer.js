@@ -38,8 +38,9 @@ class RenderedRegions{
      * @param {number} rect.y 左上
      * @param {number} rect.width 横幅
      * @param {number} rect.height 縦幅
+     * @param {boolean} [force=false] 描画済でももう一度描画
      */
-    requestRender({x, y, width, height}){
+    requestRender({x, y, width, height}, force=false){
         const minX = x;
         const minY = y;
         const maxX = x + width;
@@ -51,7 +52,7 @@ class RenderedRegions{
             maxY,
         };
 
-        if (maxX <= this.leftFrontier){
+        if (!force && maxX <= this.leftFrontier){
             return;
         }
 
@@ -60,18 +61,20 @@ class RenderedRegions{
 
         // まだrenderされていないところを列挙する
         const targets = [];
-        const startX = Math.max(minX, this.leftFrontier);
+        const startX = force ? minX : Math.max(minX, this.leftFrontier);
         xloop: for (let cx = startX; cx < maxX; cx++){
             yloop: for (let cy = minY; cy < maxY; cy++){
-                for (let rect of cols){
-                    if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
-                        if (rect.minY <= minY && maxY <= rect.maxY){
-                            // 列を全部覆う
-                            cx = rect.maxX-1;
-                            break yloop;
-                        }else{
-                            cy = rect.maxY-1;
-                            continue yloop;
+                if (!force){
+                    for (let rect of cols){
+                        if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
+                            if (rect.minY <= minY && maxY <= rect.maxY){
+                                // 列を全部覆う
+                                cx = rect.maxX-1;
+                                break yloop;
+                            }else{
+                                cy = rect.maxY-1;
+                                continue yloop;
+                            }
                         }
                     }
                 }
@@ -194,6 +197,34 @@ export default class BackLayer{
 
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    /**
+     * 指定した位置がupdateされたことを通知
+     *
+     * @param {number} x 左上位置
+     * @param {number} y 左上位置
+     * @param {number} [width=1] 範囲
+     * @param {number} [height=1] 範囲
+     */
+    update(x, y, width=1, height=1){
+        const {
+            canvas,
+            regions,
+            size,
+        } = this;
+
+        // updateされた領域を消去
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(x*size, y*size, width*size, height*size);
+
+        // 強制的に再描画
+        regions.requestRender({
+            x,
+            y,
+            width,
+            height,
+        }, true);
     }
 
     /**

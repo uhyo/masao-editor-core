@@ -85,7 +85,7 @@ module.exports = React.createClass({
         }
     },
     componentWillUnmount(){
-        this.timer.clean();
+        this.timers.clean();
     },
     componentDidUpdate(prevProps){
         //書き換える
@@ -106,15 +106,21 @@ module.exports = React.createClass({
             this.draw();
             return;
         }
-        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map ||
-           this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer ||
-           prevProps.params!==this.props.params ||
-           prevProps.edit.render_map!==this.props.edit.render_map ||
-           prevProps.edit.render_layer!==this.props.edit.render_layer){
+        if (prevProps.params !== this.props.params){
+            this.draw();
+            return;
+        }
+        // if (this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map ||
+        // this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer){
+        if (prevProps.map.lastUpdate !== this.props.map.lastUpdate){
+            // mapのupdateがあったから反応
+            this.updateBacklayer(this.props.map.lastUpdate);
             this.draw();
         }else{
             let pe=prevProps.edit, e=this.props.edit;
-            if(pe.scroll_x!==e.scroll_x ||
+            if(pe.render_map!==e.render_map ||
+               pe.render_layer!==e.render_layer ||
+               pe.scroll_x!==e.scroll_x ||
                pe.scroll_y!==e.scroll_y ||
                pe.stage!==e.stage ||
                pe.view_width!==e.view_width ||
@@ -146,6 +152,38 @@ module.exports = React.createClass({
             });
         };
         expandMap();
+    },
+    updateBacklayer(lastUpdate){
+        // map storeのlastUpdateを見てbacklayerをアップデートする
+        if (lastUpdate == null){
+            return;
+        }
+        switch (lastUpdate.type){
+            case 'all': {
+                // 刷新されちゃった
+                this.resetBacklayer();
+                break;
+            }
+            case 'map':
+            case 'layer': {
+                const {
+                    stage,
+                    x,
+                    y,
+                } = lastUpdate;
+                if (this.props.edit.stage !== stage){
+                    // 違うステージの話だった
+                    return;
+                }
+                if (lastUpdate.type === 'map'){
+                    this.backlayer_map.update(x, y);
+                }else{
+                    this.backlayer_layer.update(x, y);
+                }
+                break;
+            }
+
+        }
     },
     draw(){
         if(this.drawing===true){

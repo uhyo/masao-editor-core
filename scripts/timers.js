@@ -32,6 +32,9 @@ export default class Timers{
      * @param {string} id タイマーID
      */
     clearTimer(id){
+        const {
+            dict,
+        } = this;
         if (dict[id] != null){
             clearTimeout(dict[id]);
             dict[id] = null;

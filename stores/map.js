@@ -9,13 +9,17 @@ var mapActions = require('../actions/map'),
 module.exports = Reflux.createStore({
     listenables: [mapActions,{resetParams: paramActions.resetParams}],
     init(){
-        //init project
+        // init project
         this.map=[0,1,2,3].map((st)=>{
             return this.initStage(st+1,".");
         });
         this.layer=[0,1,2,3].map((st)=>{
             return this.initStage(st+1,"..");
         });
+        // last update information
+        this.lastUpdate = {
+            type: 'all',
+        };
     },
     initStage(stage,initial){
         var result=[];
@@ -34,7 +38,8 @@ module.exports = Reflux.createStore({
     getState(){
         return {
             map: this.map,
-            layer: this.layer
+            layer: this.layer,
+            lastUpdate: this.lastUpdate,
         };
     },
 
@@ -66,6 +71,12 @@ module.exports = Reflux.createStore({
                         return st;
                     }
                 });
+                this.lastUpdate = {
+                    type: 'map',
+                    stage,
+                    x,
+                    y,
+                };
                 this.trigger(this.getState());
             }
         }
@@ -98,6 +109,12 @@ module.exports = Reflux.createStore({
                         return st;
                     }
                 });
+                this.lastUpdate = {
+                    type: 'layer',
+                    stage,
+                    x,
+                    y,
+                };
                 this.trigger(this.getState());
             }
         }
@@ -113,18 +130,21 @@ module.exports = Reflux.createStore({
                 return row.concat([]);
             });
         });
+        let flag = false;
         for (let h = 0; h < 4; h++) {
             let ssfx = ["", "-s", "-t", "-f"][h];
             for (let i = 0; i < 3; i++) {
                 for(let j=0; j < 30; j++){
                     let p=params[`map${i}-${j}${ssfx}`];
                     if(p!=null){
+                        flag = true;
                         for(let k=0; k < 60; k++){
                             newMap[h][j][i*60+k] = p.charAt(k) || ".";
                         }
                     }
                     p=params[`layer${i}-${j}${ssfx}`];
                     if(p!=null){
+                        flag = true;
                         for(let k=0;k < 60; k++){
                             newLayer[h][j][i*60+k] = p.slice(k*2,k*2+2) || "..";
                         }
@@ -132,8 +152,13 @@ module.exports = Reflux.createStore({
                 }
             }
         }
-        this.map=newMap;
-        this.layer=newLayer;
-        this.trigger(this.getState());
+        if (flag === true){
+            this.map=newMap;
+            this.layer=newLayer;
+            this.lastUpdate = {
+                type: 'all',
+            };
+            this.trigger(this.getState());
+        }
     }
 });
