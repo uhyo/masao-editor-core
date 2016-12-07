@@ -124,8 +124,8 @@ class RenderedRegions{
         this.requestRender({
             x: this.leftFrontier,
             y: 0,
-            x: this.leftFrontier + this.expandWidth,
-            y: this.height,
+            width: this.expandWidth,
+            height: this.height,
         });
         this.leftFrontier += this.expandWidth;
         return this.leftFrontier < this.width;
@@ -211,6 +211,14 @@ export default class BackLayer{
             width,
             height,
         });
+    }
+    /**
+     * 描画済み領域を拡張
+     *
+     * @returns {boolean} 拡張完了か否か
+     */
+    expand(){
+        return this.regions.expand();
     }
 
     /**

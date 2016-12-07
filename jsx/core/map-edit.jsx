@@ -4,6 +4,7 @@ var React=require('react');
 import Resizable from './util/resizable';
 import Scroll from './util/scroll';
 
+import Timers from '../../scripts/timers';
 import BackLayer from '../../scripts/backlayer';
 
 var Promise=require('native-promise-only');
@@ -55,12 +56,16 @@ module.exports = React.createClass({
                 mapchip,
                 chips
             };
+            this.resetBacklayer();
             this.draw();
         });
         // double-buffering 
         // TODO
         this.backlayer_map = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'map'));
         this.backlayer_layer = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'layer'));
+
+        // timers
+        this.timers = new Timers();
 
         // draw grids
         let ctx=this.refs.canvas2.getContext('2d');
@@ -79,6 +84,9 @@ module.exports = React.createClass({
             ctx.stroke();
         }
     },
+    componentWillUnmount(){
+        this.timer.clean();
+    },
     componentDidUpdate(prevProps){
         //書き換える
         if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
@@ -90,8 +98,7 @@ module.exports = React.createClass({
                     mapchip,
                     chips
                 };
-                this.backlayer_map.clear();
-                this.backlayer_layer.clear();
+                this.resetBacklayer();
                 this.draw();
             });
         }
@@ -115,6 +122,30 @@ module.exports = React.createClass({
                 this.draw();
             }
         }
+    },
+    resetBacklayer(){
+        this.backlayer_map.clear();
+        this.backlayer_layer.clear();
+
+        const expandMap = ()=>{
+            this.timers.addTimer('expand-map', 400, ()=>{
+                const flag = this.backlayer_map.expand();
+                if (flag){
+                    expandMap();
+                }else{
+                    expandLayer();
+                }
+            });
+        };
+        const expandLayer = ()=>{
+            this.timers.addTimer('expand-map', 400, ()=>{
+                const flag = this.backlayer_layer.expand();
+                if (flag){
+                    expandLayer();
+                }
+            });
+        };
+        expandMap();
     },
     draw(){
         if(this.drawing===true){
@@ -173,28 +204,6 @@ module.exports = React.createClass({
                 backlayer_map.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
             }
 
-            /*
-            //map
-            for(let x=0;x < view_width; x++){
-                for(let y=0;y < view_height; y++){
-                    //TODO
-                    let mx=scroll_x+x, my=scroll_y+y;
-                    if(mapData[my]==null){
-                        //領域外。
-                        continue;
-                    }
-                    if(screen==="layer" || edit.render_layer===true){
-                        //レイヤーを描画
-                        let c=layerData[my][mx];
-                        this.drawLayer(ctx,c,x*32,y*32);
-                    }
-                    if(screen==="map" || edit.render_map===true){
-                        let c=mapData[my][mx];
-                        this.drawChip(ctx,c,x*32, y*32);
-                    }
-                }
-            }
-            */
             this.drawing=false;
             console.timeEnd("draw");
         });
