@@ -4,6 +4,8 @@ var React=require('react');
 import Resizable from './util/resizable';
 import Scroll from './util/scroll';
 
+import BackLayer from '../../scripts/backlayer';
+
 var Promise=require('native-promise-only');
 var util=require('../../scripts/util');
 
@@ -42,10 +44,10 @@ module.exports = React.createClass({
         project: React.PropTypes.object.isRequired
     },
     componentDidMount(){
-        //flags
+        // flags
         this.drawing=false;
         this.drawRequest=null;
-        //load files
+        // load files
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
             this.images={
@@ -55,7 +57,12 @@ module.exports = React.createClass({
             };
             this.draw();
         });
-        //draw grids
+        // double-buffering 
+        // TODO
+        this.backlayer_map = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'map'));
+        this.backlayer_layer = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'layer'));
+
+        // draw grids
         let ctx=this.refs.canvas2.getContext('2d');
         let {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.25)";
@@ -83,6 +90,8 @@ module.exports = React.createClass({
                     mapchip,
                     chips
                 };
+                this.backlayer_map.clear();
+                this.backlayer_layer.clear();
                 this.draw();
             });
         }
@@ -117,19 +126,54 @@ module.exports = React.createClass({
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
-            var map=this.props.map, params=this.props.params, edit=this.props.edit;
-            var screen=edit.screen;
-            var {scroll_x, scroll_y, view_width, view_height} = edit;
-            var ctx=this.refs.canvas.getContext("2d");
 
-            var width=view_width*32, height=view_height*32;
+            const {
+                backlayer_map,
+                backlayer_layer,
+                props: {
+                    map,
+                    params,
+                    edit,
+                },
+            } = this;
+            const {
+                screen,
+                scroll_x,
+                scroll_y,
+                view_width,
+                view_height,
 
-            let mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+                render_map,
+                render_layer,
+            } = edit;
+            const ctx=this.refs.canvas.getContext("2d");
 
-            //background color
+            const width=view_width*32;
+            const height=view_height*32;
+
+            const mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+
+            // バックバッファで描画
+            if (screen === 'map' || render_map === true){
+                backlayer_map.prerender(scroll_x, scroll_y, view_width, view_height);
+            }
+            if (screen === 'layer' || render_layer === true){
+                backlayer_layer.prerender(scroll_x, scroll_y, view_width, view_height);
+            }
+
+            // まず背景色で塗りつぶす
             let bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
+            // バックバッファから
+            if (screen === 'layer' || render_layer === true){
+                backlayer_layer.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+            }
+            if (screen === 'map' || render_map === true){
+                backlayer_map.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+            }
+
+            /*
             //map
             for(let x=0;x < view_width; x++){
                 for(let y=0;y < view_height; y++){
@@ -150,6 +194,7 @@ module.exports = React.createClass({
                     }
                 }
             }
+            */
             this.drawing=false;
             console.timeEnd("draw");
         });
@@ -168,6 +213,31 @@ module.exports = React.createClass({
         let idx=parseInt(c,16);
         let sx=(idx&15)*32, sy=Math.floor(idx>>4)*32;
         ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
+    },
+    drawChipOn(type, ctx, x, y, dx, dy){
+        // 指定された座標に描画
+        const {
+            map: {
+                map,
+                layer,
+            },
+            edit: {
+                stage,
+                scroll_x,
+                scroll_y,
+                view_width,
+                view_height,
+            },
+        } = this.props;
+        if (type === 'map'){
+            const mapData = map[stage-1];
+            const c = mapData[y][x];
+            this.drawChip(ctx, c, x*32, y*32);
+        }else if (type === 'layer'){
+            const layerData = layer[stage-1];
+            const c = layerData[y][x];
+            this.drawLayer(ctx, c, x*32, y*32);
+        }
     },
     render(){
         const {
