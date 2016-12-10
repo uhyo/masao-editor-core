@@ -1,6 +1,10 @@
 'use strict';
 
 const rbush = require('rbush');
+
+import {
+    sortedUniq,
+} from '../../../scripts/util';
 /**
  * すでにRenderした範囲を管理する
  */
@@ -33,61 +37,62 @@ class RenderedRegions{
 
     /**
      * 指定した範囲のレンダリングを要求する
-     * @param {Object} rect レンダリングする範囲
-     * @param {number} rect.x 左上
-     * @param {number} rect.y 左上
-     * @param {number} rect.width 横幅
-     * @param {number} rect.height 縦幅
+     * @param {Object[]} rects レンダリングする範囲
      * @param {boolean} [force=false] 描画済でももう一度描画
      */
-    requestRender({x, y, width, height}, force=false){
-        const minX = x;
-        const minY = y;
-        const maxX = x + width;
-        const maxY = y + height;
-        const item = {
-            minX,
-            minY,
-            maxX,
-            maxY,
-        };
-
-        if (!force && maxX <= this.leftFrontier){
-            return;
-        }
-
-        // colsはitemとintersectする矩形の集合
-        const cols = this.tree.search(item);
-
+    requestRender(rects, force=false){
         // まだrenderされていないところを列挙する
         const targets = [];
-        const startX = force ? minX : Math.max(minX, this.leftFrontier);
-        xloop: for (let cx = startX; cx < maxX; cx++){
-            yloop: for (let cy = minY; cy < maxY; cy++){
-                if (!force){
-                    for (let rect of cols){
-                        if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
-                            if (rect.minY <= minY && maxY <= rect.maxY){
-                                // 列を全部覆う
-                                cx = rect.maxX-1;
-                                break yloop;
-                            }else{
-                                cy = rect.maxY-1;
-                                continue yloop;
+        // colsはitemとintersectする矩形の集合
+        for(let {x, y, width, height} of rects){
+            const minX = x;
+            const minY = y;
+            const maxX = x + width;
+            const maxY = y + height;
+
+            if (!force && maxX <= this.leftFrontier){
+                continue;
+            }
+
+            const item = {
+                minX,
+                minY,
+                maxX,
+                maxY,
+            };
+
+            const cols = this.tree.search(item);
+
+            const startX = force ? minX : Math.max(minX, this.leftFrontier);
+            xloop: for (let cx = startX; cx < maxX; cx++){
+                yloop: for (let cy = minY; cy < maxY; cy++){
+                    if (!force){
+                        for (let rect of cols){
+                            if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
+                                if (rect.minY <= minY && maxY <= rect.maxY){
+                                    // 列を全部覆う
+                                    cx = rect.maxX-1;
+                                    break yloop;
+                                }else{
+                                    cy = rect.maxY-1;
+                                    continue yloop;
+                                }
                             }
                         }
                     }
+                    // 当たり判定をくぐり抜けた
+                    targets.push({
+                        x: cx,
+                        y: cy,
+                    });
                 }
-                // 当たり判定をくぐり抜けた
-                targets.push({
-                    x: cx,
-                    y: cy,
-                });
             }
+            this.insertArea(item, cols);
         }
 
-        this.insertArea(item, cols);
-        this.renderCallback(targets);
+        if (targets[0] != null){
+            this.renderCallback(targets);
+        }
     }
     /**
      * 指定された矩形を描画済み領域に追加
@@ -124,12 +129,12 @@ class RenderedRegions{
         if (this.leftFrontier >= this.width){
             return false;
         }
-        this.requestRender({
+        this.requestRender([{
             x: this.leftFrontier,
             y: 0,
             width: this.expandWidth,
             height: this.height,
-        });
+        }]);
         this.leftFrontier += this.expandWidth;
         return this.leftFrontier < this.width;
     }
@@ -144,12 +149,14 @@ export default class BackLayer{
      * @param {number} width 領域全体の横幅
      * @param {number} height 領域全体の縦幅
      * @param {number} size 1タイルの大きさ
+     * @param {Updator} updator
      * @param {Function} drawCallback 実際にcanvas上に描画する関数
      */
-    constructor(width, height, size, drawCallback){
+    constructor(width, height, size, updator, drawCallback){
         this.width = width;
         this.height = height;
         this.size = size;
+        this.updator = updator;
         this.drawCallback = drawCallback;
 
         this.regions = new RenderedRegions(width, height, this.renderTargets.bind(this));
@@ -171,17 +178,41 @@ export default class BackLayer{
     }
     /**
      * バッファ上に描画
+     *
      * @private
+     * @param {Point[]} targets 描画対象マスの一覧
      */
     renderTargets(targets){
         const {
             canvas,
+            width,
+            height,
             size,
+            updator,
         } = this;
         const ctx = canvas.getContext('2d');
+        // まずclearRectで消去
         for (let {x, y} of targets){
+            ctx.clearRect(x*size, y*size, size, size);
+        }
+
+        ctx.save();
+        // 描画対象範囲にclip
+        ctx.beginPath();
+        for (let {x, y} of targets){
+            ctx.rect(x*size, y*size, size, size);
+        }
+        ctx.clip('nonzero');
+
+        const effecters1 = updator.fromRegion(...targets);
+        effecters1.sort(({x: x1, y: y1, big: big1}, {x: x2, y: y2, big: big2})=> (big2 - big1) * width * height + (x2 - x1) * height + (y2 - y1));
+        const effecters = sortedUniq(effecters1, ({x: x1, y: y1}, {x: x2, y: y2})=> x1 === x2 && y1 === y2);
+
+        for (let {x, y, big} of effecters){
             this.drawCallback(ctx, x, y, x * size, y * size);
         }
+
+        ctx.restore();
     }
 
     /**
@@ -202,29 +233,27 @@ export default class BackLayer{
     /**
      * 指定した位置がupdateされたことを通知
      *
-     * @param {number} x 左上位置
-     * @param {number} y 左上位置
-     * @param {number} [width=1] 範囲
-     * @param {number} [height=1] 範囲
+     * @param {Points[]} points 再描画範囲
      */
-    update(x, y, width=1, height=1){
+    update(points){
         const {
             canvas,
             regions,
             size,
+            updator,
         } = this;
 
-        // updateされた領域を消去
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(x*size, y*size, width*size, height*size);
-
+        const rects = [];   // ついでにrect集合に変換
+        for (let {x, y} of points){
+            rects.push({
+                x,
+                y,
+                width: 1,
+                height: 1,
+            });
+        }
         // 強制的に再描画
-        regions.requestRender({
-            x,
-            y,
-            width,
-            height,
-        }, true);
+        regions.requestRender(rects, true);
     }
 
     /**
@@ -236,12 +265,12 @@ export default class BackLayer{
      * @param {number} height 描画領域縦幅
      */
     prerender(x, y, width, height){
-        this.regions.requestRender({
+        this.regions.requestRender([{
             x,
             y,
             width,
             height,
-        });
+        }]);
     }
     /**
      * 描画済み領域を拡張

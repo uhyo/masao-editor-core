@@ -1,20 +1,21 @@
 "use strict";
 var React=require('react');
 
-import Resizable from './util/resizable';
-import Scroll from './util/scroll';
+import Resizable from '../util/resizable';
+import Scroll from '../util/scroll';
 
-import Timers from '../../scripts/timers';
-import BackLayer from '../../scripts/backlayer';
+import Timers from '../../../scripts/timers';
+import BackLayer from './backlayer';
+import MapUpdator from './updator';
 
 var Promise=require('native-promise-only');
-var util=require('../../scripts/util');
+var util=require('../../../scripts/util');
 
-var chip=require('../../scripts/chip'),
-    loadImage=require('../../scripts/load-image');
+var chip=require('../../../scripts/chip'),
+    loadImage=require('../../../scripts/load-image');
 
-var editActions=require('../../actions/edit'),
-    mapActions=require('../../actions/map');
+var editActions=require('../../../actions/edit'),
+    mapActions=require('../../../actions/map');
 
 
 module.exports = React.createClass({
@@ -61,8 +62,10 @@ module.exports = React.createClass({
         });
         // double-buffering 
         // TODO
-        this.backlayer_map = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'map'));
-        this.backlayer_layer = new BackLayer(180, 30, 32, this.drawChipOn.bind(this, 'layer'));
+        this.updator_map = new MapUpdator(180, 30, this.chipPollution.bind(this, 'map'));
+        this.updator_layer = new MapUpdator(180, 30, this.chipPollution.bind(this, 'layer'));
+        this.backlayer_map = new BackLayer(180, 30, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
+        this.backlayer_layer = new BackLayer(180, 30, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
 
         // timers
         this.timers = new Timers();
@@ -83,6 +86,8 @@ module.exports = React.createClass({
             ctx.lineTo(view_width*32,y*32);
             ctx.stroke();
         }
+
+        this.resetMap();
     },
     componentWillUnmount(){
         this.timers.clean();
@@ -102,7 +107,8 @@ module.exports = React.createClass({
                 this.draw();
             });
         }
-        if(prevProps.edit.screen!==this.props.edit.screen){
+        let pe=prevProps.edit, e=this.props.edit;
+        if(pe.screen !== e.screen){
             this.draw();
             return;
         }
@@ -110,19 +116,21 @@ module.exports = React.createClass({
             this.draw();
             return;
         }
-        // if (this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map ||
-        // this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer){
+        if (pe.stage !== e.stage){
+            this.resetMap();
+            this.resetBacklayer();
+            this.draw();
+            return;
+        }
         if (prevProps.map.lastUpdate !== this.props.map.lastUpdate){
             // mapのupdateがあったから反応
             this.updateBacklayer(this.props.map.lastUpdate);
             this.draw();
         }else{
-            let pe=prevProps.edit, e=this.props.edit;
             if(pe.render_map!==e.render_map ||
                pe.render_layer!==e.render_layer ||
                pe.scroll_x!==e.scroll_x ||
                pe.scroll_y!==e.scroll_y ||
-               pe.stage!==e.stage ||
                pe.view_width!==e.view_width ||
                pe.view_height!==e.view_height){
                 this.draw();
@@ -134,7 +142,7 @@ module.exports = React.createClass({
         this.backlayer_layer.clear();
 
         const expandMap = ()=>{
-            this.timers.addTimer('expand-map', 400, ()=>{
+            this.timers.addTimer('expand-map', 1000, ()=>{
                 const flag = this.backlayer_map.expand();
                 if (flag){
                     expandMap();
@@ -144,7 +152,7 @@ module.exports = React.createClass({
             });
         };
         const expandLayer = ()=>{
-            this.timers.addTimer('expand-map', 400, ()=>{
+            this.timers.addTimer('expand-map', 1000, ()=>{
                 const flag = this.backlayer_layer.expand();
                 if (flag){
                     expandLayer();
@@ -153,14 +161,33 @@ module.exports = React.createClass({
         };
         expandMap();
     },
+    resetMap(){
+        const {
+            edit: {
+                stage,
+            },
+            map: {
+                map,
+                layer,
+            },
+        } = this.props;
+        this.updator_map.resetMap(map[stage-1]);
+        this.updator_layer.resetMap(layer[stage-1]);
+    },
     updateBacklayer(lastUpdate){
         // map storeのlastUpdateを見てbacklayerをアップデートする
         if (lastUpdate == null){
             return;
         }
+        const {
+            stage,
+        } = this.props.edit;
+        const map = this.props.map.map[stage-1];
+        const layer = this.props.map.layer[stage-1];
         switch (lastUpdate.type){
             case 'all': {
                 // 刷新されちゃった
+                this.resetMap();
                 this.resetBacklayer();
                 break;
             }
@@ -176,9 +203,11 @@ module.exports = React.createClass({
                     return;
                 }
                 if (lastUpdate.type === 'map'){
-                    this.backlayer_map.update(x, y);
+                    const points = this.updator_map.update(x, y, map[y][x]);
+                    this.backlayer_map.update(points);
                 }else{
-                    this.backlayer_layer.update(x, y);
+                    const points = this.updator_layer.update(x, y, layer[y][x]);
+                    this.backlayer_layer.update(points);
                 }
                 break;
             }
@@ -285,6 +314,31 @@ module.exports = React.createClass({
             const c = layerData[y][x];
             this.drawLayer(ctx, c, x*32, y*32);
         }
+    },
+    chipPollution(type, c){
+        if (type === 'layer'){
+            // layerのチップは全部普通
+            return {
+                minX: 0,
+                minY: 0,
+                maxX: 1,
+                maxY: 1,
+            };
+        }
+        const {
+            params,
+        } = this.props;
+        // mapの場合は広い範囲に描画されるかも
+        const renderRect = chip.chipRenderRect(params, c);
+
+        // タイル単位に変換
+        const updateRect = {
+            minX: Math.floor(renderRect.minX / 32),
+            minY: Math.floor(renderRect.minY / 32),
+            maxX: Math.ceil(renderRect.maxX / 32),
+            maxY: Math.ceil(renderRect.maxY / 32),
+        };
+        return updateRect;
     },
     render(){
         const {

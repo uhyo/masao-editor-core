@@ -36,3 +36,26 @@ function stageBackColor(params,edit){
 
 }
 exports.stageBackColor = stageBackColor;
+
+// ソート済配列に対するuniq (non-destructive)
+function sortedUniq(arr, eq){
+    const result = [];
+    const l = arr.length;
+    if (l === 0){
+        return result;
+    }
+    let n = arr[0];
+    result.push(n);
+    for (let i = 1; i < l; i++){
+        const x = arr[i];
+        if (eq(n, x)){
+            continue;
+        }else{
+            n = x;
+            result.push(n);
+        }
+    }
+    return result;
+}
+
+exports.sortedUniq = sortedUniq;
