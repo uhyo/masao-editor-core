@@ -1,17 +1,21 @@
 "use strict";
 var React=require('react');
 
-import Resizable from './util/resizable';
-import Scroll from './util/scroll';
+import Resizable from '../util/resizable';
+import Scroll from '../util/scroll';
+
+import Timers from '../../../scripts/timers';
+import BackLayer from './backlayer';
+import MapUpdator from './updator';
 
 var Promise=require('native-promise-only');
-var util=require('../../scripts/util');
+var util=require('../../../scripts/util');
 
-var chip=require('../../scripts/chip'),
-    loadImage=require('../../scripts/load-image');
+var chip=require('../../../scripts/chip'),
+    loadImage=require('../../../scripts/load-image');
 
-var editActions=require('../../actions/edit'),
-    mapActions=require('../../actions/map');
+var editActions=require('../../../actions/edit'),
+    mapActions=require('../../../actions/map');
 
 
 module.exports = React.createClass({
@@ -42,10 +46,10 @@ module.exports = React.createClass({
         project: React.PropTypes.object.isRequired
     },
     componentDidMount(){
-        //flags
+        // flags
         this.drawing=false;
         this.drawRequest=null;
-        //load files
+        // load files
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
             this.images={
@@ -53,9 +57,20 @@ module.exports = React.createClass({
                 mapchip,
                 chips
             };
+            this.resetBacklayer();
             this.draw();
         });
-        //draw grids
+        // double-buffering 
+        // TODO
+        this.updator_map = new MapUpdator(180, 30, this.chipPollution.bind(this, 'map'));
+        this.updator_layer = new MapUpdator(180, 30, this.chipPollution.bind(this, 'layer'));
+        this.backlayer_map = new BackLayer(180, 30, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
+        this.backlayer_layer = new BackLayer(180, 30, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
+
+        // timers
+        this.timers = new Timers();
+
+        // draw grids
         let ctx=this.refs.canvas2.getContext('2d');
         let {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.25)";
@@ -71,6 +86,11 @@ module.exports = React.createClass({
             ctx.lineTo(view_width*32,y*32);
             ctx.stroke();
         }
+
+        this.resetMap();
+    },
+    componentWillUnmount(){
+        this.timers.clean();
     },
     componentDidUpdate(prevProps){
         //書き換える
@@ -83,28 +103,115 @@ module.exports = React.createClass({
                     mapchip,
                     chips
                 };
+                this.resetBacklayer();
                 this.draw();
             });
         }
-        if(prevProps.edit.screen!==this.props.edit.screen){
+        let pe=prevProps.edit, e=this.props.edit;
+        if(pe.screen !== e.screen){
             this.draw();
             return;
         }
-        if(this.props.edit.screen==="map" && prevProps.map.map!==this.props.map.map ||
-           this.props.edit.screen==="layer" && prevProps.map.layer!==this.props.map.layer ||
-           prevProps.params!==this.props.params ||
-           prevProps.edit.render_map!==this.props.edit.render_map ||
-           prevProps.edit.render_layer!==this.props.edit.render_layer){
+        if (prevProps.params !== this.props.params){
+            this.draw();
+            return;
+        }
+        if (pe.stage !== e.stage){
+            this.resetMap();
+            this.resetBacklayer();
+            this.draw();
+            return;
+        }
+        if (prevProps.map.lastUpdate !== this.props.map.lastUpdate){
+            // mapのupdateがあったから反応
+            this.updateBacklayer(this.props.map.lastUpdate);
             this.draw();
         }else{
-            let pe=prevProps.edit, e=this.props.edit;
-            if(pe.scroll_x!==e.scroll_x ||
+            if(pe.render_map!==e.render_map ||
+               pe.render_layer!==e.render_layer ||
+               pe.scroll_x!==e.scroll_x ||
                pe.scroll_y!==e.scroll_y ||
-               pe.stage!==e.stage ||
                pe.view_width!==e.view_width ||
                pe.view_height!==e.view_height){
                 this.draw();
             }
+        }
+    },
+    resetBacklayer(){
+        this.backlayer_map.clear();
+        this.backlayer_layer.clear();
+
+        const expandMap = ()=>{
+            this.timers.addTimer('expand-map', 1000, ()=>{
+                const flag = this.backlayer_map.expand();
+                if (flag){
+                    expandMap();
+                }else{
+                    expandLayer();
+                }
+            });
+        };
+        const expandLayer = ()=>{
+            this.timers.addTimer('expand-map', 1000, ()=>{
+                const flag = this.backlayer_layer.expand();
+                if (flag){
+                    expandLayer();
+                }
+            });
+        };
+        expandMap();
+    },
+    resetMap(){
+        const {
+            edit: {
+                stage,
+            },
+            map: {
+                map,
+                layer,
+            },
+        } = this.props;
+        this.updator_map.resetMap(map[stage-1]);
+        this.updator_layer.resetMap(layer[stage-1]);
+    },
+    updateBacklayer(lastUpdate){
+        // map storeのlastUpdateを見てbacklayerをアップデートする
+        if (lastUpdate == null){
+            return;
+        }
+        const {
+            stage,
+        } = this.props.edit;
+        const map = this.props.map.map[stage-1];
+        const layer = this.props.map.layer[stage-1];
+        switch (lastUpdate.type){
+            case 'all': {
+                // 刷新されちゃった
+                this.resetMap();
+                this.resetBacklayer();
+                break;
+            }
+            case 'map':
+            case 'layer': {
+                const {
+                    stage,
+                    x,
+                    y,
+                } = lastUpdate;
+                if (this.props.edit.stage !== stage){
+                    // 違うステージの話だった
+                    return;
+                }
+                if (lastUpdate.type === 'map'){
+                    const points = this.updator_map.update(x, y, map[y][x]);
+                    this.backlayer_map.update(points);
+                }else{
+                    const points = this.updator_layer.update(x, y, layer[y][x]);
+                    this.backlayer_layer.update(points);
+                }
+                break;
+            }
+
         }
     },
     draw(){
@@ -117,39 +224,53 @@ module.exports = React.createClass({
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             console.time("draw");
-            var map=this.props.map, params=this.props.params, edit=this.props.edit;
-            var screen=edit.screen;
-            var {scroll_x, scroll_y, view_width, view_height} = edit;
-            var ctx=this.refs.canvas.getContext("2d");
 
-            var width=view_width*32, height=view_height*32;
+            const {
+                backlayer_map,
+                backlayer_layer,
+                props: {
+                    map,
+                    params,
+                    edit,
+                },
+            } = this;
+            const {
+                screen,
+                scroll_x,
+                scroll_y,
+                view_width,
+                view_height,
 
-            let mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+                render_map,
+                render_layer,
+            } = edit;
+            const ctx=this.refs.canvas.getContext("2d");
 
-            //background color
+            const width=view_width*32;
+            const height=view_height*32;
+
+            const mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+
+            // バックバッファで描画
+            if (screen === 'map' || render_map === true){
+                backlayer_map.prerender(scroll_x, scroll_y, view_width, view_height);
+            }
+            if (screen === 'layer' || render_layer === true){
+                backlayer_layer.prerender(scroll_x, scroll_y, view_width, view_height);
+            }
+
+            // まず背景色で塗りつぶす
             let bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,width,height);
-            //map
-            for(let x=0;x < view_width; x++){
-                for(let y=0;y < view_height; y++){
-                    //TODO
-                    let mx=scroll_x+x, my=scroll_y+y;
-                    if(mapData[my]==null){
-                        //領域外。
-                        continue;
-                    }
-                    if(screen==="layer" || edit.render_layer===true){
-                        //レイヤーを描画
-                        let c=layerData[my][mx];
-                        this.drawLayer(ctx,c,x*32,y*32);
-                    }
-                    if(screen==="map" || edit.render_map===true){
-                        let c=mapData[my][mx];
-                        this.drawChip(ctx,c,x*32, y*32);
-                    }
-                }
+            // バックバッファから
+            if (screen === 'layer' || render_layer === true){
+                backlayer_layer.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
             }
+            if (screen === 'map' || render_map === true){
+                backlayer_map.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+            }
+
             this.drawing=false;
             console.timeEnd("draw");
         });
@@ -168,6 +289,56 @@ module.exports = React.createClass({
         let idx=parseInt(c,16);
         let sx=(idx&15)*32, sy=Math.floor(idx>>4)*32;
         ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
+    },
+    drawChipOn(type, ctx, x, y, dx, dy){
+        // 指定された座標に描画
+        const {
+            map: {
+                map,
+                layer,
+            },
+            edit: {
+                stage,
+                scroll_x,
+                scroll_y,
+                view_width,
+                view_height,
+            },
+        } = this.props;
+        if (type === 'map'){
+            const mapData = map[stage-1];
+            const c = mapData[y][x];
+            this.drawChip(ctx, c, x*32, y*32);
+        }else if (type === 'layer'){
+            const layerData = layer[stage-1];
+            const c = layerData[y][x];
+            this.drawLayer(ctx, c, x*32, y*32);
+        }
+    },
+    chipPollution(type, c){
+        if (type === 'layer'){
+            // layerのチップは全部普通
+            return {
+                minX: 0,
+                minY: 0,
+                maxX: 1,
+                maxY: 1,
+            };
+        }
+        const {
+            params,
+        } = this.props;
+        // mapの場合は広い範囲に描画されるかも
+        const renderRect = chip.chipRenderRect(params, c);
+
+        // タイル単位に変換
+        const updateRect = {
+            minX: Math.floor(renderRect.minX / 32),
+            minY: Math.floor(renderRect.minY / 32),
+            maxX: Math.ceil(renderRect.maxX / 32),
+            maxY: Math.ceil(renderRect.maxY / 32),
+        };
+        return updateRect;
     },
     render(){
         const {

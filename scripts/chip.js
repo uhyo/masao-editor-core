@@ -1,6 +1,10 @@
 "use strict";
 //chipの情報
 
+import {
+    containerRect,
+} from './rect';
+
 //再利用
 const dossunsun_pattern = {
     chip: 184,
@@ -2449,6 +2453,60 @@ function drawChip(ctx,images,params,chip,x,y,full){
 }
 
 exports.drawChip = drawChip;
+
+// チップの描画範囲を返す（相対座標）
+function chipRenderRect(params, chip){
+    const rect = {
+        minX: 0,
+        minY: 0,
+        maxX: 0,
+        maxY: 0,
+    };
+    if(chip==="."){
+        return rect;
+    }
+    var t=chipFor(params,chip);
+    if(t==null){
+        return rect;
+    }
+    var p=t.pattern;
+    if(!Array.isArray(p)){
+        p=[p];
+    }
+    const rects = [rect];
+    // 各描画要素の影響範囲
+    for(var i=0; i<p.length ;i++){
+        let pi=p[i];
+        const chip = "number"===typeof pi ? pi : pi.chip;
+        if(chip != null){
+            const width=pi.width || 32;
+            const height=pi.height || 32;
+            const dx = pi.dx || 0;
+            const dy = pi.dy || 0;
+            rects.push({
+                minX: dx,
+                minY: dy,
+                maxX: dx+width,
+                maxY: dy+height,
+            });
+        }else if(pi.subx!=null && pi.suby!=null){
+            // subの場合
+            const width=pi.width || 16;
+            const height=pi.height || 16;
+            const dx = pi.dx || 0;
+            const dy = pi.dy || 0;
+            rects.push({
+                minX: dx,
+                minY: dy,
+                maxX: dx+width,
+                maxY: dy+height,
+            });
+        }
+    }
+    return containerRect(...rects);
+}
+
+exports.chipRenderRect = chipRenderRect;
 
 //チップオブジェクト
 function chipFor(params,chip){
