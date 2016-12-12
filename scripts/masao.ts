@@ -1,10 +1,15 @@
-var masao=require('masao');
+import {
+    param,
+    format,
+} from 'masao';
 
-exports.param = masao.param;
-exports.format= masao.format;
+export {
+    param,
+    format,
+};
 
 //paramの分類
-var paramTypes={
+export const paramTypes={
     "stage": {
         name: "全般",
         params: [
@@ -402,10 +407,9 @@ var paramTypes={
         ]
     },*/
 };
-exports.paramTypes = paramTypes;
 
 //対応可能なバージョンに変換
-function acceptVersion(version){
+export function acceptVersion(version: string): string{
     if(version==="2.7" || version==="2.8"){
         return "2.8";
     }else if(version==="kani" || version==="kani2"){
@@ -413,4 +417,4 @@ function acceptVersion(version){
     }
     return "fx16";
 }
-exports.acceptVersion = acceptVersion;
+

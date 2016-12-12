@@ -1,5 +1,5 @@
 "use strict";
-var React=require('react');
+import * as React from 'react';
 
 import Resizable from '../util/resizable';
 import Scroll from '../util/scroll';
@@ -8,43 +8,80 @@ import Timers from '../../../scripts/timers';
 import BackLayer from './backlayer';
 import MapUpdator from './updator';
 
-var Promise=require('native-promise-only');
-var util=require('../../../scripts/util');
+import Promise from '../../../scripts/promise';
+import * as util from '../../../scripts/util';
 
-var chip=require('../../../scripts/chip'),
-    loadImage=require('../../../scripts/load-image');
+import * as chip from '../../../scripts/chip';
+import loadImage from '../../../scripts/load-image';
 
-var editActions=require('../../../actions/edit'),
-    mapActions=require('../../../actions/map');
+import {
+    Rect,
+} from '../../../scripts/rect';
 
+// import * as editActions from '../../../actions/edit';
+// import * as mapActions from '../../../actions/map';
+const editActions = require('../../../actions/edit');
+const mapActions = require('../../../actions/map');
 
-module.exports = React.createClass({
-    displayName: "MapEdit",
-    propTypes: {
-        pattern: React.PropTypes.string.isRequired,
-        mapchip: React.PropTypes.string.isRequired,
-        chips: React.PropTypes.string.isRequired,
+/**
+ * 画像リソースたち
+ */
+interface Images{
+    pattern: HTMLImageElement;
+    mapchip: HTMLImageElement;
+    chips: HTMLImageElement;
+}
 
-        map: React.PropTypes.shape({
-            map: React.PropTypes.arrayOf(
-                React.PropTypes.arrayOf(
-                    React.PropTypes.arrayOf(
-                        React.PropTypes.string.isRequired
-                    ).isRequired
-                ).isRequired
-            ).isRequired,
-            layer: React.PropTypes.arrayOf(
-                React.PropTypes.arrayOf(
-                    React.PropTypes.arrayOf(
-                        React.PropTypes.string.isRequired
-                    ).isRequired
-                ).isRequired
-            ).isRequired
-        }),
-        params: React.PropTypes.object.isRequired,
-        edit: React.PropTypes.object.isRequired,
-        project: React.PropTypes.object.isRequired
-    },
+export interface IPropMapEdit{
+    pattern: string;
+    mapchip: string;
+    chips: string;
+
+    map: any;
+    params: Record<string, string>;
+    edit: any; /* TODO */
+    project: any; /* TODO */
+}
+export default class MapEdit extends React.Component<IPropMapEdit, {}>{
+    /**
+     * 描画処理が走っているか
+     */
+    private drawing: boolean;
+    /**
+     * 画像リソース
+     */
+    private images: Images;
+    /**
+     * requestAnimationFrameの返り値
+     */
+    private drawRequest: any;
+
+    /**
+     * マップのupdator
+     */
+    private updator_map: MapUpdator;
+    /**
+     * 背景レイヤーのupdator
+     */
+    private updator_layer: MapUpdator;
+    /**
+     * マップのbacklayer
+     */
+    private backlayer_map: BackLayer;
+    /**
+     * 背景レイヤーのbacklayer
+     */
+    private backlayer_layer: BackLayer;
+    /**
+     * タイマー
+     */
+    private timers: Timers;
+    constructor(props: IPropMapEdit){
+        super(props);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+    }
+
     componentDidMount(){
         // flags
         this.drawing=false;
@@ -71,16 +108,19 @@ module.exports = React.createClass({
         this.timers = new Timers();
 
         // draw grids
-        let ctx=this.refs.canvas2.getContext('2d');
-        let {view_width, view_height} = this.props.edit;
+        const ctx = (this.refs['canvas2'] as HTMLCanvasElement).getContext('2d');
+        if (ctx == null){
+            return;
+        }
+        const {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.25)";
-        for(let x=1;x < view_width; x++){
+        for(let x=1; x < view_width; x++){
             ctx.beginPath();
-            ctx.moveTo(x*32,0);
-            ctx.lineTo(x*32,view_height*32);
+            ctx.moveTo(x*32, 0);
+            ctx.lineTo(x*32, view_height*32);
             ctx.stroke();
         }
-        for(let y=1;y < view_height; y++){
+        for(let y=1; y < view_height; y++){
             ctx.beginPath();
             ctx.moveTo(0,y*32);
             ctx.lineTo(view_width*32,y*32);
@@ -88,11 +128,11 @@ module.exports = React.createClass({
         }
 
         this.resetMap();
-    },
+    }
     componentWillUnmount(){
         this.timers.clean();
-    },
-    componentDidUpdate(prevProps){
+    }
+    componentDidUpdate(prevProps: IPropMapEdit){
         //書き換える
         if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
             //画像の再読み込みが必要
@@ -136,7 +176,7 @@ module.exports = React.createClass({
                 this.draw();
             }
         }
-    },
+    }
     resetBacklayer(){
         this.backlayer_map.clear();
         this.backlayer_layer.clear();
@@ -160,7 +200,7 @@ module.exports = React.createClass({
             });
         };
         expandMap();
-    },
+    }
     resetMap(){
         const {
             edit: {
@@ -173,8 +213,9 @@ module.exports = React.createClass({
         } = this.props;
         this.updator_map.resetMap(map[stage-1]);
         this.updator_layer.resetMap(layer[stage-1]);
-    },
-    updateBacklayer(lastUpdate){
+    }
+    /* TODO */
+    updateBacklayer(lastUpdate: any){
         // map storeのlastUpdateを見てbacklayerをアップデートする
         if (lastUpdate == null){
             return;
@@ -213,7 +254,7 @@ module.exports = React.createClass({
             }
 
         }
-    },
+    }
     draw(){
         if(this.drawing===true){
             return;
@@ -244,7 +285,10 @@ module.exports = React.createClass({
                 render_map,
                 render_layer,
             } = edit;
-            const ctx=this.refs.canvas.getContext("2d");
+            const ctx = (this.refs['canvas'] as HTMLCanvasElement).getContext("2d");
+            if (ctx == null){
+                return;
+            }
 
             const width=view_width*32;
             const height=view_height*32;
@@ -274,23 +318,23 @@ module.exports = React.createClass({
             this.drawing=false;
             console.timeEnd("draw");
         });
-    },
-    drawChip(ctx,c,x,y){
-        if(c==null){
+    }
+    drawChip(ctx: CanvasRenderingContext2D, c: string, x: number, y: number): void{
+        if(c == null){
             return;
         }
-        chip.drawChip(ctx,this.images,this.props.params,c,x,y,true);
-    },
-    drawLayer(ctx,c,x,y){
+        chip.drawChip(ctx, this.images, this.props.params, c, x, y, true);
+    }
+    drawLayer(ctx: CanvasRenderingContext2D , c: string, x: number, y: number): void{
         //レイヤ
-        if(c===".."){
+        if(c === '..'){ 
             return;
         }
-        let idx=parseInt(c,16);
-        let sx=(idx&15)*32, sy=Math.floor(idx>>4)*32;
+        const idx = parseInt(c, 16);
+        const sx = (idx&15)*32, sy = Math.floor(idx>>4)*32;
         ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
-    },
-    drawChipOn(type, ctx, x, y, dx, dy){
+    }
+    drawChipOn(type: 'map' | 'layer', ctx: CanvasRenderingContext2D, x: number, y: number){
         // 指定された座標に描画
         const {
             map: {
@@ -314,8 +358,8 @@ module.exports = React.createClass({
             const c = layerData[y][x];
             this.drawLayer(ctx, c, x*32, y*32);
         }
-    },
-    chipPollution(type, c){
+    }
+    chipPollution(type: 'map' | 'layer', c: string): Rect{
         if (type === 'layer'){
             // layerのチップは全部普通
             return {
@@ -339,7 +383,7 @@ module.exports = React.createClass({
             maxY: Math.ceil(renderRect.maxY / 32),
         };
         return updateRect;
-    },
+    }
     render(){
         const {
             view_width,
@@ -365,28 +409,28 @@ module.exports = React.createClass({
                 <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
                     <div className="me-core-map-edit-canvas-wrapper">
                         <canvas ref="canvas" width={width} height={height}/>
-                        <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : null} onContextMenu={this.handleContextMenu}/>
+                        <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : void 0} onContextMenu={this.handleContextMenu}/>
                     </div>
                 </Resizable>
             </Scroll>
         </div>;
-    },
-    handleResize(width, height){
+    }
+    handleResize(width: number, height: number){
         editActions.changeView({
             width: Math.floor(width/32),
             height: Math.floor(height/32),
         });
-    },
-    handleScroll(x, y){
+    }
+    handleScroll(x: number, y: number){
         editActions.scroll({
             x,
             y,
         });
-    },
-    handleMouseDown(e){
+    }
+    handleMouseDown<T>(e: React.MouseEvent<T>){
         //マウスが下がった
         e.preventDefault();
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs.canvas2);
+        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
         var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
         var screen=this.props.edit.screen;
         var mode;
@@ -427,19 +471,19 @@ module.exports = React.createClass({
         }
 
         //マウスが上がったときの処理
-        var mouseUpHandler=(e)=>{
+        const mouseUpHandler=()=>{
             editActions.mouseUp();
             //上がったらおわり
             document.body.removeEventListener("mouseup",mouseUpHandler,false);
         };
         document.body.addEventListener("mouseup",mouseUpHandler,false);
-    },
-    handleMouseMove(e){
+    }
+    handleMouseMove<T>(e: React.MouseEvent<T>){
         e.preventDefault();
         this.mouseMoves(this.props.edit.mode_current, e.pageX, e.pageY);
-    },
-    mouseMoves(mode,pageX,pageY){
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs.canvas2);
+    }
+    mouseMoves(mode: string, pageX: number, pageY: number){
+        const {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
         var edit=this.props.edit, map=this.props.map;
@@ -492,9 +536,10 @@ module.exports = React.createClass({
                 });
             }
         }
-    },
-    handleContextMenu(e){
+    }
+    handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();
     }
-});
+}
+
 

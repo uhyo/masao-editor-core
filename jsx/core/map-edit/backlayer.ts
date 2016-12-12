@@ -1,29 +1,56 @@
 'use strict';
 
-const rbush = require('rbush');
+import * as rbush from 'rbush';
 
 import {
     sortedUniq,
 } from '../../../scripts/util';
+import {
+    Rect,
+} from '../../../scripts/rect';
+import MapUpdator from './updator';
 /**
  * すでにRenderした範囲を管理する
  */
+
+export interface Point{
+    x: number;
+    y: number;
+}
+export type RenderCallback = (targets: Array<Point>)=>void;
+
+/**
+ * 位置と大きさで表された矩形
+ */
+export interface Box{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
 class RenderedRegions{
+    /**
+     * 既に描画済みの領域の右端
+     */
+    private leftFrontier: number = 0;
+
+    /**
+     * 1回のexpandで拡大するfrontierの長さ
+     */
+    private expandWidth: number = 10;
+
+    /**
+     * 描画済み領域
+     */
+    private tree: rbush.RBush<Rect>;
     /**
      * @constructor
      * @param {number} width 管理する範囲の横幅
      * @param {number} height 管理する範囲の縦幅
      * @param {Function} renderCallback 実際の書き込み発生時のあれ
      */
-    constructor(width, height, renderCallback){
-        this.width = width;
-        this.height = height;
-        this.renderCallback = renderCallback;
-
+    constructor(private width: number, private height: number, private renderCallback: RenderCallback){
         // 左から順番に描画するやつ
-        this.leftFrontier = 0;
-        this.expandWidth = 10;
-
         this.tree = rbush(9);
     }
 
@@ -40,7 +67,7 @@ class RenderedRegions{
      * @param {Object[]} rects レンダリングする範囲
      * @param {boolean} [force=false] 描画済でももう一度描画
      */
-    requestRender(rects, force=false){
+    requestRender(rects: Array<Box>, force: boolean=false){
         // まだrenderされていないところを列挙する
         const targets = [];
         // colsはitemとintersectする矩形の集合
@@ -64,18 +91,18 @@ class RenderedRegions{
             const cols = this.tree.search(item);
 
             const startX = force ? minX : Math.max(minX, this.leftFrontier);
-            xloop: for (let cx = startX; cx < maxX; cx++){
-                yloop: for (let cy = minY; cy < maxY; cy++){
+            for (let cx = startX; cx < maxX; cx++){
+                for (let cy = minY; cy < maxY; cy++){
                     if (!force){
                         for (let rect of cols){
                             if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
                                 if (rect.minY <= minY && maxY <= rect.maxY){
                                     // 列を全部覆う
                                     cx = rect.maxX-1;
-                                    break yloop;
+                                    break;
                                 }else{
                                     cy = rect.maxY-1;
-                                    continue yloop;
+                                    continue;
                                 }
                             }
                         }
@@ -94,6 +121,7 @@ class RenderedRegions{
             this.renderCallback(targets);
         }
     }
+
     /**
      * 指定された矩形を描画済み領域に追加
      * @param {Rect} item 矩形
@@ -101,7 +129,7 @@ class RenderedRegions{
      *
      * @private
      */
-    insertArea(item, cols){
+    insertArea(item: Rect, cols?: Array<Rect>){
         const {
             minX,
             minY,
@@ -140,10 +168,13 @@ class RenderedRegions{
     }
 }
 
+export type DrawCallback = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number)=>void;
 /**
  * ダブルバッファリングを表すクラス
  */
 export default class BackLayer{
+    private regions: RenderedRegions;
+    private canvas: HTMLCanvasElement;
     /**
      * @constructor
      * @param {number} width 領域全体の横幅
@@ -152,21 +183,14 @@ export default class BackLayer{
      * @param {Updator} updator
      * @param {Function} drawCallback 実際にcanvas上に描画する関数
      */
-    constructor(width, height, size, updator, drawCallback){
-        this.width = width;
-        this.height = height;
-        this.size = size;
-        this.updator = updator;
-        this.drawCallback = drawCallback;
-
+    constructor(private width: number, private height: number, private size: number, private updator: MapUpdator, private drawCallback: DrawCallback){
         this.regions = new RenderedRegions(width, height, this.renderTargets.bind(this));
         this.initCanvas();
     }
     /**
      * canvasを初期化
-     * @private
      */
-    initCanvas(){
+    private initCanvas(){
         const {
             width,
             height,
@@ -179,10 +203,9 @@ export default class BackLayer{
     /**
      * バッファ上に描画
      *
-     * @private
      * @param {Point[]} targets 描画対象マスの一覧
      */
-    renderTargets(targets){
+    private renderTargets(targets: Array<Point>){
         const {
             canvas,
             width,
@@ -191,6 +214,9 @@ export default class BackLayer{
             updator,
         } = this;
         const ctx = canvas.getContext('2d');
+        if (ctx == null){
+            return;
+        }
         // まずclearRectで消去
         for (let {x, y} of targets){
             ctx.clearRect(x*size, y*size, size, size);
@@ -205,7 +231,8 @@ export default class BackLayer{
         ctx.clip('nonzero');
 
         const effecters1 = updator.fromRegion(...targets);
-        effecters1.sort(({x: x1, y: y1, big: big1}, {x: x2, y: y2, big: big2})=> (big2 - big1) * width * height + (x2 - x1) * height + (y2 - y1));
+        // TODO
+        effecters1.sort(({x: x1, y: y1, big: big1}: any, {x: x2, y: y2, big: big2}: any)=> (big2 - big1) * width * height + (x2 - x1) * height + (y2 - y1));
         const effecters = sortedUniq(effecters1, ({x: x1, y: y1}, {x: x2, y: y2})=> x1 === x2 && y1 === y2);
 
         for (let {x, y, big} of effecters){
@@ -227,6 +254,9 @@ export default class BackLayer{
         regions.clear();
 
         const ctx = canvas.getContext('2d');
+        if (ctx == null){
+            return;
+        }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -235,7 +265,7 @@ export default class BackLayer{
      *
      * @param {Points[]} points 再描画範囲
      */
-    update(points){
+    update(points: Array<Point>){
         const {
             canvas,
             regions,
@@ -264,7 +294,7 @@ export default class BackLayer{
      * @param {number} width 描画領域横幅
      * @param {number} height 描画領域縦幅
      */
-    prerender(x, y, width, height){
+    prerender(x: number, y: number, width: number, height: number){
         this.regions.requestRender([{
             x,
             y,
@@ -292,7 +322,7 @@ export default class BackLayer{
      * @param {number} dx 描画対象位置
      * @param {number} dy 描画対象位置
      */
-    copyTo(ctx, x, y, width, height, dx, dy){
+    copyTo(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, dx: number, dy: number){
         const {
             canvas,
             size,
@@ -300,8 +330,9 @@ export default class BackLayer{
         ctx.drawImage(canvas,
                       x * size, y * size,
                       width * size, height * size,
-                      0, 0,
+                      dx * size, dy * size,
                       width * size, height * size);
     }
 
 }
+

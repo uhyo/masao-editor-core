@@ -2,38 +2,52 @@
 
 import {
     containerRect,
+    Rect,
 } from '../../../scripts/rect';
 
 import {
     sortedUniq,
 } from '../../../scripts/util';
+
+export interface Point{
+    x: number;
+    y: number;
+}
+
+export interface TileDep{
+    x: number;
+    y: number;
+    big: boolean;
+}
+export interface DependencyTile{
+    from: Array<TileDep>;
+    to: Array<TileDep>;
+}
 /**
  * マップの各タイルの依存関係を解決するクラス
  */
 export class TileDependency{
+    private map: Array<Array<DependencyTile>>;
     /**
      * @constructor
      * @param {number} width マップの横幅
      * @param {number} height マップの縦幅
      */
-    constructor(width, height){
-        this.width = width;
-        this.height = height;
-
+    constructor(private width: number, private height: number){
         this.initMap();
     }
 
     /**
      * 依存関係マップを初期化
      */
-    initMap(){
+    initMap(): void{
         const {
             width,
             height,
         } = this;
-        const result = [];
+        const result: Array<Array<DependencyTile>> = [];
         for (let y = 0; y < height; y++){
-            const row = [];
+            const row: Array<DependencyTile> = [];
             result.push(row);
             for (let x = 0; x < width; x++){
                 row.push({
@@ -48,7 +62,7 @@ export class TileDependency{
     /**
      * 指定した位置のタイルが影響を与える範囲を返す
      */
-    toRegion(...points){
+    toRegion(...points: Array<Point>): Array<TileDep>{
         const {
             map,
         } = this;
@@ -61,7 +75,7 @@ export class TileDependency{
     /**
      * 指定した位置のタイルに影響を与える範囲を返す
      */
-    fromRegion(...points){
+    fromRegion(...points: Array<Point>): Array<TileDep>{
         const {
             map,
         } = this;
@@ -83,7 +97,7 @@ export class TileDependency{
      * @param {number} pollution.maxX 右下
      * @param {number} pollution.maxY 右下
      */
-    update(x, y, pollution){
+    update(x: number, y: number, pollution: Rect){
         const {
             map,
             width,
@@ -148,10 +162,9 @@ export class TileDependency{
  * マップの変更をdependencyに入力するクラス
  */
 export default class MapUpdator{
-    constructor(width, height, pollutionCallback){
-        this.width = width;
-        this.height = height;
-        this.pollutionCallback = pollutionCallback;
+    private pollutionCache: Record<string, Rect>;
+    private deps: TileDependency;
+    constructor(private width: number, private height: number, private pollutionCallback: (chip: string)=>Rect){
         this.pollutionCache = {};
 
         this.deps = new TileDependency(width, height);
@@ -160,7 +173,7 @@ export default class MapUpdator{
     /**
      * FIXME
      */
-    fromRegion(...points){
+    fromRegion(...points: Array<Point>): Array<TileDep>{
         return this.deps.fromRegion(...points);
     }
 
@@ -172,7 +185,7 @@ export default class MapUpdator{
      * @param {string} chip マップチップ
      *
      */
-    update(x, y, chip){
+    update(x: number, y: number, chip: string): Array<Point>{
         const {
             pollutionCallback,
             pollutionCache,
@@ -204,7 +217,7 @@ export default class MapUpdator{
      * マップが全部変わったのを登録
      * @param {string[][]} map マップ
      */
-    resetMap(map){
+    resetMap(map: Array<Array<string>>): void{
         const {
             width,
             height,
@@ -219,3 +232,4 @@ export default class MapUpdator{
         }
     }
 }
+

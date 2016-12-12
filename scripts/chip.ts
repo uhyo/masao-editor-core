@@ -1,12 +1,33 @@
-"use strict";
+'use strict';
 //chipの情報
 
 import {
+    Rect,
     containerRect,
 } from './rect';
 
+export interface MainChipRendering{
+    chip: number;
+    x?: number;
+    y?: number;
+    dx?: number;
+    dy?: number;
+    width?: number;
+    height?: number;
+    rotate?: number;
+}
+export interface SubChipRendering{
+    subx: number;
+    suby: number;
+    dx?: number;
+    dy?: number;
+    width?: number;
+    height?: number;
+}
+export type ChipRendering = MainChipRendering | SubChipRendering;
+
 //再利用
-const dossunsun_pattern = {
+const dossunsun_pattern: ChipRendering = {
     chip: 184,
     x: 96,
     y: 576,
@@ -15,7 +36,7 @@ const dossunsun_pattern = {
     width: 96,
     height: 64
 };
-const emptyblock_pattern = {
+const emptyblock_pattern: ChipRendering = {
     subx: 0,
     suby: 32,
     dx: -16,
@@ -23,6 +44,12 @@ const emptyblock_pattern = {
     width: 32,
     height: 32
 };
+
+export interface Chip{
+    pattern: number | ChipRendering | Array<number | ChipRendering>;
+    name: string;
+    category?: string;
+}
 
 /* categoryの種類
  * masao: 正男
@@ -33,7 +60,7 @@ const emptyblock_pattern = {
  * water: 水
  * item: アイテム
  */
-var chipTable={
+export const chipTable: Record<string, Chip> = {
     A: {
         pattern: 100,
         name: "主人公",
@@ -449,12 +476,10 @@ var chipTable={
     }
 };
 
-
-exports.chipTable = chipTable;
-exports.chipList = Object.keys(chipTable);
+export const chipList = Object.keys(chipTable);
 
 //仕掛けのparamに応じたやつ
-var athleticTable = {
+var athleticTable: Record<string, Chip> = {
     "2": {
         pattern: {
             chip: 180,
@@ -2350,7 +2375,7 @@ var athleticTable = {
 };
 
 //アスレチックのやつとparamの対応
-var athleticTypeParam = {
+const athleticTypeParam: Record<string, string> = {
     k: "coin1_type",
     l: "coin3_type",
     u: "dokan1_type",
@@ -2371,25 +2396,35 @@ var athleticTypeParam = {
 //  params: params
 //  chips: 補助チップ
 //}
-function drawChip(ctx,images,params,chip,x,y,full){
+export interface ImagesObject{
+    pattern: HTMLImageElement;
+    chips: HTMLImageElement;
+}
+export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject,params: Record<string, string>, chip: string, x: number, y: number, full: boolean){
     console.log("drawchip");
     if(chip==="."){
         return;
     }
-    var t=chipFor(params,chip);
+    const t=chipFor(params,chip);
     if(t==null){
         return;
     }
-    var p=t.pattern;
+    let p=t.pattern;
     if(!Array.isArray(p)){
         p=[p];
     }
-    for(var i=0;i<p.length;i++){
-        let pi=p[i];
-        var chip = "number"===typeof pi ? pi : pi.chip;
+    for(let i=0; i<p.length; i++){
+        let pi = p[i];
+        if ('number' === typeof pi){
+            pi = {
+                chip: pi,
+            };
+        }
+        const chip = (pi as MainChipRendering).chip;
         let sx,sy;
         //その番号を描画
-        if(chip!=null){
+        if(chip != null){
+            pi = pi as MainChipRendering;
             if(full){
                 sy=pi.y || Math.floor(chip/10)*32, sx=pi.x || (chip%10)*32;
                 let width=pi.width || 32, height=pi.height || 32;
@@ -2443,7 +2478,8 @@ function drawChip(ctx,images,params,chip,x,y,full){
                     ctx.restore();
                 }
             }
-        }else if(pi.subx!=null && pi.suby!=null){
+        }else if((pi as SubChipRendering).subx!=null && (pi as SubChipRendering).suby!=null){
+            pi = pi as SubChipRendering;
             //subを描画
             let width=pi.width || 16, height=pi.height || 16;
             let xx=pi.dx||0, yy=pi.dy||0;
@@ -2452,11 +2488,9 @@ function drawChip(ctx,images,params,chip,x,y,full){
     }
 }
 
-exports.drawChip = drawChip;
-
 // チップの描画範囲を返す（相対座標）
-function chipRenderRect(params, chip){
-    const rect = {
+export function chipRenderRect(params: Record<string, string>, chip: string): Rect{
+    const rect: Rect = {
         minX: 0,
         minY: 0,
         maxX: 0,
@@ -2465,11 +2499,11 @@ function chipRenderRect(params, chip){
     if(chip==="."){
         return rect;
     }
-    var t=chipFor(params,chip);
+    const t=chipFor(params,chip);
     if(t==null){
         return rect;
     }
-    var p=t.pattern;
+    let p=t.pattern;
     if(!Array.isArray(p)){
         p=[p];
     }
@@ -2477,7 +2511,12 @@ function chipRenderRect(params, chip){
     // 各描画要素の影響範囲
     for(var i=0; i<p.length ;i++){
         let pi=p[i];
-        const chip = "number"===typeof pi ? pi : pi.chip;
+        if ('number' === typeof pi){
+            pi = {
+                chip: pi,
+            };
+        }
+        const chip = (pi as MainChipRendering).chip;
         if(chip != null){
             const width=pi.width || 32;
             const height=pi.height || 32;
@@ -2489,7 +2528,7 @@ function chipRenderRect(params, chip){
                 maxX: dx+width,
                 maxY: dy+height,
             });
-        }else if(pi.subx!=null && pi.suby!=null){
+        }else if((pi as SubChipRendering).subx!=null && (pi as SubChipRendering).suby!=null){
             // subの場合
             const width=pi.width || 16;
             const height=pi.height || 16;
@@ -2506,15 +2545,13 @@ function chipRenderRect(params, chip){
     return containerRect(...rects);
 }
 
-exports.chipRenderRect = chipRenderRect;
-
 //チップオブジェクト
-function chipFor(params,chip){
+export function chipFor(params: Record<string, string>, chip: string): Chip{
     let pa=athleticTypeParam[chip];
     if(pa!=null && params[pa]!=="1"){
         //変わったアスレチックだ
         return athleticTable[params[pa]];
-    }else if(chip==="j" && params.layer_mode==="2"){
+    }else if(chip==='j' && params['layer_mode'] === '2'){
         //ブロック10はレイヤーありのとき透明になる
         return {
             pattern: [{
@@ -2531,7 +2568,7 @@ function chipFor(params,chip){
             name: "ブロック10（透明）",
             category: "block"
         };
-    }else if(chip==="[" && params.layer_mode==="2"){
+    }else if(chip==='[' && params['layer_mode'] === '2'){
         //下から通れる床
         return {
             pattern: [{
@@ -2545,7 +2582,7 @@ function chipFor(params,chip){
             name: "下から通れる床（透明）",
             category: "block"
         };
-    }else if(chip==="]" && params.layer_mode==="2"){
+    }else if(chip===']' && params['layer_mode'] === '2'){
         //ハシゴ
         return {
             pattern: [{
@@ -2559,7 +2596,7 @@ function chipFor(params,chip){
             name: "ハシゴ（透明）",
             category: "block"
         };
-    }else if(chip==="<" && params.layer_mode==="2"){
+    }else if(chip==='<' && params['layer_mode'] === '2'){
         //坂も透明になる
         return {
             pattern: [{
@@ -2573,7 +2610,7 @@ function chipFor(params,chip){
             name: "上り坂（透明）",
             category: "block"
         };
-    }else if(chip===">" && params.layer_mode==="2"){
+    }else if(chip==='>' && params['layer_mode'] === '2'){
         //坂も透明になる
         return {
             pattern: [{
@@ -2592,4 +2629,3 @@ function chipFor(params,chip){
     }
 }
 
-exports.chipFor = chipFor;

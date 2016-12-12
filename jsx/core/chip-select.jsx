@@ -1,10 +1,11 @@
 "use strict";
-var React=require('react');
+const React=require('react');
 
-var Promise=require('native-promise-only');
+import Promise from '../../scripts/promise';
+
 var chip=require('../../scripts/chip'),
     util=require('../../scripts/util'),
-    loadImage=require('../../scripts/load-image');
+    loadImage=require('../../scripts/load-image').default;
 
 var editActions=require('../../actions/edit');
 

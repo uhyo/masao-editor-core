@@ -1,28 +1,75 @@
 // Scrollable area!
 'use strict';
-const React = require('react');
-import styles from './scroll.css';
+import * as React from 'react';
+
+// import styles from './scroll.css';
+const styles: any = require('./scroll.css');
 
 import {
     getAbsolutePosition,
 } from '../../../scripts/util';
 
-export default class Scroll extends React.Component{
-    constructor(props){
+export interface IPropScroll{
+    /**
+     * scroll area x
+     */
+    width: number;
+    /**
+     * scroll area y
+     */
+    height: number;
+    /**
+     * current position x
+     */
+    x: number;
+    /**
+     * current position y
+     */
+    y: number;
+    /**
+     * screen size x
+     */
+    screenX: number;
+    /**
+     * screen size y
+     */
+    screenY: number;
+    /**
+     * event handler
+     */
+    onScroll: (x: number, y: number)=>void;
+}
+export default class Scroll extends React.Component<IPropScroll, {}>{
+    /**
+     * マウスが押されているフラグ
+     */
+    private mouse_flag: boolean = false;
+    /**
+     * Free Scroll対象
+     */
+    private fsc_target: HTMLElement | null = null;
+    /**
+     * Hand Scroll対象
+     */
+    private hsc_target: HTMLElement | null = null;
+    /**
+     * Hand Scrollの親
+     */
+    private hsc_parent: HTMLElement | null = null;
+    /**
+     * Hand Scrollのつかんだ位置 x
+     */
+    private hsc_x: number = -1;
+    /**
+     * Hand Scrollのつかんだ位置 y
+     */
+    private hsc_y: number = -1;
+    constructor(props: IPropScroll){
         super(props);
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handlePushButton = this.handlePushButton.bind(this);
-
-        this.mouse_flag = false;
-        // Free Scroll
-        this.fsc_target = null;
-        // Hand Scroll
-        this.hsc_target = null;
-        this.hsc_parent = null;
-        this.hsc_x = null;
-        this.hsc_y = null;
     }
     render(){
         const {
@@ -71,34 +118,34 @@ export default class Scroll extends React.Component{
             </div>
         </div>;
     }
-    handleMouseDown(e){
+    handleMouseDown<T>(e: React.MouseEvent<T>){
         const {
             target,
             pageX,
             pageY,
         } = e;
 
-        if (target === this.refs.hor || target === this.refs.ver){
+        if (target === this.refs['hor'] || target === this.refs['ver']){
             // 瞬間移動
             e.preventDefault();
-            this.doFreeScroll(target, pageX, pageY);
-            this.registerFreeScroll(target);
+            this.doFreeScroll(target as HTMLElement, pageX, pageY);
+            this.registerFreeScroll(target as HTMLElement);
             return;
         }
-        if (target === this.refs.horTip || target === this.refs.verTip){
+        if (target === this.refs['horTip'] || target === this.refs['verTip']){
             // つかんで移動
             e.preventDefault();
-            this.registerHandScroll(target, pageX, pageY);
+            this.registerHandScroll(target as HTMLElement, pageX, pageY);
         }
     }
-    handleMouseMove(e){
+    handleMouseMove(e: MouseEvent){
         if (this.fsc_target != null){
             this.doFreeScroll(this.fsc_target, e.pageX, e.pageY);
         }else if (this.hsc_target != null){
             this.doHandScroll(this.hsc_target, e.pageX, e.pageY, this.hsc_parent, this.hsc_x, this.hsc_y);
         }
     }
-    handleMouseUp(e){
+    handleMouseUp<T>(){
         // free scrollを解除
         if (this.mouse_flag === true){
             document.removeEventListener('mousemove', this.handleMouseMove, false);
@@ -111,7 +158,7 @@ export default class Scroll extends React.Component{
     }
 
     // mouseMoveの処理をregister
-    registerFreeScroll(target){
+    registerFreeScroll(target: HTMLElement){
         this.fsc_target = target;
         if (this.mouse_flag === false){
             this.mouse_flag = true;
@@ -119,7 +166,7 @@ export default class Scroll extends React.Component{
             document.addEventListener('mouseup', this.handleMouseUp, false);
         }
     }
-    registerHandScroll(target, pageX, pageY){
+    registerHandScroll(target: HTMLElement, pageX: number, pageY: number){
         const {
             x: target_x,
             y: target_y,
@@ -129,9 +176,9 @@ export default class Scroll extends React.Component{
 
         this.hsc_target = target;
         this.hsc_parent =
-            target === this.refs.horTip ? this.refs.hor :
-            target === this.refs.verTip ? this.refs.ver :
-            void 0;
+            target === this.refs['horTip'] ? this.refs['hor'] as HTMLElement :
+            target === this.refs['verTip'] ? this.refs['ver'] as HTMLElement :
+            null;
         this.hsc_x = pageX - target_x;
         this.hsc_y = pageY - target_y;
         if (this.mouse_flag === false){
@@ -140,9 +187,9 @@ export default class Scroll extends React.Component{
             document.addEventListener('mouseup', this.handleMouseUp, false);
         }
     }
-    handlePushButton(e){
+    handlePushButton<T>(e: React.MouseEvent<T>){
         e.preventDefault();
-        const dir = e.target.dataset.dir;
+        const dir = (e.target as HTMLElement).dataset['dir'];
         switch (dir){
             case 'left':
                 this.setScroll(this.props.x-1, null);
@@ -161,7 +208,7 @@ export default class Scroll extends React.Component{
 
 
     // スクロールを処理
-    doFreeScroll(target, pageX, pageY){
+    doFreeScroll(target: HTMLElement, pageX: number, pageY: number){
         const {
             props: {
                 width,
@@ -182,19 +229,22 @@ export default class Scroll extends React.Component{
         const px = pageX - target_x;
         const py = pageY - target_y;
 
-        if (target === this.refs.hor){
+        if (target === this.refs['hor']){
             // 瞬間移動（横）
             const pos = Math.round(px/target_width * (width + screenX) - screenX/2);
             this.setScroll(pos, null);
             return;
-        }else if (target === this.refs.ver){
+        }else if (target === this.refs['ver']){
             // 瞬間移動（縦）
             const pos = Math.round(py/target_height * (height + screenY) - screenY/2);
             this.setScroll(null, pos);
             return;
         }
     }
-    doHandScroll(target, pageX, pageY, parent, handX, handY){
+    doHandScroll(target: HTMLElement | null, pageX: number, pageY: number, parent: HTMLElement | null, handX: number, handY: number){
+        if (target == null || parent == null){
+            return;
+        }
         const {
             props: {
                 width,
@@ -215,16 +265,16 @@ export default class Scroll extends React.Component{
         const px = pageX - parent_x;
         const py = pageY - parent_y;
 
-        if (target === this.refs.horTip){
+        if (target === this.refs['horTip']){
             const pos = Math.round((px - handX)/parent_width * (width + screenX));
             this.setScroll(pos, null);
-        }else if (target === this.refs.verTip){
+        }else if (target === this.refs['verTip']){
             const pos = Math.round((py - handY)/parent_height * (height + screenY));
             this.setScroll(null, pos);
         }
     }
     // スクロールを伝達
-    setScroll(nx, ny){
+    setScroll(nx: number | null, ny: number | null){
         const {
             x,
             y,
@@ -240,16 +290,3 @@ export default class Scroll extends React.Component{
         }
     }
 }
-Scroll.PropTypes = {
-    // scroll area.
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    // current position.
-    x: React.PropTypes.number.isRequired,
-    y: React.PropTypes.number.isRequired,
-    // screen size.
-    screenX: React.PropTypes.number.isRequired,
-    screenY: React.PropTypes.number.isRequired,
-    // event handler.
-    onScroll: React.PropTypes.func.isRequired,
-};

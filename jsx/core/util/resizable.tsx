@@ -1,19 +1,36 @@
 "use strict";
-var React=require('react');
+import * as React from 'react';
 
-const Resizable = require('react-resizable-box');
+const Resizable: any = require('react-resizable-box');
 
-import styles from './resizable.css';
+// import styles from './resizable.css';
+const styles = require('./resizable.css');
 
-export default class ResizableBox extends React.Component{
-    constructor(props){
+interface IPropResizableBox{
+    width: number;
+    height: number;
+
+    minWidth?: number;
+    minHeight?: number;
+
+    grid: {
+        x: number;
+        y: number;
+    };
+    onResize(width: number, height: number): void;
+}
+export default class ResizableBox extends React.Component<IPropResizableBox, {}>{
+    // 変化前の大きさ
+    private prev_width: number;
+    private prev_height: number;
+    constructor(props: IPropResizableBox){
         super(props);
         this.onResize = this.onResize.bind(this);
 
         this.prev_width = props.width;
         this.prev_height = props.height;
     }
-    onResize(direction, styleSize, clientSize, delta){
+    onResize(_: any, styleSize: {width: number; height: number}){
         const {
             props: {
                 onResize,
@@ -55,17 +72,6 @@ export default class ResizableBox extends React.Component{
             </Resizable>
         </div>;
     }
-};
-ResizableBox.propTypes = {
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    minWidth: React.PropTypes.number,
-    minHeight: React.PropTypes.number,
-    grid: React.PropTypes.shape({
-        x: React.PropTypes.number.isRequired,
-        y: React.PropTypes.number.isRequired,
-    }),
-    onResize: React.PropTypes.func,
 };
 
 

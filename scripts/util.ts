@@ -1,9 +1,11 @@
-"use strict";
+'use strict';
 //util methods
-//
-//elementのabsolute position of HTMLElement
-function getAbsolutePosition(elm){
-    var r=elm.getBoundingClientRect();
+
+/**
+ * elementのabsolute positionを返す
+ */
+export function getAbsolutePosition(elm: HTMLElement){
+    const r=elm.getBoundingClientRect();
     return {
         x: r.left+window.scrollX,
         y: r.top+window.scrollY,
@@ -12,34 +14,37 @@ function getAbsolutePosition(elm){
         height: r.height,
     };
 }
-exports.getAbsolutePosition=getAbsolutePosition;
 
-function cssColor(r,g,b){
+/**
+ * r, g, b要素をCSSの値に直す
+ */
+export function cssColor(r: number,g: number,b: number){
     return `rgb(${r},${g},${b})`;
 }
-exports.cssColor = cssColor;
 
-//背景色を求める
-function stageBackColor(params,edit){
-    let stage=edit.stage;
-    if(stage===1){
+/**
+ * ステージの背景色を求める
+ * TODO
+ */
+export function stageBackColor(params: any, edit: any){
+    const stage: number = edit.stage;
+    if(stage === 1){
         return cssColor(params.backcolor_red, params.backcolor_green, params.backcolor_blue);
-    }else if(stage===2){
+    }else if(stage === 2){
         return cssColor(params.backcolor_red_s, params.backcolor_green_s, params.backcolor_blue_s);
-    }else if(stage===3){
+    }else if(stage === 3){
         return cssColor(params.backcolor_red_t, params.backcolor_green_t, params.backcolor_blue_t);
-    }else if(stage===4){
+    }else if(stage === 4){
         return cssColor(params.backcolor_red_f, params.backcolor_green_f, params.backcolor_blue_f);
     }
     return "#000000";
 
 
 }
-exports.stageBackColor = stageBackColor;
 
 // ソート済配列に対するuniq (non-destructive)
-function sortedUniq(arr, eq){
-    const result = [];
+export function sortedUniq<T>(arr: Array<T>, eq:(x: T, y: T)=>boolean){
+    const result: Array<T> = [];
     const l = arr.length;
     if (l === 0){
         return result;
@@ -58,4 +63,4 @@ function sortedUniq(arr, eq){
     return result;
 }
 
-exports.sortedUniq = sortedUniq;
+

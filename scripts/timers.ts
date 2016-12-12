@@ -4,18 +4,12 @@
  * タイマーを名前で管理していざとなったら全部消せるクラス
  */
 export default class Timers{
-    constructor(){
-        this.dict = {};
-    }
+    private dict: Record<string, any> = {};
 
     /**
      * 新しいタイマーを発行
-     *
-     * @param {string} id タイマーID
-     * @param {number} wait 待ち時間
-     * @param {Function} callback 関数
      */
-    addTimer(id, wait, callback){
+    addTimer(id: string, wait: number, callback: ()=>void): void{
         const {
             dict,
         } = this;
@@ -29,14 +23,14 @@ export default class Timers{
     }
     /**
      * タイマーを取り消し
-     * @param {string} id タイマーID
      */
-    clearTimer(id){
+    clearTimer(id: string){
         const {
             dict,
         } = this;
-        if (dict[id] != null){
-            clearTimeout(dict[id]);
+        const timerid = dict[id];
+        if (timerid != null){
+            clearTimeout(timerid);
             dict[id] = null;
         }
     }
@@ -56,3 +50,4 @@ export default class Timers{
         this.dict = {};
     }
 }
+

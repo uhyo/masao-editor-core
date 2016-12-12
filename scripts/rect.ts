@@ -2,11 +2,18 @@
 
 // Rectを扱う機能群
 
+export interface Rect{
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+}
+
 /**
  * 複数のRectを包含するやつ
  */
-export function containerRect(...rects){
-    const rect = {
+export function containerRect(...rects: Array<Rect>): Rect{
+    const rect: Rect = {
         minX: Infinity,
         minY: Infinity,
         maxX: -Infinity,
@@ -29,3 +36,4 @@ export function containerRect(...rects){
     }
     return rect;
 }
+

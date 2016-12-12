@@ -13,7 +13,7 @@ const mapStore=require('../../stores/map'),
       editStore=require('../../stores/edit'),
       projectStore=require('../../stores/project');
 
-const MapEdit=require('./map-edit/index.jsx'),
+const MapEdit=require('./map-edit/index.tsx').default,
       ChipSelect=require('./chip-select.jsx'),
       EditMode=require('./edit-mode.jsx'),
       MiniMap=require('./mini-map.jsx'),
