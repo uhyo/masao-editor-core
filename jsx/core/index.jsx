@@ -1,9 +1,8 @@
-"use strict";
-const React=require('react'),
-      Reflux=require('reflux');
-const extend=require('extend'),
-      masao=require('../../scripts/masao');
+const React = require('react');
+const Reflux = require('reflux');
 
+const extend = require('extend');
+const masao = require('../../scripts/masao');
 
 const paramActions=require('../../actions/params'),
       projectActions=require('../../actions/project');
@@ -13,15 +12,14 @@ const mapStore=require('../../stores/map'),
       editStore=require('../../stores/edit'),
       projectStore=require('../../stores/project');
 
-const MapEdit=require('./map-edit/index.tsx').default,
-      ChipSelect=require('./chip-select.jsx'),
-      EditMode=require('./edit-mode.jsx'),
-      MiniMap=require('./mini-map.jsx'),
-      ScreenSelect=require('./screen-select.jsx'),
-      ParamEdit=require('./param-edit.jsx'),
-      ProjectEdit=require('./project-edit.jsx'),
-      Button=require('./util/button.jsx');
-
+const MapEdit = require('./map-edit/index').default;
+const ChipSelect = require('./chip-select').default;
+const EditMode = require('./edit-mode').default;
+const MiniMap = require('./mini-map').default;
+const ScreenSelect = require('./screen-select').default;
+const ParamEdit = require('./param-edit').default;
+const ProjectEdit = require('./project-edit').default;
+const Button = require('./util/button').default;
 
 const MasaoEditorCore = React.createClass({
     displayName: "MasaoEditorCore",

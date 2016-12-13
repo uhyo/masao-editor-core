@@ -1,18 +1,17 @@
-"use strict";
-var React=require('react');
+import * as React from 'react';
 
-var editActions=require('../../actions/edit');
+// TODO
+const editActions: any = require('../../actions/edit');
 
-var Select=require('./util/select.jsx');
+import Select from './util/select';
 
-module.exports = React.createClass({
-    displayName: "ScreenSelect",
-    propTypes: {
-        edit: React.PropTypes.object.isRequired
-    },
+export interface IPropScreenSelect{
+    edit: any;
+}
+export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>{
     render(){
-        var edit=this.props.edit;
-        var contents=[
+        const edit=this.props.edit;
+        const contents=[
             {
                 key:"map",
                 value:"マップ編集"
@@ -30,9 +29,9 @@ module.exports = React.createClass({
                 value:"プロジェクト設定"
             }
         ];
-        var valueLink={
+        const valueLink={
             value: this.props.edit.screen,
-            requestChange: (key)=>{
+            requestChange: (key: string)=>{
                 editActions.changeScreen({
                     screen: key
                 });
@@ -41,6 +40,6 @@ module.exports = React.createClass({
         return <div className="me-core-screen-select">
             <Select contents={contents} valueLink={valueLink}/>
         </div>
-    },
-});
+    }
+}
 

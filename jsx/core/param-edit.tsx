@@ -1,31 +1,37 @@
-"use strict";
-var React=require('react'),
-    masao=require('../../scripts/masao');
+import * as React from 'react';
+import * as masao from '../../scripts/masao';
 
-var Select=require('./util/select.jsx'),
-    Color=require('./util/color.jsx');
+import Select from './util/select';
+import Color from './util/color';
 
-var paramActions=require('../../actions/params'),
-    editActions=require('../../actions/edit');
+// TODO
+const paramActions: any = require('../../actions/params');
+const editActions: any = require('../../actions/edit');
 
-module.exports = React.createClass({
-    displayName: "ParamEdit",
-    propTypes: {
-        edit: React.PropTypes.object.isRequired,
-        params: React.PropTypes.object.isRequired,
-        project: React.PropTypes.object.isRequired
-    },
-    componentDidUpdate(prevProps){
+export interface IPropParamEdit{
+    edit: any;
+    params: any;
+    project: any;
+}
+
+export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
+    componentDidUpdate(prevProps: IPropParamEdit){
         if(prevProps.edit.param_type !== this.props.edit.param_type){
-            let main=this.refs.main;
+            let main = this.refs['main'] as HTMLElement;
             main.scrollTop=0;
         }
-    },
+    }
     render(){
-        var data=masao.param.data, params=this.props.params, project=this.props.project;
-        var param_type=this.props.edit.param_type;
-        var keys=Object.keys(data);
-        var paramTypesContents=[{
+        const data=masao.param.data;
+        const {
+            params,
+            project,
+            edit: {
+                param_type,
+            },
+        } = this.props;
+        const keys = Object.keys(data);
+        const paramTypesContents=[{
             key: "",
             value: "全て表示"
         }].concat(Object.keys(masao.paramTypes).map((key)=>{
@@ -35,11 +41,11 @@ module.exports = React.createClass({
             };
         })), paramTypeLink={
             value: param_type,
-            requestChange: (param_type)=>{
+            requestChange: (param_type: string)=>{
                 editActions.changeParamType({param_type});
             }
         };
-        var typeMenu=<div className="me-core-param-edit-menu">
+        const typeMenu=<div className="me-core-param-edit-menu">
             <Select contents={paramTypesContents} valueLink={paramTypeLink}/>
         </div>;
 
@@ -47,7 +53,9 @@ module.exports = React.createClass({
             {typeMenu}
             <div ref="main" className="me-core-param-edit-main">{
                 (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
-                    let description, field, obj;
+                    let description: string;
+                    let field;
+                    let obj: masao.param.Data;
                     if(/@@@/.test(key)){
                         //色コントロールを設置
                         let key_red=key.replace("@@@","red"), key_green=key.replace("@@@","green"), key_blue=key.replace("@@@","blue");
@@ -58,7 +66,7 @@ module.exports = React.createClass({
                                 green: Number(params[key_green]),
                                 blue: Number(params[key_blue])
                             },
-                            requestChange: ({red, green, blue})=>{
+                            requestChange: ({red, green, blue}: {red: number; green: number; blue: number})=>{
                                 paramActions.changeParams({
                                     [key_red]: String(red),
                                     [key_green]: String(green),
@@ -77,15 +85,16 @@ module.exports = React.createClass({
                         if(pv==="fx16"){
                             pv="fx";
                         }
-                        if(version && version[pv]===false){
+                        // TODO
+                        if(version && (version as any)[pv]===false){
                             //これは表示しない
                             return null;
                         }
                         //typeに応じて
-                        if(obj.type==="enum"){
-                            let valueLink={
+                        if(obj.type === 'enum'){
+                            const valueLink={
                                 value: params[key],
-                                requestChange:(v)=>{
+                                requestChange:(v: string)=>{
                                     paramActions.changeParam({
                                         param: key,
                                         value: v
@@ -93,61 +102,56 @@ module.exports = React.createClass({
                                 }
                             };
                             let enumValues=obj.enumValues;
-                            if(version && Array.isArray(version[pv])){
+                            // TODO
+                            if(version && Array.isArray((version as any)[pv])){
                                 //選択肢の制限
                                 enumValues=enumValues.filter((obj)=>{
-                                    return version[pv].indexOf(obj.value)>=0;
+                                    return (version as any)[pv].indexOf(obj.value)>=0;
                                 });
                             }
-                            field=<select valueLink={valueLink}>{
+                            const fieldChange = (e: React.SyntheticEvent<HTMLSelectElement>)=>{
+                                paramActions.changeParam({
+                                    param: key,
+                                    value: e.currentTarget.value,
+                                });
+                            };
+                            field=<select value={params[key]} onChange={fieldChange}>{
                                 enumValues.map((obj)=>{
                                     return <option key={obj.value} value={obj.value}>{obj.description}</option>;
                                 })
                             }</select>;
                         }else if(obj.type==="boolean"){
-                            let checkedLink={
-                                value: params[key]==="1",
-                                requestChange:(checked)=>{
-                                    paramActions.changeParam({
-                                        param: key,
-                                        value: checked ? "1" : "2"
-                                    });
-                                }
+                            const checkChange = (e: React.SyntheticEvent<HTMLInputElement>)=>{
+                                paramActions.changeParam({
+                                    param: key,
+                                    value: e.currentTarget.checked ? '1' : '2',
+                                });
                             };
-                            field=<input type="checkbox" checkedLink={checkedLink}/>;
+                            field=<input type="checkbox" checked={params[key] === '1'} onChange={checkChange}/>;
                         }else if(obj.type==="boolean-reversed"){
-                            let checkedLink={
-                                value: params[key]==="2",
-                                requestChange:(checked)=>{
-                                    paramActions.changeParam({
-                                        param: key,
-                                        value: checked ? "2" : "1"
-                                    });
-                                }
+                            const checkChange = (e: React.SyntheticEvent<HTMLInputElement>)=>{
+                                paramActions.changeParam({
+                                    param: key,
+                                    value: e.currentTarget.checked ? '2' : '1',
+                                });
                             };
-                            field=<input type="checkbox" checkedLink={checkedLink}/>;
+                            field=<input type="checkbox" checked={params[key] === '2'} onChange={checkChange}/>;
                         }else if(obj.type==="integer"){
-                            let valueLink={
-                                value: params[key],
-                                requestChange:(v)=>{
-                                    paramActions.changeParam({
-                                        param: key,
-                                        value: v
-                                    });
-                                }
+                            const numChange = (e: React.SyntheticEvent<HTMLInputElement>)=>{
+                                paramActions.changeParam({
+                                    param: key,
+                                    value: e.currentTarget.value,
+                                });
                             };
-                            field=<input type="number" step="1" min={obj.min} max={obj.max} valueLink={valueLink}/>;
+                            field=<input type="number" step="1" min={obj.min} max={obj.max} value={params[key]} onChange={numChange}/>;
                         }else if(obj.type==="string"){
-                            let valueLink={
-                                value: params[key],
-                                requestChange:(v)=>{
-                                    paramActions.changeParam({
-                                        param: key,
-                                        value: v
-                                    });
-                                }
+                            const valChange = (e: React.SyntheticEvent<HTMLInputElement>)=>{
+                                paramActions.changeParam({
+                                    param: key,
+                                    value: e.currentTarget.value,
+                                });
                             };
-                            field=<input type="text" valueLink={valueLink}/>;
+                            field=<input type="text" value={params[key]} onChange={valChange}/>;
                         }else{
                             return null;
                         }
@@ -162,5 +166,5 @@ module.exports = React.createClass({
             }</div>
         </div>;
     }
-});
+}
 

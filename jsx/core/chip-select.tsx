@@ -1,25 +1,34 @@
-"use strict";
-const React=require('react');
+import * as React from 'react';
 
 import Promise from '../../scripts/promise';
 
-var chip=require('../../scripts/chip'),
-    util=require('../../scripts/util'),
-    loadImage=require('../../scripts/load-image').default;
+import * as chip from '../../scripts/chip';
+import * as util from '../../scripts/util';
+import loadImage from '../../scripts/load-image';
 
-var editActions=require('../../actions/edit');
+const editActions: any = require('../../actions/edit');
 
-module.exports = React.createClass({
-    displayName: "ChipSelect",
-    propTypes: {
-        pattern: React.PropTypes.string.isRequired,
-        mapchip: React.PropTypes.string.isRequired,
-        chips: React.PropTypes.string.isRequired,
+export interface IPropChipSelect{
+    // 画像ファイル
+    pattern: string;
+    mapchip: string;
+    chips: string;
 
-        params: React.PropTypes.object.isRequired,
-        edit: React.PropTypes.object.isRequired,
-        project: React.PropTypes.object.isRequired
-    },
+    // TODO
+    params: any;
+    edit: any;
+    project: any;
+}
+export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
+    constructor(props: IPropChipSelect){
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
+    private images: {
+        pattern: HTMLImageElement;
+        mapchip: HTMLImageElement;
+        chips: HTMLImageElement;
+    };
     componentDidMount(){
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
@@ -30,8 +39,8 @@ module.exports = React.createClass({
             };
             this.draw(true);
         });
-    },
-    componentDidUpdate(prevProps){
+    }
+    componentDidUpdate(prevProps: IPropChipSelect){
         if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
             Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
             .then(([pattern, mapchip, chips])=>{
@@ -47,17 +56,20 @@ module.exports = React.createClass({
         }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
             this.draw(false);
         }
-    },
-    draw(full){
-        if(this.images==null){
+    }
+    draw(full: boolean){
+        if(this.images == null){
             return;
         }
         var params=this.props.params, screen=this.props.edit.screen;
         var version=this.props.project.version;
         if(full){
             //チップセットを書き換える
-            let canvas=this.refs.canvas;
-            let ctx=canvas.getContext('2d');
+            const canvas = this.refs['canvas'] as HTMLCanvasElement;
+            const ctx = canvas.getContext('2d');
+            if (ctx == null){
+                return;
+            }
             //まず背景を塗る
             ctx.fillStyle = util.stageBackColor(params, this.props.edit);
             ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -92,8 +104,11 @@ module.exports = React.createClass({
         }
 
         //下のやつも描画
-        let canvas=this.refs.canvas2;
-        let ctx=canvas.getContext('2d');
+        const canvas=this.refs['canvas2'] as HTMLCanvasElement;
+        const ctx=canvas.getContext('2d');
+        if (ctx == null){
+            return;
+        }
         ctx.clearRect(0,0,canvas.width,canvas.height);
         if(screen==="layer"){
             let pen_layer=this.props.edit.pen_layer;
@@ -104,7 +119,7 @@ module.exports = React.createClass({
         }else{
             chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
         }
-    },
+    }
     render(){
         var screen=this.props.edit.screen;
         var w= screen==="layer" ? 16 : 8;
@@ -139,15 +154,15 @@ module.exports = React.createClass({
                 </div>
             </div>
         </div>;
-    },
-    handleClick(e){
+    }
+    handleClick<T>(e: React.MouseEvent<T>){
         //canvasをクリックした
-        var {target, pageX, pageY} = e;
-        var {offsetLeft, offsetTop}= target;
-        var x=pageX-offsetLeft, y=pageY-offsetTop;
-        var ks=Object.keys(chip.chipTable);
+        const {target, pageX, pageY} = e;
+        const {offsetLeft, offsetTop, width} = target as HTMLCanvasElement;
+        const x=pageX-offsetLeft, y=pageY-offsetTop;
+        const ks=Object.keys(chip.chipTable);
 
-        var haba = Math.floor(target.width/32);
+        const haba = Math.floor(width/32);
         var penidx = Math.floor(x/32) + Math.floor(y/32)*haba;
         if(this.props.edit.screen==="layer"){
             editActions.changePenLayer({
@@ -160,4 +175,5 @@ module.exports = React.createClass({
         }
         e.preventDefault();
     }
-});
+}
+

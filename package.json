@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/uhyo/masao-editor",
   "devDependencies": {
+    "@types/extend": "^2.0.30",
     "@types/node": "0.0.2",
     "@types/rbush": "^2.0.2",
     "@types/react": "^0.14.54",

@@ -8,8 +8,12 @@ export {
     format,
 };
 
+export interface ParamType{
+    name: string;
+    params: Array<string>;
+}
 //paramの分類
-export const paramTypes={
+export const paramTypes: Record<string, ParamType> = {
     "stage": {
         name: "全般",
         params: [

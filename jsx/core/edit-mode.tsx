@@ -1,19 +1,18 @@
-"use strict";
-var React=require('react');
+import * as React from 'react';
 
-var editActions=require('../../actions/edit');
+const editActions=require('../../actions/edit');
 
-var Select=require('./util/select.jsx'),
-    Switch=require('./util/switch.jsx');
+import Select from './util/select';
+import Switch from './util/switch';
 
-module.exports = React.createClass({
-    displayName: "EditMode",
-    propTypes: {
-        edit: React.PropTypes.object.isRequired
-    },
+export interface IPropEditMode{
+    // TODO
+    edit: any;
+}
+export default class EditMode extends React.Component<IPropEditMode, {}>{
     render(){
-        var edit=this.props.edit;
-        var contents=[
+        const edit=this.props.edit;
+        const contents=[
             {
                 key:"pen",
                 value:"ペンモード"
@@ -48,50 +47,50 @@ module.exports = React.createClass({
                 value: "ステージ4"
             }
         ];
-        var mode_valueLink={
+        const mode_valueLink = {
             value: edit.mode,
-            requestChange: (key)=>{
+            requestChange: (key: string)=>{
                 editActions.changeMode({
                     mode: key
                 });
             }
         };
-        var grid_valueLink={
+        const grid_valueLink = {
             value: edit.grid,
-            requestChange: (grid)=>{
+            requestChange: (grid: boolean)=>{
                 editActions.changeGrid({
                     grid
                 });
             }
         };
-        var stage_valueLink={
+        const stage_valueLink = {
             value: String(edit.stage),
-            requestChange: (key)=>{
+            requestChange: (key: string)=>{
                 editActions.changeStage({
                     stage: Number(key),
                 });
-            }
+            },
         };
 
-        var renderSwitch;
-        if(this.props.edit.screen==="layer"){
-            let vl={
+        let renderSwitch;
+        if(this.props.edit.screen === 'layer'){
+            let vl = {
                 value: edit.render_map,
-                requestChange: (key)=>{
+                requestChange: (key: boolean)=>{
                     editActions.changeRenderMode({
                         render_map: key
                     });
-                }
+                },
             };
             renderSwitch=<Switch label="マップも表示" valueLink={vl}/>;
         }else{
-            let vl={
+            let vl = {
                 value: edit.render_layer,
-                requestChange: (key)=>{
+                requestChange: (key: boolean)=>{
                     editActions.changeRenderMode({
                         render_layer: key
                     });
-                }
+                },
             };
             renderSwitch=<Switch label="背景レイヤーも表示" valueLink={vl}/>;
         }
@@ -109,5 +108,5 @@ module.exports = React.createClass({
                 <Select contents={contents2} valueLink={stage_valueLink}/>
             </div>
         </div>
-    },
-});
+    }
+}

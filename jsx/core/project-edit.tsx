@@ -1,17 +1,16 @@
-var React=require('react');
+import * as React from 'react';
 
-var projectActions=require('../../actions/project');
+const projectActions: any = require('../../actions/project');
 
-var Select=require('./util/select.jsx');
+import Select from './util/select';
 
-module.exports = React.createClass({
-    displayName: "ProjectEdit",
-    propTypes: {
-        project: React.PropTypes.object.isRequired
-    },
+export interface IPropProjectEdit{
+    project: any;
+}
+export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
     render(){
-        var project=this.props.project;
-        var contents=[
+        const project=this.props.project;
+        const contents=[
             {
                 key: "2.8",
                 value: "2.8"
@@ -26,7 +25,7 @@ module.exports = React.createClass({
             }
         ], valueLink={
             value: project.version,
-            requestChange:(version)=>{
+            requestChange:(version: string)=>{
                 projectActions.changeVersion({version});
             }
         };
@@ -35,4 +34,4 @@ module.exports = React.createClass({
             <Select contents={contents} valueLink={valueLink}/>
         </div>
     }
-});
+}
