@@ -21,14 +21,14 @@ export default class Select extends React.Component<IPropSelect, {}>{
     render(){
         const valueLink=this.props.valueLink;
         return <div className={styles.wrapper}>{
-            this.props.contents.map(({key,value})=>{
+            this.props.contents.map(({key, value}, i)=>{
                 const c = key === valueLink.value ? styles['button-current'] : styles.button;
-                return <div key={key} className={c} onClick={this.handleClick(key)}>{value}</div>;
+                return <div key={i} className={c} onClick={this.handleClick(key)}>{value}</div>;
             })
         }</div>;
     }
-    handleClick<T>(key: string){
-        return (e: React.MouseEvent<T>)=>{
+    handleClick<E>(key: string){
+        return (e: React.MouseEvent<E>)=>{
             e.preventDefault();
             this.props.valueLink.requestChange(key);
         };

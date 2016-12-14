@@ -1,11 +1,11 @@
-var React=require('react');
+import * as React from 'react';
 
-var Core=require('../core/index.jsx');
+import Core from '../core/index';
 
-var masao=require('../../scripts/masao');
+import * as masao from '../../scripts/masao';
 
 //サンプル1
-var defaultValue = masao.format.make({
+const defaultValue = masao.format.make({
     params: {
         "map0-0" : "............................................................",
         "map0-1" : "............................................................",
@@ -176,8 +176,7 @@ var defaultValue = masao.format.make({
     }
 });
 
-module.exports = React.createClass({
-    displayName:"Front",
+export default class MasaoEditor extends React.Component<{}, {}>{
     render(){
         //it's sample!
         var commands=[
@@ -193,11 +192,11 @@ module.exports = React.createClass({
         return <div>
             <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" filename_chips="images/chips.png" externalCommands={commands} defaultGame={defaultValue}/>
         </div>;
-    },
-    handleRequestSave(params){
-        console.log(params);
-    },
-    handleRequestTestplay(params){
+    }
+    handleRequestSave(params: any){
         console.log(params);
     }
-});
+    handleRequestTestplay(params: any){
+        console.log(params);
+    }
+}

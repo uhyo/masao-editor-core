@@ -6,7 +6,11 @@ import * as chip from '../../scripts/chip';
 import * as util from '../../scripts/util';
 import loadImage from '../../scripts/load-image';
 
-const editActions: any = require('../../actions/edit');
+import * as editActions from '../../actions/edit';
+
+import { EditState } from '../../stores/edit';
+import { ParamsState } from '../../stores/params';
+import { ProjectState } from '../../stores/project';
 
 export interface IPropChipSelect{
     // 画像ファイル
@@ -14,10 +18,9 @@ export interface IPropChipSelect{
     mapchip: string;
     chips: string;
 
-    // TODO
-    params: any;
-    edit: any;
-    project: any;
+    params: ParamsState;
+    edit: EditState;
+    project: ProjectState;
 }
 export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     constructor(props: IPropChipSelect){

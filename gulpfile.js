@@ -95,7 +95,7 @@ gulp.task('default',['jsx','css','mc_canvas','static']);
 
 //jsx compiling
 function jsxCompiler(watch){
-    return gulp.src('./jsx/entrypoint.jsx')
+    return gulp.src('./jsx/entrypoint.tsx')
     .pipe(gulpWebpack(Object.assign({watch}, require('./webpack.config.js')), webpack))
     .pipe(gulp.dest('./dist'));
     /*

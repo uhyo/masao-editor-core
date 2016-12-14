@@ -3,7 +3,10 @@ import * as React from 'react';
 import * as util from '../../scripts/util';
 import * as chip from '../../scripts/chip';
 
-const editActions: any = require('../../actions/edit');
+import * as editActions from '../../actions/edit';
+import { EditState } from '../../stores/edit';
+import { ParamsState } from '../../stores/params';
+import { MapState } from '../../stores/map';
 
 //色の対応
 const colors: Record<string, string> = {
@@ -16,14 +19,10 @@ const colors: Record<string, string> = {
     item: "#ffff00"
 };
 
-// TODO
 export interface IPropMiniMap{
-    params: any;
-    edit: any;
-    map: {
-        map: Array<Array<Array<string>>>;
-        layer: Array<Array<Array<string>>>;
-    };
+    params: ParamsState;
+    edit: EditState;
+    map: MapState;
 }
 interface IStateMiniMap{
     mouse_down: boolean;
@@ -105,7 +104,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 }
             }
             //スクロールビュー
-            let wkc=util.cssColor(255-params.backcolor_red, 255-params.backcolor_green, 255-params.backcolor_blue);
+            let wkc=util.cssColor(255-Number(params['backcolor_red']), 255-Number(params['backcolor_green']), 255-Number(params['backcolor_blue']));
             ctx.strokeStyle=wkc;
             ctx.lineWidth=1;
             ctx.strokeRect(edit.scroll_x*2+0.5, edit.scroll_y*2+0.5, edit.view_width*2-1, edit.view_height*2-1);

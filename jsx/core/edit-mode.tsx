@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-const editActions=require('../../actions/edit');
+import * as editActions from '../../actions/edit';
+import { EditState } from '../../stores/edit';
 
 import Select from './util/select';
 import Switch from './util/switch';
 
 export interface IPropEditMode{
-    // TODO
-    edit: any;
+    edit: EditState;
 }
 export default class EditMode extends React.Component<IPropEditMode, {}>{
     render(){

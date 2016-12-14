@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-// TODO
-const editActions: any = require('../../actions/edit');
+import * as editActions from '../../actions/edit';
+import { EditState } from '../../stores/edit';
 
 import Select from './util/select';
 
 export interface IPropScreenSelect{
-    edit: any;
+    edit: EditState;
 }
 export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>{
     render(){
@@ -31,9 +31,9 @@ export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>
         ];
         const valueLink={
             value: this.props.edit.screen,
-            requestChange: (key: string)=>{
+            requestChange: (key: 'map' | 'layer' | 'params' | 'project')=>{
                 editActions.changeScreen({
-                    screen: key
+                    screen: key,
                 });
             }
         };

@@ -1,16 +1,17 @@
 import * as React from 'react';
 
-const projectActions: any = require('../../actions/project');
+import * as projectActions from '../../actions/project';
+import { ProjectState } from '../../stores/project';
 
 import Select from './util/select';
 
 export interface IPropProjectEdit{
-    project: any;
+    project: ProjectState;
 }
 export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
     render(){
-        const project=this.props.project;
-        const contents=[
+        const project = this.props.project;
+        const contents = [
             {
                 key: "2.8",
                 value: "2.8"
@@ -25,7 +26,7 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
             }
         ], valueLink={
             value: project.version,
-            requestChange:(version: string)=>{
+            requestChange:(version: '2.8' | 'fx16' | 'kani2')=>{
                 projectActions.changeVersion({version});
             }
         };

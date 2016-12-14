@@ -18,10 +18,12 @@ import {
     Rect,
 } from '../../../scripts/rect';
 
-// import * as editActions from '../../../actions/edit';
-// import * as mapActions from '../../../actions/map';
-const editActions = require('../../../actions/edit');
-const mapActions = require('../../../actions/map');
+import * as editActions from '../../../actions/edit';
+import * as mapActions from '../../../actions/map';
+import { EditState } from '../../../stores/edit';
+import { MapState } from '../../../stores/map';
+import { ParamsState } from '../../../stores/params';
+import { ProjectState } from '../../../stores/project';
 
 /**
  * 画像リソースたち
@@ -37,10 +39,10 @@ export interface IPropMapEdit{
     mapchip: string;
     chips: string;
 
-    map: any;
-    params: Record<string, string>;
-    edit: any; /* TODO */
-    project: any; /* TODO */
+    map: MapState;
+    params: ParamsState;
+    edit: EditState;
+    project: ProjectState;
 }
 export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     /**
@@ -454,14 +456,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || ".." : "..";
                 editActions.changePenLayer({
                     pen: c,
-                    mode: true
+                    mode: true,
                 });
             }else{
                 let map=this.props.map.map;
                 let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || "." : ".";
                 editActions.changePen({
                     pen: c,
-                    mode: true
+                    mode: true,
                 });
             }
         }
@@ -472,11 +474,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         //マウスが上がったときの処理
         const mouseUpHandler=()=>{
-            editActions.mouseUp();
+            editActions.mouseUp({});
             //上がったらおわり
-            document.body.removeEventListener("mouseup",mouseUpHandler,false);
+            document.body.removeEventListener("mouseup", mouseUpHandler, false);
         };
-        document.body.addEventListener("mouseup",mouseUpHandler,false);
+        document.body.addEventListener("mouseup", mouseUpHandler, false);
     }
     handleMouseMove<T>(e: React.MouseEvent<T>){
         e.preventDefault();

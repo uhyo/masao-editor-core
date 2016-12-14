@@ -4,14 +4,16 @@ import * as masao from '../../scripts/masao';
 import Select from './util/select';
 import Color from './util/color';
 
-// TODO
-const paramActions: any = require('../../actions/params');
-const editActions: any = require('../../actions/edit');
+import * as paramActions from '../../actions/params';
+import * as editActions from'../../actions/edit';
+import { EditState } from '../../stores/edit';
+import { ParamsState } from '../../stores/params';
+import { ProjectState } from '../../stores/project';
 
 export interface IPropParamEdit{
-    edit: any;
-    params: any;
-    project: any;
+    edit: EditState;
+    params: ParamsState;
+    project: ProjectState;
 }
 
 export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
@@ -81,12 +83,9 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                         let type=obj.type;
                         description=obj.description;
                         //versionがあれか見る
-                        let version=obj.version, pv=project.version;
-                        if(pv==="fx16"){
-                            pv="fx";
-                        }
-                        // TODO
-                        if(version && (version as any)[pv]===false){
+                        let version = obj.version;
+                        let pv: '2.8' | 'fx' | 'kani2' = project.version === 'fx16' ? 'fx' : project.version;
+                        if(version && version[pv]===false){
                             //これは表示しない
                             return null;
                         }
@@ -102,14 +101,14 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                                 }
                             };
                             let enumValues=obj.enumValues;
-                            // TODO
-                            if(version && Array.isArray((version as any)[pv])){
+                            if(version != null && Array.isArray(version[pv])){
                                 //選択肢の制限
                                 enumValues=enumValues.filter((obj)=>{
-                                    return (version as any)[pv].indexOf(obj.value)>=0;
+                                    return (version![pv] as Array<string>).indexOf(obj.value)>=0;
                                 });
                             }
                             const fieldChange = (e: React.SyntheticEvent<HTMLSelectElement>)=>{
+                                const value = e.currentTarget.value;
                                 paramActions.changeParam({
                                     param: key,
                                     value: e.currentTarget.value,

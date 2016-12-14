@@ -11,6 +11,10 @@ export interface IPropSwitch{
     };
 }
 export default class Switch extends React.Component<IPropSwitch, {}>{
+    constructor(props: IPropSwitch){
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
     render(){
         const c = this.props.valueLink.value === true ? styles['switch-yes'] : styles['switch'];
         return <div className={c} onClick={this.handleClick}>{this.props.label}</div>;

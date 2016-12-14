@@ -413,7 +413,7 @@ export const paramTypes: Record<string, ParamType> = {
 };
 
 //対応可能なバージョンに変換
-export function acceptVersion(version: string): string{
+export function acceptVersion(version: string){
     if(version==="2.7" || version==="2.8"){
         return "2.8";
     }else if(version==="kani" || version==="kani2"){
