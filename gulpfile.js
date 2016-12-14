@@ -5,13 +5,10 @@ var webserver=require('gulp-webserver');
 var gulputil=require('gulp-util');
 var gulpif=require('gulp-if');
 var duration=require('gulp-duration');
-var browserify=require('browserify');
 var source=require('vinyl-source-stream');
-var babelify=require('babelify');
-var uglifyify=require('uglifyify');
-var watchify=require('watchify');
 var uglify=require('gulp-uglify');
-const cssModulesify = require('css-modulesify');
+const gulpWebpack = require('gulp-webpack');
+const webpack = require('webpack');
 
 
 var del=require('del');
@@ -98,13 +95,17 @@ gulp.task('default',['jsx','css','mc_canvas','static']);
 
 //jsx compiling
 function jsxCompiler(watch){
+    return gulp.src('./jsx/entrypoint.tsx')
+    .pipe(gulpWebpack(Object.assign({watch}, require('./webpack.config.js')), webpack))
+    .pipe(gulp.dest('./dist'));
+    /*
     //init browserify bundler
     var opts={
         entries:[path.join(__dirname,"jsx/entrypoint.jsx")],
         extensions:[".js",".jsx"],
         basedir:__dirname,
     };
-    if(watch){
+
         opts.cache={};
         opts.packageCache={};
         opts.fullPaths=true;
@@ -139,4 +140,5 @@ function jsxCompiler(watch){
         .pipe(source("components.js"))
         .pipe(gulp.dest("dist/"));
     }
+   */
 }
