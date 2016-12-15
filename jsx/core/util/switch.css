@@ -1,11 +1,11 @@
 @value button-surface-color-on from '../theme/color.css';
 
-.switch {
+.switch-normal {
   composes: button from './button.css';
 }
 
 .switch-yes {
-  composes: switch;
+  composes: switch-normal;
 
   background-color: button-surface-color-on;
 }

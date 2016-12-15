@@ -1,7 +1,7 @@
 "use strict";
 import * as React from 'react';
 
-const styles: any = require('./switch.css');
+import * as styles from './switch.css';
 
 export interface IPropSwitch{
     label: string;
@@ -16,7 +16,7 @@ export default class Switch extends React.Component<IPropSwitch, {}>{
         this.handleClick = this.handleClick.bind(this);
     }
     render(){
-        const c = this.props.valueLink.value === true ? styles['switch-yes'] : styles['switch'];
+        const c = this.props.valueLink.value === true ? styles.switchYes : styles.switchNormal;
         return <div className={c} onClick={this.handleClick}>{this.props.label}</div>;
     }
     handleClick<T>(e: React.MouseEvent<T>){

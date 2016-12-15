@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const styles: any = require('./button.css');
+import * as styles from './button.css';
 
 export interface IPropButton{
     label: string;

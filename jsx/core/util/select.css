@@ -3,7 +3,7 @@
 }
 
 .button {
-  composes: switch from './switch.css';
+  composes: switchNormal from './switch.css';
 }
 
 .button-current {

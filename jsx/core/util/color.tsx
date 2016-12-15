@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const styles: any = require('./color.css');
+import * as styles from './color.css';
 
 export interface IPropColor{
     colorLink: {

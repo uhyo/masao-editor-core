@@ -2,8 +2,7 @@
 'use strict';
 import * as React from 'react';
 
-// import styles from './scroll.css';
-const styles: any = require('./scroll.css');
+import * as styles from './scroll.css';
 
 import {
     getAbsolutePosition,

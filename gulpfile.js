@@ -1,19 +1,18 @@
 var path=require('path');
 var util=require('util');
 var gulp=require('gulp');
+const debug=require('gulp-debug');
 var webserver=require('gulp-webserver');
-var gulputil=require('gulp-util');
 var gulpif=require('gulp-if');
 var duration=require('gulp-duration');
-var source=require('vinyl-source-stream');
 var uglify=require('gulp-uglify');
-const gulpWebpack = require('gulp-webpack');
 const webpack = require('webpack');
+const sass = require('gulp-sass');
+const gulp_tcm = require('gulp-typed-css-modules');
 
 
 var del=require('del');
 var changed=require('gulp-changed');
-var sass=require('gulp-sass');
 var rename=require('gulp-rename');
 var replace=require('gulp-replace');
 var concat=require('gulp-concat');
@@ -23,6 +22,7 @@ gulp.task('jsx',function(){
 });
 
 gulp.task('watch-jsx',function(){
+    console.log('watch!');
     return jsxCompiler(true);
 });
 
@@ -71,6 +71,17 @@ gulp.task('css',function(){
     .pipe(gulp.dest("dist/"));
 });
 
+gulp.task('tcm', function(){
+    return gulp.src(["jsx/**/*.css"], {
+        base: '.',
+    })
+    .pipe(changed("./", {extension: '.css.d.ts'}))
+    .pipe(gulp_tcm({
+        camelCase: true,
+    }))
+    .pipe(gulp.dest("./"));
+});
+
 gulp.task('webserver',function(){
     gulp.src("dist")
     .pipe(webserver({
@@ -85,19 +96,60 @@ gulp.task('clean',function(cb){
     ],cb);
 });
 
-gulp.task('watch',['watch-jsx','css','html','webserver'],function(){
+gulp.task('watch',['tcm', 'watch-jsx', 'css', 'html', 'webserver'],function(){
     //w
-    gulp.watch("html/*.html",['html']);
-    gulp.watch("css/*.scss",['css']);
+    gulp.watch('html/*.html', ['html']);
+    gulp.watch('css/*.scss', ['css']);
+    gulp.watch('jsx/**/*.css', ['tcm']);
 });
 
-gulp.task('default',['jsx','css','mc_canvas','static']);
+gulp.task('default',['tcm', 'jsx', 'css', 'mc_canvas', 'static']);
 
 //jsx compiling
 function jsxCompiler(watch){
+    /*
     return gulp.src('./jsx/entrypoint.tsx')
-    .pipe(gulpWebpack(Object.assign({watch}, require('./webpack.config.js')), webpack))
+    .pipe(gulpWebpack(Object.assign({watch, verbose: true}, require('./webpack.config.js')), webpack))
+    .pipe(debug({title:'jsxcompiler'}))
     .pipe(gulp.dest('./dist'));
+   */
+  const compiler = webpack(require('./webpack.config.js'));
+
+  const handleStats = (stats, watch)=>{
+      console.log(stats.toString({
+          chunks: !watch,
+          colors: true,
+      }));
+      /*
+      const info = stats.toJson();
+
+      if (stats.hasErrors()) {
+          console.error(info.errors);
+      }
+
+      if (stats.hasWarnings()) {
+          console.warn(info.warnings)
+      }
+     */
+  };
+  if (watch){
+      const watching = compiler.watch({
+      }, (err, stats)=>{
+          if (err){
+              console.error(err);
+              return;
+          }
+          handleStats(stats, true);
+      });
+  }else{
+      compiler.run((err, stats)=>{
+          if (err){
+              console.error(err);
+              return;
+          }
+          handleStats(stats, false);
+      });
+  }
     /*
     //init browserify bundler
     var opts={

@@ -1,7 +1,7 @@
 //select box
 import * as React from 'react';
 
-const styles: any = require('./select.css');
+import * as styles from './select.css';
 
 export interface IPropSelect{
     disabled?: boolean;
@@ -22,7 +22,7 @@ export default class Select extends React.Component<IPropSelect, {}>{
         const valueLink=this.props.valueLink;
         return <div className={styles.wrapper}>{
             this.props.contents.map(({key, value}, i)=>{
-                const c = key === valueLink.value ? styles['button-current'] : styles.button;
+                const c = key === valueLink.value ? styles.buttonCurrent : styles.button;
                 return <div key={i} className={c} onClick={this.handleClick(key)}>{value}</div>;
             })
         }</div>;

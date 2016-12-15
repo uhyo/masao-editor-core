@@ -4,12 +4,9 @@ const webpack=require('webpack');
 
 module.exports={
     devtool: 'source-map',
-    /*
     entry: {
-        js: './jsx/entrypoint.jsx',
-        html: './html/index.html',
+        js: './jsx/entrypoint.tsx',
     },
-   */
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
@@ -26,8 +23,8 @@ module.exports={
                 }
             },
             {
-                test: /\.tsx?/,
-                exclude: /node_modules/,
+                test: /\.tsx?$/,
+                exclude: /node_modules|\.d\.ts$/,
                 loader: 'awesome-typescript-loader',
             },
             {
@@ -55,6 +52,10 @@ module.exports={
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         modules: [path.resolve(__dirname, 'node_modules')],
+    },
+    performance: {
+        //bye bye, FIXME...
+        hints: false,
     },
     
     devServer: {
