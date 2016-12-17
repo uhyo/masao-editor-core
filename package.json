@@ -48,6 +48,8 @@
     "gulp-webserver": "^0.9.1",
     "json-loader": "^0.5.4",
     "masao": "^0.0.8",
+    "postcss-loader": "^1.2.1",
+    "postcss-nested": "^1.0.0",
     "rbush": "^2.0.1",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",

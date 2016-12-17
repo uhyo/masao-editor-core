@@ -14,6 +14,8 @@ import * as util from '../../../scripts/util';
 import * as chip from '../../../scripts/chip';
 import loadImage from '../../../scripts/load-image';
 
+import * as styles from './index.css';
+
 import {
     Rect,
 } from '../../../scripts/rect';
@@ -402,16 +404,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         };
 
         // TODO
-        return <div className="me-core-map-edit" style={style}>
+        return <div className={styles.wrapper}style={style}>
             <Scroll width={180-view_width} height={30-view_height}
                 x={scroll_x} y={scroll_y}
                 screenX={view_width}
                 screenY={view_height}
                 onScroll={this.handleScroll}>
                 <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
-                    <div className="me-core-map-edit-canvas-wrapper">
+                    <div className={styles.canvasWrapper}>
                         <canvas ref="canvas" width={width} height={height}/>
-                        <canvas ref="canvas2" className="me-core-map-edit-canvas2" style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : void 0} onContextMenu={this.handleContextMenu}/>
+                        <canvas ref="canvas2" className={styles.overlapCanvas} style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : void 0} onContextMenu={this.handleContextMenu}/>
                     </div>
                 </Resizable>
             </Scroll>

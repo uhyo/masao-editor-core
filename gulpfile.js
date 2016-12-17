@@ -7,7 +7,6 @@ var gulpif=require('gulp-if');
 var duration=require('gulp-duration');
 var uglify=require('gulp-uglify');
 const webpack = require('webpack');
-const sass = require('gulp-sass');
 const gulp_tcm = require('gulp-typed-css-modules');
 
 
@@ -63,13 +62,6 @@ gulp.task('html',function(){
     .pipe(gulp.dest("dist/"));
 });
 
-gulp.task('css',function(){
-    return gulp.src(["css/index.scss"])
-    .pipe(sass({outputStyle:"compressed"}).on("error",sass.logError))
-    .pipe(rename("css.css"))
-    .pipe(gulp.dest("dist/"));
-});
-
 gulp.task('tcm', function(){
     return gulp.src(["jsx/**/*.css"], {
         base: '.',
@@ -95,14 +87,13 @@ gulp.task('clean',function(cb){
     ],cb);
 });
 
-gulp.task('watch',['tcm', 'watch-jsx', 'css', 'html', 'webserver'],function(){
+gulp.task('watch',['tcm', 'watch-jsx', 'html', 'webserver'],function(){
     //w
     gulp.watch('html/*.html', ['html']);
-    gulp.watch('css/*.scss', ['css']);
     gulp.watch('jsx/**/*.css', ['tcm']);
 });
 
-gulp.task('default',['tcm', 'jsx', 'css', 'mc_canvas', 'static']);
+gulp.task('default',['tcm', 'jsx', 'mc_canvas', 'static']);
 
 //jsx compiling
 function jsxCompiler(watch){

@@ -25,6 +25,8 @@ import ParamEdit from './param-edit';
 import ProjectEdit from './project-edit';
 import Button from './util/button';
 
+import * as styles from './css/index.css';
+
 export interface IDefnMasaoEditorCore{
     map: MapState;
     params: ParamsState;
@@ -97,8 +99,8 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 </div>;
             });
         }
-        return <div className="me-core">
-            <div className="me-core-info">
+        return <div>
+            <div className={styles.info}>
                 <div>
                     <ScreenSelect edit={edit}/>
                 </div>
@@ -162,12 +164,12 @@ const MapScreen = (props: IPropMapScreen)=>{
         are = <p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>;
     }
     return <div>
-        <div className="me-core-map-info">
+        <div className={styles.mapInfo}>
         <EditMode edit={edit}/>
         </div>
         <MiniMap params={params} edit={edit} map={map}/>
         {are}
-        <div className="me-core-main">
+        <div className={styles.main}>
         <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
         <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>
         </div>

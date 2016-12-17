@@ -1,0 +1,23 @@
+.info{
+  display: flex;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 4px;
+
+  & > div {
+    margin: 0 8px;
+  }
+}
+
+.map-info {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.main {
+  display: flex;
+
+  p {
+    margin: 0;
+  }
+}

@@ -37,7 +37,7 @@ export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>
                 });
             }
         };
-        return <div className="me-core-screen-select">
+        return <div>
             <Select contents={contents} valueLink={valueLink}/>
         </div>
     }

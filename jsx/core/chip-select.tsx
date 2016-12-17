@@ -15,6 +15,8 @@ import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
 import { ProjectState } from '../../stores/project';
 
+import * as styles from './css/chip-select.css';
+
 export interface IPropChipSelect{
     // 画像ファイル
     pattern: string;
@@ -164,8 +166,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 name=t.name;
             }
         }
-        var c = screen==="layer" ? "me-core-chip-select-layer" : "me-core-chip-select-map";
-
         const w = chipselect_width * 32;
         const allh = Math.ceil(this.chipNumber() / chipselect_width);
         const h = chipselect_height * 32;
@@ -175,19 +175,19 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         const chipselectedStyle = {
             width: `${w}px`,
         };
-        return <div className={`me-core-chip-select ${c}`}>
-            <div className="me-core-chip-list">
+        return <div className={styles.wrapper}>
+            <div>
                 <Scroll x={0} y={chipselect_scroll} width={chipselect_width} height={scrollHeight} screenX={chipselect_width} screenY={chipselect_height} disableX disableY={scrollHeight === 0} onScroll={this.handleScroll}>
                     <Resizable width={w} height={h} grid={{x: 32, y: 32}} onResize={this.handleResize}>
                         <canvas ref="canvas" width={w} height={h} onClick={this.handleClick}/>
                     </Resizable>
                 </Scroll>
             </div>
-            <div className="me-core-chip-selected" style={chipselectedStyle}>
-                <div className="me-core-chip-selected-d">
+            <div style={chipselectedStyle}>
+                <div>
                     <p>選択中： <code>{pen}</code> {name}</p>
                 </div>
-                <div className="me-core-chip-selected-c">
+                <div>
                     <canvas ref="canvas2" width="96" height="64"/>
                 </div>
             </div>

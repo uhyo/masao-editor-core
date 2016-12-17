@@ -10,6 +10,8 @@ import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
 import { ProjectState } from '../../stores/project';
 
+import * as styles from './css/param-edit.css';
+
 export interface IPropParamEdit{
     edit: EditState;
     params: ParamsState;
@@ -47,13 +49,13 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                 editActions.changeParamType({param_type});
             }
         };
-        const typeMenu=<div className="me-core-param-edit-menu">
+        const typeMenu=<div className={styles.menu}>
             <Select contents={paramTypesContents} valueLink={paramTypeLink}/>
         </div>;
 
-        return <div className="me-core-param-edit">
+        return <div className={styles.wrapper}>
             {typeMenu}
-            <div ref="main" className="me-core-param-edit-main">{
+            <div ref="main" className={styles.main}>{
                 (param_type==="" ? keys : masao.paramTypes[param_type].params).map((key)=>{
                     let description: string;
                     let field;
@@ -155,7 +157,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                             return null;
                         }
                     }
-                    return <div key={key} className="me-core-param-param">
+                    return <div key={key} className={styles.param}>
                         <label>
                             <b>{description}</b>
                             <span>{field}</span>
@@ -166,4 +168,3 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
         </div>;
     }
 }
-

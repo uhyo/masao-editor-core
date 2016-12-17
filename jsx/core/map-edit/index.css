@@ -1,0 +1,19 @@
+.wrapper {
+  margin: 4px;
+  padding: 0;
+}
+
+.canvas-wrapper {
+  position: relative;
+
+  & > canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+
+.overlap-canvas {
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}

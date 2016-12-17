@@ -1,0 +1,5 @@
+.wrapper {
+  flex: auto 0 0;
+  box-sizing: content-box;
+  padding: 4px;
+}

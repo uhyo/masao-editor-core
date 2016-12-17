@@ -6,6 +6,8 @@ import { EditState } from '../../stores/edit';
 import Select from './util/select';
 import Switch from './util/switch';
 
+import * as style from './css/edit-mode.css';
+
 export interface IPropEditMode{
     edit: EditState;
 }
@@ -94,7 +96,7 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
             };
             renderSwitch=<Switch label="背景レイヤーも表示" valueLink={vl}/>;
         }
-        return <div className="me-core-edit-mode">
+        return <div className={style.wrapper}>
             <div>
                 <Select contents={contents} valueLink={mode_valueLink}/>
             </div>

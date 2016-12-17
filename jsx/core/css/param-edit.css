@@ -1,0 +1,37 @@
+.wrapper {
+  margin: 5px;
+}
+
+.menu {
+  margin: 5px;
+}
+
+.main {
+  max-height: 600px;
+  overflow-y: scroll;
+}
+
+.param > label{
+  display: block;
+  border-bottom: 1px dashed #cccccc;
+  margin-bottom: 2px;
+
+
+}
+.param {
+  label {
+    display: block;
+    border-bottom: 1px dashed #cccccc;
+    margin-bottom: 2px;
+
+    & > b,& > span {
+      display: inline-block;
+    }
+    b {
+      width: 340px;
+    }
+    input[type="text"], input[type="number"], select {
+      min-width: 300px;
+    }
+  }
+}

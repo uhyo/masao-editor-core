@@ -7,5 +7,5 @@
 .switch-yes {
   composes: switch-normal;
 
-  background-color: button-surface-color-on;
+  background-color: button-surface-color-on !important;
 }
