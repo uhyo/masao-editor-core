@@ -83,3 +83,14 @@ export interface ScrollAction {
     y: number;
 }
 export const scroll = createAction<ScrollAction>();
+
+export interface ChangeChipselectSizeAction {
+    width: number;
+    height: number;
+}
+export const changeChipselectSize = createAction<ChangeChipselectSizeAction>();
+
+export interface ChangeChipselectScrollAction {
+    y: number;
+}
+export const changeChipselectScroll = createAction<ChangeChipselectScrollAction>();

@@ -37,6 +37,14 @@ export interface IPropScroll{
      * event handler
      */
     onScroll: (x: number, y: number)=>void;
+    /**
+     * disable x bar
+     */
+    disableX?: boolean;
+    /**
+     * disable y bar
+     */
+    disableY?: boolean;
 }
 export default class Scroll extends React.Component<IPropScroll, {}>{
     /**
@@ -81,6 +89,8 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                 y,
                 screenX,
                 screenY,
+                disableX = false,
+                disableY = false,
             },
         } = this;
 
@@ -97,23 +107,31 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             top: `${(100*y/vh).toFixed(3)}%`,
         };
 
+        const hor =
+            disableX ? null :
+            <div className={styles.horWrap}>
+                <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
+                <div ref="hor" className={styles.hor} onMouseDown={this.handleMouseDown}>
+                    <div ref="horTip" className={styles.horTip} style={horStyle} />
+                </div>
+                <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
+            </div>;
+
+        const ver =
+            disableY ? null :
+            <div className={styles.verWrap}>
+                <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
+                <div ref="ver" className={styles.ver} onMouseDown={this.handleMouseDown}>
+                    <div ref="verTip" className={styles.verTip} style={verStyle} />
+                </div>
+                <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
+            </div>;
+
         return <div className={styles.outerWrapper}>
             <div className={styles.wrapper}>
                 <div className={styles.content}>{children}</div>
-                <div className={styles.horWrap}>
-                    <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
-                    <div ref="hor" className={styles.hor} onMouseDown={this.handleMouseDown}>
-                        <div ref="horTip" className={styles.horTip} style={horStyle} />
-                    </div>
-                    <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
-                </div>
-                <div className={styles.verWrap}>
-                    <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
-                    <div ref="ver" className={styles.ver} onMouseDown={this.handleMouseDown}>
-                        <div ref="verTip" className={styles.verTip} style={verStyle} />
-                    </div>
-                    <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
-                </div>
+                {hor}
+                {ver}
             </div>
         </div>;
     }

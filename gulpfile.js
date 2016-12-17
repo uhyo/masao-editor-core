@@ -22,7 +22,6 @@ gulp.task('jsx',function(){
 });
 
 gulp.task('watch-jsx',function(){
-    console.log('watch!');
     return jsxCompiler(true);
 });
 

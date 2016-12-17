@@ -83,6 +83,19 @@ export interface EditState{
      * マウスが押されたときのスクロール状態y
      */
     scroll_sy: number;
+
+    /**
+     * チップ選択画面の横幅
+     */
+    chipselect_width: number;
+    /**
+     * チップ選択画面の縦幅
+     */
+    chipselect_height: number;
+    /**
+     * チップ選択画面のスクロール位置(Y)
+     */
+    chipselect_scroll: number;
 }
 export class EditStore extends Store<EditState>{
     constructor(){
@@ -108,12 +121,18 @@ export class EditStore extends Store<EditState>{
             mouse_sy: Number.NaN,
             scroll_sx: Number.NaN,
             scroll_sy: Number.NaN,
+            chipselect_width: 8,
+            chipselect_height: 9,
+            chipselect_scroll: 0,
         };
     }
     onChangeScreen({screen}: editActions.ChangeScreenAction){
-        this.setState({
-            screen,
-        });
+        if (this.state.screen !== screen){
+            this.setState({
+                screen,
+                chipselect_scroll: 0,
+            });
+        }
     }
     onChangeStage({stage}: editActions.ChangeStageAction){
         this.setState({
@@ -184,6 +203,21 @@ export class EditStore extends Store<EditState>{
             this.setState({
                 scroll_x: x,
                 scroll_y: y,
+            });
+        }
+    }
+    onChangeChipselectSize({width, height}: editActions.ChangeChipselectSizeAction){
+        if (width !== this.state.chipselect_width || height !== this.state.chipselect_height){
+            this.setState({
+                chipselect_width: width,
+                chipselect_height: height,
+            });
+        }
+    }
+    onChangeChipselectScroll({y}: editActions.ChangeChipselectScrollAction){
+        if (y !== this.state.chipselect_scroll){
+            this.setState({
+                chipselect_scroll: y,
             });
         }
     }

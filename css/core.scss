@@ -23,15 +23,18 @@ $me-button-surface-color-hov : #88bb55;
   margin-bottom: 4px;
 }
 .me-core-chip-select {
+  flex: auto 0 0;
   box-sizing: content-box;
   padding: 4px;
 }
+/*
 .me-core-chip-select-layer {
   flex: 512px 0 0;
 }
 .me-core-chip-select-map {
   flex: 256px 0 0;
 }
+*/
 .me-core-map-edit {
   margin: 4px;
   padding: 0;
@@ -51,14 +54,14 @@ $me-button-surface-color-hov : #88bb55;
 }
 
 .me-core-chip-selected {
-  display: flex;
+  // display: flex;
 
   .me-core-chip-selected-c {
     padding: 0;
-    flex: 96px 0 0;
+    // flex: 96px 0 0;
   }
   .me-core-chip-selected-d {
-    flex: auto 1 1;
+    // flex: auto 1 1;
     padding: 6px;
   }
 }
