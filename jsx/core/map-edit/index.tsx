@@ -313,10 +313,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             ctx.fillRect(0,0,width,height);
             // バックバッファから
             if (screen === 'layer' || render_layer === true){
+                ctx.save();
+                ctx.globalAlpha = screen === 'layer' ? 1 : 0.5;
                 backlayer_layer.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+                ctx.restore();
             }
             if (screen === 'map' || render_map === true){
+                ctx.save();
+                ctx.globalAlpha = screen === 'map' ? 1 : 0.5;
                 backlayer_map.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+                ctx.restore();
             }
 
             this.drawing=false;
