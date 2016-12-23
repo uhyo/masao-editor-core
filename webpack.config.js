@@ -5,11 +5,13 @@ const webpack=require('webpack');
 module.exports={
     devtool: 'source-map',
     entry: {
-        js: './jsx/entrypoint.tsx',
+        js: './jsx/index.ts',
     },
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
+        library: 'MasaoEditorCore',
+        libraryTarget: 'umd',
     },
     module: {
         loaders: [
@@ -35,6 +37,10 @@ module.exports={
                 test: /\.json$/,
                 loaders: ['json-loader'],
             },
+            {
+                test: /\.(?:png|gif)$/,
+                loaders: ['url-loader', 'img-loader'],
+            },
             /*
             {
                 test: /\.jsx?$/,
@@ -53,6 +59,15 @@ module.exports={
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         modules: [path.resolve(__dirname, 'node_modules')],
     },
+    externals: {
+        react: {
+            commonjs: 'react',
+            commonjs2: 'react',
+            amd: 'react',
+            root: 'React',
+        },
+    },
+
     performance: {
         //bye bye, FIXME...
         hints: false,

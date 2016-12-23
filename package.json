@@ -2,7 +2,8 @@
   "name": "masao-editor-core",
   "version": "0.0.5",
   "description": "Web Masao Editor.",
-  "main": "index.js",
+  "main": "dist/bundle.js",
+  "types": "./index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,12 +21,6 @@
   },
   "homepage": "https://github.com/uhyo/masao-editor",
   "devDependencies": {
-    "@types/extend": "^2.0.30",
-    "@types/node": "6.0.52",
-    "@types/rbush": "^2.0.2",
-    "@types/react": "^0.14.55",
-    "@types/react-dom": "^0.14.19",
-    "@types/reflux": "0.0.30",
     "awesome-typescript-loader": "^3.0.0-beta.17",
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.18.0",
@@ -35,6 +30,7 @@
     "es6-promise": "^4.0.5",
     "extend": "^3.0.0",
     "extract-text-webpack-plugin": "^2.0.0-beta.4",
+    "file-loader": "^0.9.0",
     "gulp": "^3.9.1",
     "gulp-changed": "^1.3.2",
     "gulp-concat": "^2.6.1",
@@ -46,19 +42,28 @@
     "gulp-typed-css-modules": "^1.0.0",
     "gulp-uglify": "^2.0.0",
     "gulp-webserver": "^0.9.1",
+    "img-loader": "^1.3.1",
     "json-loader": "^0.5.4",
     "masao": "^0.0.8",
     "postcss-loader": "^1.2.1",
     "postcss-nested": "^1.0.0",
     "rbush": "^2.0.1",
-    "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-resizable-box": "^1.8.1",
     "reflux": "^5.0.4",
     "style-loader": "^0.13.1",
     "typescript": "^2.1.4",
+    "url-loader": "^0.5.7",
     "webpack": "^2.1.0-beta.27",
     "webpack-dev-server": "^2.1.0-beta.12"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/extend": "^2.0.30",
+    "@types/node": "6.0.52",
+    "@types/rbush": "^2.0.2",
+    "@types/react": "^0.14.55",
+    "@types/react-dom": "^0.14.19",
+    "@types/reflux": "0.0.30",
+    "react": "^15.4.1"
+  }
 }

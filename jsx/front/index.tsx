@@ -190,7 +190,7 @@ export default class MasaoEditor extends React.Component<{}, {}>{
             }
         ];
         return <div>
-            <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" filename_chips="images/chips.png" externalCommands={commands} defaultGame={defaultValue}/>
+            <Core filename_pattern="pattern.gif" filename_mapchip="mapchip.gif" externalCommands={commands} defaultGame={defaultValue}/>
         </div>;
     }
     handleRequestSave(params: any){

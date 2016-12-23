@@ -46,14 +46,6 @@ gulp.task('mc_canvas',['mc_canvas-static','mc_canvas-uglify'],function(){
     .pipe(gulp.dest("dist/"));
 });
 
-gulp.task('static',function(){
-    return gulp.src(["images/**/*"],{
-        base:"images"
-    })
-    .pipe(changed("dist/images/"))
-    .pipe(gulp.dest("dist/images/"));
-});
-
 gulp.task('html',function(){
     return gulp.src(["html/**/*"],{
         base:"html"
@@ -87,13 +79,13 @@ gulp.task('clean',function(cb){
     ],cb);
 });
 
-gulp.task('watch',['tcm', 'watch-jsx', 'html', 'webserver'],function(){
+gulp.task('watch',['tcm', 'watch-jsx', 'html'],function(){
     //w
     gulp.watch('html/*.html', ['html']);
     gulp.watch('jsx/**/*.css', ['tcm']);
 });
 
-gulp.task('default',['tcm', 'jsx', 'mc_canvas', 'static']);
+gulp.task('default',['tcm', 'jsx', 'mc_canvas']);
 
 //jsx compiling
 function jsxCompiler(watch){

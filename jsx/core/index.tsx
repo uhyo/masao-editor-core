@@ -36,7 +36,6 @@ export interface IDefnMasaoEditorCore{
 export interface IPropMasaoEditorCore{
     filename_pattern: string;
     filename_mapchip: string;
-    filename_chips: string;
 
     defaultParams?: Record<string, string>;
 
@@ -44,7 +43,7 @@ export interface IPropMasaoEditorCore{
     defaultGame?: any;
     externalCommands?: Array<{
         label: string;
-        request(game: any): void;
+        request(game: any, states: IDefnMasaoEditorCore): void;
     }>;
 }
 export interface IStateMasaoEditorCore{
@@ -82,10 +81,11 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             edit,
             project,
         } = this.state;
+        const chips: string = require('../../images/chips.png');
 
         let screen = null;
         if(edit.screen==="map" || edit.screen==="layer"){
-            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={this.props.filename_chips} map={map} params={params} edit={edit} project={project}/>;
+            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="project"){
@@ -109,12 +109,14 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             {screen}
         </div>;
     }
-    handleExternal<T>(req: (game: any)=>void){
+    handleExternal<T>(req: (game: any, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
         return (e: React.MouseEvent<T>)=>{
             const {
                 map,
                 project,
+                edit,
+                params,
             } = this.state;
             e.preventDefault();
 
@@ -127,7 +129,12 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 params: allParams,
                 version
             });
-            req(obj);
+            req(obj, {
+                map,
+                project,
+                edit,
+                params,
+            });
         };
     }
 
