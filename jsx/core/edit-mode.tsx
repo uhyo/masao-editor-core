@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import * as editActions from '../../actions/edit';
 import { EditState } from '../../stores/edit';
+import { ParamsState } from '../../stores/params';
 
 import Select from './util/select';
 import Switch from './util/switch';
@@ -10,10 +11,14 @@ import * as style from './css/edit-mode.css';
 
 export interface IPropEditMode{
     edit: EditState;
+    params: ParamsState;
 }
 export default class EditMode extends React.Component<IPropEditMode, {}>{
     render(){
-        const edit=this.props.edit;
+        const {
+            edit,
+            params,
+        } = this.props;
         const contents=[
             {
                 key:"pen",
@@ -31,24 +36,15 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
                 key:"spuit",
                 value:"スポイト"
             }
-        ], contents2=[
-            {
-                key: "1",
-                value: "ステージ1"
-            },
-            {
-                key: "2",
-                value: "ステージ2"
-            },
-            {
-                key: "3",
-                value: "ステージ3"
-            },
-            {
-                key: "4",
-                value: "ステージ4"
-            }
         ];
+        const contents2=[];
+        const stage_number = Number(params['stage_max']);
+        for (let i = 1; i <= stage_number; i++){
+            contents2.push({
+                key: String(i),
+                value: `ステージ${i}`,
+            });
+        }
         const mode_valueLink = {
             value: edit.mode,
             requestChange: (key: string)=>{

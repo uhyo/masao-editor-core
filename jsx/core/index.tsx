@@ -172,7 +172,7 @@ const MapScreen = (props: IPropMapScreen)=>{
     }
     return <div>
         <div className={styles.mapInfo}>
-        <EditMode edit={edit}/>
+        <EditMode edit={edit} params={params}/>
         </div>
         <MiniMap params={params} edit={edit} map={map}/>
         {are}
