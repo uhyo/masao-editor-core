@@ -531,13 +531,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             let sx=edit.mouse_sx-mx+edit.scroll_sx, sy=edit.mouse_sy-my+edit.scroll_sy;
             if(sx < 0){
                 sx=0;
-            }else if(sx > 165){
-                sx=165;
+            }else if(sx > 180-edit.view_width){
+                sx = 180 - edit.view_width;
             }
             if(sy < 0){
                 sy=0;
-            }else if(sy > 20){
-                sy=20;
+            }else if(sy > 30-edit.view_height){
+                sy = 30 - edit.view_height;
             }
             if(sx!==edit.scroll_x || sy!==edit.scroll_y){
                 editActions.scroll({
