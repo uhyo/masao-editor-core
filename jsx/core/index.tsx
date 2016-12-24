@@ -120,22 +120,39 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             } = this.state;
             e.preventDefault();
 
-            const mp = mapToParam(map);
-            // FIXME
-            // const version = project.version==="fx" ? "fx16" : project.version;
-            const version = project.version;
-            const allParams = masao.param.sanitize(extend({},this.state.params, mp),version);
-            const obj=masao.format.make({
-                params: allParams,
-                version
-            });
-            req(obj, {
+            req(this.getCurrentGame(), {
                 map,
                 project,
                 edit,
                 params,
             });
         };
+    }
+
+    // get infooooooom API
+    public getCurrentGame(): any{
+        const {
+            map,
+            project,
+            params,
+        } = this.state;
+
+        const mp = mapToParam(map);
+
+        const version = project.version;
+        const allParams = masao.param.sanitize({
+            ...params,
+            ...mp,
+        });
+
+        const obj = masao.format.make({
+            params: allParams,
+            version,
+        });
+        return obj;
+    }
+    public getCurrentStage(): number{
+        return this.state.edit.stage;
     }
 
     //export stores
