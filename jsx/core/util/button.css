@@ -1,5 +1,7 @@
 @value button-surface-color-off, button-surface-color-on, button-surface-color-hov from '../theme/color.css';
 .button {
+  display: inline-block;
+
   padding: 6px;
   background-color: button-surface-color-off;
   transition: background-color 0.3s ease;
