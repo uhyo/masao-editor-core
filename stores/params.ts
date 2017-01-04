@@ -22,9 +22,7 @@ export class ParamsStore extends Store<ParamsState>{
         this.setState(extend({}, this.state, obj));
     }
     private onResetParams(obj: Record<string, string>){
-        this.setState({
-            params: extend({}, obj),
-        });
+        this.setState(extend({}, obj));
     }
 }
 export default new ParamsStore();

@@ -17,6 +17,8 @@ import { ProjectState } from '../../stores/project';
 
 import * as styles from './css/chip-select.css';
 
+import propChanged from './util/changed';
+
 export interface IPropChipSelect{
     // 画像ファイル
     pattern: string;
@@ -51,7 +53,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         });
     }
     componentDidUpdate(prevProps: IPropChipSelect){
-        if(prevProps.pattern!==this.props.pattern || prevProps.mapchip!==this.props.mapchip || prevProps.chips!==this.props.chips){
+        if(propChanged(prevProps, this.props, ['pattern', 'mapchip', 'chips'])){
             Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
             .then(([pattern, mapchip, chips])=>{
                 this.images = {
@@ -61,9 +63,11 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 };
                 this.draw(true);
             });
-        }else if(prevProps.edit.screen!==this.props.edit.screen || prevProps.project.version!==this.props.project.version || prevProps.edit.stage!==this.props.edit.stage || prevProps.edit.chipselect_width!==this.props.edit.chipselect_width || prevProps.edit.chipselect_height!==this.props.edit.chipselect_height || prevProps.edit.chipselect_scroll!==this.props.edit.chipselect_scroll){
+        }else if(propChanged(prevProps.edit, this.props.edit, ['screen', 'stage', 'chipselect_width', 'chipselect_height', 'chipselect_scroll']) ||
+                 prevProps.project.version !== this.props.project.version ||
+                 prevProps.params !== this.props.params){
             this.draw(true);
-        }else if(prevProps.edit.pen!==this.props.edit.pen || prevProps.edit.pen_layer!==this.props.edit.pen_layer){
+        }else if(propChanged(prevProps.edit, this.props.edit, ['pen', 'pen_layer'])){
             this.draw(false);
         }
     }
