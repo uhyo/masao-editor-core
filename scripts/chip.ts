@@ -60,7 +60,15 @@ export interface Chip{
  * water: 水
  * item: アイテム
  */
-export const chipTable: Record<string, Chip> = {
+function keyToNum<T>(obj: Record<string, T>):Record<string, T>{
+    const result: Record<string, T> = {};
+    for (let k in obj){
+        const code = k === '.' ? 0 : k.charCodeAt(0);
+        result[code] = obj[k];
+    }
+    return result;
+};
+export const chipTable: Record<string, Chip> = keyToNum({
     A: {
         pattern: 100,
         name: "主人公",
@@ -474,9 +482,10 @@ export const chipTable: Record<string, Chip> = {
         pattern: 0,
         name: "空白"
     }
-};
+});
 
-export const chipList = Object.keys(chipTable);
+// TODO
+export const chipList = Object.keys(chipTable).map(key=> Number(key));
 
 //仕掛けのparamに応じたやつ
 var athleticTable: Record<string, Chip> = {
@@ -2400,9 +2409,9 @@ export interface ImagesObject{
     pattern: HTMLImageElement;
     chips: HTMLImageElement;
 }
-export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject,params: Record<string, string>, chip: string, x: number, y: number, full: boolean){
+export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject, params: Record<string, string>, chip: number, x: number, y: number, full: boolean){
     console.log("drawchip");
-    if(chip==="."){
+    if(chip === 0){
         return;
     }
     const t=chipFor(params,chip);
@@ -2489,14 +2498,14 @@ export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject,par
 }
 
 // チップの描画範囲を返す（相対座標）
-export function chipRenderRect(params: Record<string, string>, chip: string): Rect{
+export function chipRenderRect(params: Record<string, string>, chip: number): Rect{
     const rect: Rect = {
         minX: 0,
         minY: 0,
         maxX: 0,
         maxY: 0,
     };
-    if(chip==="."){
+    if(chip === 0){
         return rect;
     }
     const t=chipFor(params,chip);
@@ -2546,12 +2555,12 @@ export function chipRenderRect(params: Record<string, string>, chip: string): Re
 }
 
 //チップオブジェクト
-export function chipFor(params: Record<string, string>, chip: string): Chip{
+export function chipFor(params: Record<string, string>, chip: number): Chip{
     let pa=athleticTypeParam[chip];
     if(pa!=null && params[pa]!=="1"){
         //変わったアスレチックだ
         return athleticTable[params[pa]];
-    }else if(chip==='j' && params['layer_mode'] === '2'){
+    }else if(chip===106 && params['layer_mode'] === '2'){
         //ブロック10はレイヤーありのとき透明になる
         return {
             pattern: [{
@@ -2568,7 +2577,7 @@ export function chipFor(params: Record<string, string>, chip: string): Chip{
             name: "ブロック10（透明）",
             category: "block"
         };
-    }else if(chip==='[' && params['layer_mode'] === '2'){
+    }else if(chip===91 && params['layer_mode'] === '2'){
         //下から通れる床
         return {
             pattern: [{
@@ -2582,7 +2591,7 @@ export function chipFor(params: Record<string, string>, chip: string): Chip{
             name: "下から通れる床（透明）",
             category: "block"
         };
-    }else if(chip===']' && params['layer_mode'] === '2'){
+    }else if(chip===93 && params['layer_mode'] === '2'){
         //ハシゴ
         return {
             pattern: [{
@@ -2596,7 +2605,7 @@ export function chipFor(params: Record<string, string>, chip: string): Chip{
             name: "ハシゴ（透明）",
             category: "block"
         };
-    }else if(chip==='<' && params['layer_mode'] === '2'){
+    }else if(chip===60 && params['layer_mode'] === '2'){
         //坂も透明になる
         return {
             pattern: [{
@@ -2610,7 +2619,7 @@ export function chipFor(params: Record<string, string>, chip: string): Chip{
             name: "上り坂（透明）",
             category: "block"
         };
-    }else if(chip==='>' && params['layer_mode'] === '2'){
+    }else if(chip===62 && params['layer_mode'] === '2'){
         //坂も透明になる
         return {
             pattern: [{
@@ -2629,3 +2638,30 @@ export function chipFor(params: Record<string, string>, chip: string): Chip{
     }
 }
 
+// 従来の文字列表現チップと数値の相互変換
+export function chipToMapString(chip: number): string{
+    return chip === 0 ? '.' : String.fromCharCode(chip);
+}
+export function mapStringToChip(chip: string): number{
+    if (chip === '.' || !chip){
+        return 0;
+    }else{
+        return chip.charCodeAt(0);
+    }
+}
+export function chipToLayerString(chip: number): string{
+    if (chip === 0){
+        return '..';
+    }else if (chip < 0x10){
+        return '.' + chip.toString(16);
+    }else {
+        return chip.toString(16);
+    }
+}
+export function layerStringToChip(chip: string): number{
+    if (chip === '..' || !chip){
+        return 0;
+    }else{
+        return parseInt(chip, 16);
+    }
+}

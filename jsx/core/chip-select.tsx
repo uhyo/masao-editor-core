@@ -114,8 +114,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 }
             }else{
                 while(i < chip.chipList.length && y < chipselect_height*32){
-                    let c=chip.chipList[i];
-                    if(version!=='2.8' || (c!=='{' && c!=='[' && c!==']' && c!=='<' && c!=='>')){
+                    let c = chip.chipList[i];
+                    if(version!=='2.8' || (c!==123 && c!==91 && c!==93 && c!==60 && c!==62)){
                         chip.drawChip(ctx, this.images, params, c, x, y, false);
                     }
                     i++;
@@ -136,10 +136,9 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         }
         ctx.clearRect(0,0,canvas.width,canvas.height);
         if(screen==="layer"){
-            let pen_layer=this.props.edit.pen_layer;
-            if(pen_layer!==".."){
-                let idx=parseInt(pen_layer,16);
-                ctx.drawImage(this.images.mapchip, (idx&15)*32, (idx>>4)*32, 32, 32, 32, 0, 32, 32);
+            const pen_layer=this.props.edit.pen_layer;
+            if(pen_layer !== 0){
+                ctx.drawImage(this.images.mapchip, (pen_layer&15)*32, (pen_layer>>4)*32, 32, 32, 32, 0, 32, 32);
             }
         }else{
             chip.drawChip(ctx,this.images,params,this.props.edit.pen, 32,0,true);
@@ -157,11 +156,11 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         // var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
         let pen, name;
         if(screen === 'layer'){
-            pen=this.props.edit.pen_layer;
-            if(pen===".."){
+            pen = this.props.edit.pen_layer;
+            if(pen === 0){
                 name="（空白）";
             }else{
-                name="("+parseInt(pen,16)+")";
+                name="("+pen.toString(16)+")";
             }
         }else{
             pen=this.props.edit.pen;
@@ -245,7 +244,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
 
         if(this.props.edit.screen==="layer"){
             editActions.changePenLayer({
-                pen: penidx===0 ? ".." : ("0"+penidx.toString(16)).slice(-2),
+                pen: penidx,
             });
         }else{
             editActions.changePen({

@@ -3,13 +3,17 @@ import * as extend from 'extend';
 import {
     Store,
 } from '../scripts/reflux-util';
+import {
+    mapStringToChip,
+    layerStringToChip,
+} from '../scripts/chip';
 
 import * as mapActions from '../actions/map';
 import * as paramActions from '../actions/params';
 
 export interface MapState{
-    map: Array<Array<Array<string>>>;
-    layer: Array<Array<Array<string>>>;
+    map: Array<Array<Array<number>>>;
+    layer: Array<Array<Array<number>>>;
     lastUpdate: {
         type: 'all';
     } | {
@@ -30,8 +34,8 @@ export class MapStore extends Store<MapState>{
         this.listenables = [mapActions, {resetParams: paramActions.resetParams}];
         // TODO
         console.log('INIT MAP');
-        const map = [0, 1, 2, 3].map(()=> this.initStage('.'));
-        const layer = [0, 1, 2, 3].map(()=> this.initStage('..'));
+        const map = [0, 1, 2, 3].map(()=> this.initStage(0));
+        const layer = [0, 1, 2, 3].map(()=> this.initStage(0));
         this.state = {
             map,
             layer,
@@ -40,7 +44,7 @@ export class MapStore extends Store<MapState>{
             },
         };
     }
-    private initStage(initial: string): Array<Array<string>>{
+    private initStage<T>(initial: T): Array<Array<T>>{
         const result = [];
         // TODO
         for (let i=0; i < 30; i++){
@@ -154,14 +158,14 @@ export class MapStore extends Store<MapState>{
                     if(p != null){
                         flag = true;
                         for(let k=0; k < 60; k++){
-                            newMap[h][j][i*60+k] = p.charAt(k) || ".";
+                            newMap[h][j][i*60+k] = mapStringToChip(p.charAt(k));
                         }
                     }
                     p = params[`layer${i}-${j}${ssfx}`];
                     if(p != null){
                         flag = true;
                         for(let k=0; k < 60; k++){
-                            newLayer[h][j][i*60+k] = p.slice(k*2,k*2+2) || "..";
+                            newLayer[h][j][i*60+k] = layerStringToChip(p.slice(k*2,k*2+2));
                         }
                     }
                 }
@@ -178,5 +182,6 @@ export class MapStore extends Store<MapState>{
         }
     }
 }
+
 
 export default new MapStore();

@@ -40,11 +40,11 @@ export interface EditState{
     /**
      * ペン（メインマップ）
      */
-    pen: string; // TODO
+    pen: number; // TODO
     /**
      * ペン（背景レイヤー）
      */
-    pen_layer: string; // TODO
+    pen_layer: number; // TODO
     /**
      * どのparamTypeを編集しているか
      */
@@ -110,8 +110,8 @@ export class EditStore extends Store<EditState>{
             stage: 1,
             mode: 'pen',
             mode_current: 'pen',
-            pen: '.',
-            pen_layer: '..',
+            pen: 0,
+            pen_layer: 0,
             param_type: '',
             grid: false,
             render_map: false,

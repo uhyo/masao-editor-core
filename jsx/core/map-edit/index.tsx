@@ -329,19 +329,18 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             console.timeEnd("draw");
         });
     }
-    drawChip(ctx: CanvasRenderingContext2D, c: string, x: number, y: number): void{
+    drawChip(ctx: CanvasRenderingContext2D, c: number, x: number, y: number): void{
         if(c == null){
             return;
         }
         chip.drawChip(ctx, this.images, this.props.params, c, x, y, true);
     }
-    drawLayer(ctx: CanvasRenderingContext2D , c: string, x: number, y: number): void{
+    drawLayer(ctx: CanvasRenderingContext2D , c: number, x: number, y: number): void{
         //レイヤ
-        if(c === '..'){ 
+        if(c === 0){ 
             return;
         }
-        const idx = parseInt(c, 16);
-        const sx = (idx&15)*32, sy = Math.floor(idx>>4)*32;
+        const sx = (c&15)*32, sy = Math.floor(c>>4)*32;
         ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
     }
     drawChipOn(type: 'map' | 'layer', ctx: CanvasRenderingContext2D, x: number, y: number){
@@ -369,7 +368,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.drawLayer(ctx, c, x*32, y*32);
         }
     }
-    chipPollution(type: 'map' | 'layer', c: string): Rect{
+    chipPollution(type: 'map' | 'layer', c: number): Rect{
         if (type === 'layer'){
             // layerのチップは全部普通
             return {
@@ -461,14 +460,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             let edit=this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
             if(screen==="layer"){
                 let map=this.props.map.layer;
-                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || ".." : "..";
+                let c = map[stage-1][myy] ? map[stage-1][myy][mxx] || 0 : 0;
                 editActions.changePenLayer({
                     pen: c,
                     mode: true,
                 });
             }else{
                 let map=this.props.map.map;
-                let c=map[stage-1][myy] ? map[stage-1][myy][mxx] || "." : ".";
+                let c = map[stage-1][myy] ? map[stage-1][myy][mxx] || 0 : 0;
                 editActions.changePen({
                     pen: c,
                     mode: true,
@@ -499,7 +498,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         var edit=this.props.edit, map=this.props.map;
         let screen=edit.screen;
         let mapdata=screen==="layer" ? map.layer[edit.stage-1] : map.map[edit.stage-1];
-        let pen=screen==="layer" ? edit.pen_layer : edit.pen, pen_default=screen==="layer" ? ".." : ".";
+        let pen = screen==="layer" ? edit.pen_layer : edit.pen;
+        let pen_default = 0;
 
         if(mode==="pen"){
             //ペンモード

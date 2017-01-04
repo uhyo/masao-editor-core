@@ -164,7 +164,7 @@ export class TileDependency{
 export default class MapUpdator{
     private pollutionCache: Record<string, Rect>;
     private deps: TileDependency;
-    constructor(private width: number, private height: number, private pollutionCallback: (chip: string)=>Rect){
+    constructor(private width: number, private height: number, private pollutionCallback: (chip: number)=>Rect){
         this.pollutionCache = {};
 
         this.deps = new TileDependency(width, height);
@@ -182,10 +182,10 @@ export default class MapUpdator{
      *
      * @param {number} x 変更X座標
      * @param {number} y 変更Y座標
-     * @param {string} chip マップチップ
+     * @param {number} chip マップチップ
      *
      */
-    update(x: number, y: number, chip: string): Array<Point>{
+    update(x: number, y: number, chip: number): Array<Point>{
         const {
             pollutionCallback,
             pollutionCache,
@@ -215,9 +215,9 @@ export default class MapUpdator{
 
     /**
      * マップが全部変わったのを登録
-     * @param {string[][]} map マップ
+     * @param {number[][]} map マップ
      */
-    resetMap(map: Array<Array<string>>): void{
+    resetMap(map: Array<Array<number>>): void{
         const {
             width,
             height,

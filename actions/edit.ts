@@ -25,27 +25,31 @@ export interface ChangeViewAction {
 export const changeView = createAction<ChangeViewAction>();
 
 export interface ChangePenAction {
-    pen: string;
+    pen: number;
     mode?: boolean;
 }
 export const changePen = createAction<ChangePenAction>({
     preEmit: (obj: ChangePenAction)=>{
         if(obj==null){
-            return {pen: "."};
+            return {pen: 0};
         }else if(obj.pen==null){
-            return {pen: "."};
+            return {pen: 0};
         }
         return;
     },
 });
-export const changePenLayer = createAction<ChangePenAction>({
+export interface ChangePenLayerAction {
+    pen: number;
+    mode?: boolean;
+}
+export const changePenLayer = createAction<ChangePenLayerAction>({
     preEmit: (obj: ChangePenAction)=>{
         if(obj==null){
             return {
-                pen: ".."
+                pen: 0,
             };
         }else if(obj.pen==null){
-            return {pen: ".."};
+            return {pen: 0};
         }
         return;
     },
