@@ -211,12 +211,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 stage,
             },
             map: {
-                map,
-                layer,
+                data,
             },
         } = this.props;
-        this.updator_map.resetMap(map[stage-1]);
-        this.updator_layer.resetMap(layer[stage-1]);
+        this.updator_map.resetMap(data[stage-1].map);
+        this.updator_layer.resetMap(data[stage-1].layer);
     }
     /* TODO */
     updateBacklayer(lastUpdate: any){
@@ -225,10 +224,15 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             return;
         }
         const {
-            stage,
-        } = this.props.edit;
-        const map = this.props.map.map[stage-1];
-        const layer = this.props.map.layer[stage-1];
+            edit: {
+                stage,
+            },
+            map: {
+                data,
+            },
+        } = this.props;
+        const map = data[stage-1].map;
+        const layer = data[stage-1].layer;
         switch (lastUpdate.type){
             case 'all': {
                 // 刷新されちゃった
@@ -297,7 +301,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             const width=view_width*32;
             const height=view_height*32;
 
-            const mapData=map.map[edit.stage-1], layerData=map.layer[edit.stage-1];
+            const mapData=map.data[edit.stage-1].map, layerData=map.data[edit.stage-1].layer;
 
             // バックバッファで描画
             if (screen === 'map' || render_map === true){
@@ -347,8 +351,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         // 指定された座標に描画
         const {
             map: {
-                map,
-                layer,
+                data,
             },
             edit: {
                 stage,
@@ -359,11 +362,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             },
         } = this.props;
         if (type === 'map'){
-            const mapData = map[stage-1];
+            const mapData = data[stage-1].map;
             const c = mapData[y][x];
             this.drawChip(ctx, c, x*32, y*32);
         }else if (type === 'layer'){
-            const layerData = layer[stage-1];
+            const layerData = data[stage-1].layer;
             const c = layerData[y][x];
             this.drawLayer(ctx, c, x*32, y*32);
         }
@@ -457,17 +460,17 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
         if(mode==="spuit"){
             //スポイトは1回限り
-            let edit=this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
+            const edit = this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
             if(screen==="layer"){
-                let map=this.props.map.layer;
-                let c = map[stage-1][myy] ? map[stage-1][myy][mxx] || 0 : 0;
+                const map = this.props.map.data[stage-1].layer;
+                const c = map[myy] ? map[myy][mxx] || 0 : 0;
                 editActions.changePenLayer({
                     pen: c,
                     mode: true,
                 });
             }else{
-                let map=this.props.map.map;
-                let c = map[stage-1][myy] ? map[stage-1][myy][mxx] || 0 : 0;
+                let map=this.props.map.data[stage-1].map;
+                let c = map[myy] ? map[myy][mxx] || 0 : 0;
                 editActions.changePen({
                     pen: c,
                     mode: true,
@@ -495,9 +498,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
         var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
 
-        var edit=this.props.edit, map=this.props.map;
-        let screen=edit.screen;
-        let mapdata=screen==="layer" ? map.layer[edit.stage-1] : map.map[edit.stage-1];
+        const {
+            edit,
+            map,
+        } = this.props;
+        const {
+            screen,
+            stage,
+        } = edit;
+
+        const mapdata = screen==="layer" ? map.data[stage-1].layer : map.data[stage-1].map;
         let pen = screen==="layer" ? edit.pen_layer : edit.pen;
         let pen_default = 0;
 
@@ -508,7 +518,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen){
                 (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage: edit.stage,
+                    stage,
                     x: cx,
                     y: cy,
                     chip: pen
@@ -520,7 +530,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
                 (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage: edit.stage,
+                    stage,
                     x: cx,
                     y: cy,
                     chip: pen_default

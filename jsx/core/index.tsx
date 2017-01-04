@@ -250,11 +250,11 @@ function mapToParam(map: MapState){
             stagechar="-f";
         }
         for(let y=0; y < 30; y++){
-            let j=map.map[stage][y].map(chipToMapString).join("");
+            const j = map.data[stage].map[y].map(chipToMapString).join("");
             result[`map0-${y}${stagechar}`]=j.slice(0,60);
             result[`map1-${y}${stagechar}`]=j.slice(60,120);
             result[`map2-${y}${stagechar}`]=j.slice(120,180);
-            let k=map.layer[stage][y].map(chipToLayerString).join("");
+            const k = map.data[stage].layer[y].map(chipToLayerString).join("");
             result[`layer0-${y}${stagechar}`]=k.slice(0,120);
             result[`layer1-${y}${stagechar}`]=k.slice(120,240);
             result[`layer2-${y}${stagechar}`]=k.slice(240,360);

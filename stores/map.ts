@@ -12,8 +12,7 @@ import * as mapActions from '../actions/map';
 import * as paramActions from '../actions/params';
 
 export interface MapState{
-    map: Array<Array<Array<number>>>;
-    layer: Array<Array<Array<number>>>;
+    data: Array<StageData>;
     lastUpdate: {
         type: 'all';
     } | {
@@ -28,36 +27,47 @@ export interface MapState{
         stage: number;
     };
 }
+interface StageData{
+    map: Array<Array<number>>;
+    layer: Array<Array<number>>;
+}
 export class MapStore extends Store<MapState>{
     constructor(){
         super();
         this.listenables = [mapActions, {resetParams: paramActions.resetParams}];
         // TODO
-        console.log('INIT MAP');
-        const map = [0, 1, 2, 3].map(()=> this.initStage(0));
-        const layer = [0, 1, 2, 3].map(()=> this.initStage(0));
+        const data = [0, 1, 2, 3].map(()=> this.initStage());
         this.state = {
-            map,
-            layer,
+            data,
             lastUpdate: {
                 type: 'all',
             },
         };
     }
-    private initStage<T>(initial: T): Array<Array<T>>{
-        const result = [];
+    private initStage(): StageData{
+        const map = [];
+        const layer = [];
         // TODO
         for (let i=0; i < 30; i++){
-            const r2 = [];
+            const r2m = [];
+            const r2l = [];
             for (let j=0; j < 180; j++){
-                r2.push(initial);
+                r2m.push(0);
+                r2l.push(0);
             }
-            result.push(r2);
+            map.push(r2m);
+            layer.push(r2l);
         }
-        return result;
+        return {
+            map,
+            layer,
+        };
     }
     private onUpdateMap({stage,x,y,chip}: mapActions.UpdateMapAction){
-        const st=this.state.map[stage-1];
+        const {
+            data,
+        } = this.state;
+        const st = this.state.data[stage-1].map;
         if(st){
             const row=st[y];
             if(row){
@@ -65,9 +75,9 @@ export class MapStore extends Store<MapState>{
                     //変わっていない
                     return;
                 }
-                const map = this.state.map.map((st, i)=>{
+                const d = data.map((st, i)=>{
                     if(i === stage-1){
-                        return st.map((a,i)=>{
+                        const map = st.map.map((a,i)=>{
                             if(i===y){
                                 return a.map((c,i)=>{
                                     if(i===x){
@@ -80,12 +90,16 @@ export class MapStore extends Store<MapState>{
                                 return a;
                             }
                         });
+                        return {
+                            ...st,
+                            map,
+                        };
                     }else{
                         return st;
                     }
                 });
                 this.setState({
-                    map,
+                    data: d,
                     lastUpdate: {
                         type: 'map',
                         stage,
@@ -97,7 +111,10 @@ export class MapStore extends Store<MapState>{
         }
     }
     private onUpdateLayer({stage,x,y,chip}: mapActions.UpdateMapAction){
-        const st = this.state.layer[stage-1];
+        const {
+            data,
+        } = this.state;
+        const st = data[stage-1].layer;
         if(st){
             const row = st[y];
             if(row){
@@ -105,9 +122,9 @@ export class MapStore extends Store<MapState>{
                     //変わっていない
                     return;
                 }
-                const layer = this.state.layer.map((st,i)=>{
+                const d = data.map((st,i)=>{
                     if(i===stage-1){
-                        return st.map((a,i)=>{
+                        const l = st.layer.map((a,i)=>{
                             if(i===y){
                                 return a.map((c,i)=>{
                                     if(i===x){
@@ -120,12 +137,16 @@ export class MapStore extends Store<MapState>{
                                 return a;
                             }
                         });
+                        return {
+                            ...st,
+                            layer: l,
+                        };
                     }else{
                         return st;
                     }
                 });
                 this.setState({
-                    layer,
+                    data: d,
                     lastUpdate: {
                         type: 'layer',
                         stage,
@@ -138,16 +159,7 @@ export class MapStore extends Store<MapState>{
     }
     private onResetParams(params: Record<string, string>){
         //mapに対する変更があったら検知する
-        const newMap = this.state.map.map((st)=>{
-            return st.map((row)=>{
-                return row.concat([]);
-            });
-        });
-        const newLayer = this.state.layer.map((st)=>{
-            return st.map((row)=>{
-                return row.concat([]);
-            });
-        });
+        const newData = [0, 1, 2, 3].map(this.initStage);
         let flag = false;
         // TODO
         for (let h = 0; h < 4; h++) {
@@ -158,14 +170,14 @@ export class MapStore extends Store<MapState>{
                     if(p != null){
                         flag = true;
                         for(let k=0; k < 60; k++){
-                            newMap[h][j][i*60+k] = mapStringToChip(p.charAt(k));
+                            newData[h].map[j][i*60+k] = mapStringToChip(p.charAt(k));
                         }
                     }
                     p = params[`layer${i}-${j}${ssfx}`];
                     if(p != null){
                         flag = true;
                         for(let k=0; k < 60; k++){
-                            newLayer[h][j][i*60+k] = layerStringToChip(p.slice(k*2,k*2+2));
+                            newData[h].layer[j][i*60+k] = layerStringToChip(p.slice(k*2,k*2+2));
                         }
                     }
                 }
@@ -173,8 +185,7 @@ export class MapStore extends Store<MapState>{
         }
         if (flag === true){
             this.setState({
-                map: newMap,
-                layer: newLayer,
+                data: newData,
                 lastUpdate: {
                     type: 'all',
                 },

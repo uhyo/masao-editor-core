@@ -60,10 +60,10 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 params,
                 edit,
                 map: {
-                    map,
+                    data,
                 },
             } = this.props;
-            const mapdata=map[edit.stage-1];
+            const mapdata = data[edit.stage-1].map;
             //bg
             const bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
