@@ -14,7 +14,7 @@ export interface ChangeStageAction {
 export const changeStage = createAction<ChangeStageAction>();
 
 export interface ChangeModeAction {
-    mode: string;
+    mode: 'pen' | 'eraser' | 'hand' | 'spuit';
 }
 export const changeMode = createAction<ChangeModeAction>();
 
@@ -74,7 +74,7 @@ export const changeRenderMode = createAction<ChangeRenderModeAction>();
 export interface MouseDownAction {
     x: number;
     y: number;
-    mode?: string;
+    mode?: ChangeModeAction['mode'];
 }
 export const mouseDown = createAction<MouseDownAction>();
 

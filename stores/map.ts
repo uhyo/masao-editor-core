@@ -12,25 +12,32 @@ import * as mapActions from '../actions/map';
 import * as paramActions from '../actions/params';
 
 export interface MapState{
+    advanced: boolean;
     data: Array<StageData>;
-    lastUpdate: {
-        type: 'all';
-    } | {
-        type: 'map';
-        x: number;
-        y: number;
-        stage: number;
-    } | {
-        type: 'layer';
-        x: number;
-        y: number;
-        stage: number;
-    };
+    lastUpdate: LastUpdateData;
 }
-interface StageData{
+export interface StageData{
+    size: {
+        x: number;
+        y: number;
+    };
     map: Array<Array<number>>;
     layer: Array<Array<number>>;
 }
+export type LastUpdateData = {
+    type: 'all';
+} | {
+    type: 'map';
+    x: number;
+    y: number;
+    stage: number;
+} | {
+    type: 'layer';
+    x: number;
+    y: number;
+    stage: number;
+};
+
 export class MapStore extends Store<MapState>{
     constructor(){
         super();
@@ -38,6 +45,7 @@ export class MapStore extends Store<MapState>{
         // TODO
         const data = [0, 1, 2, 3].map(()=> this.initStage());
         this.state = {
+            advanced: false,
             data,
             lastUpdate: {
                 type: 'all',
@@ -45,13 +53,15 @@ export class MapStore extends Store<MapState>{
         };
     }
     private initStage(): StageData{
+        const width = 180;
+        const height = 30;
         const map = [];
         const layer = [];
         // TODO
-        for (let i=0; i < 30; i++){
+        for (let i=0; i < height; i++){
             const r2m = [];
             const r2l = [];
-            for (let j=0; j < 180; j++){
+            for (let j=0; j < width; j++){
                 r2m.push(0);
                 r2l.push(0);
             }
@@ -59,6 +69,10 @@ export class MapStore extends Store<MapState>{
             layer.push(r2l);
         }
         return {
+            size: {
+                x: width,
+                y: height,
+            },
             map,
             layer,
         };
@@ -159,6 +173,10 @@ export class MapStore extends Store<MapState>{
     }
     private onResetParams(params: Record<string, string>){
         //mapに対する変更があったら検知する
+        if (this.state.advanced){
+            // advanced時はparamから変更しない
+            return;
+        }
         const newData = [0, 1, 2, 3].map(this.initStage);
         let flag = false;
         // TODO
@@ -185,6 +203,7 @@ export class MapStore extends Store<MapState>{
         }
         if (flag === true){
             this.setState({
+                advanced: false,
                 data: newData,
                 lastUpdate: {
                     type: 'all',

@@ -47,7 +47,7 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
         }
         const mode_valueLink = {
             value: edit.mode,
-            requestChange: (key: string)=>{
+            requestChange: (key: editActions.ChangeModeAction['mode'])=>{
                 editActions.changeMode({
                     mode: key
                 });

@@ -198,15 +198,23 @@ const MapScreen = (props: IPropMapScreen)=>{
     if(project.version==="2.8" && edit.screen==="layer"){
         are = <p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>;
     }
+
+    const {
+        lastUpdate,
+        data,
+    } = map;
+    // いまのステージ
+    const stage = data[edit.stage-1];
+
     return <div>
         <div className={styles.mapInfo}>
         <EditMode edit={edit} params={params}/>
         </div>
-        <MiniMap params={params} edit={edit} map={map}/>
+        <MiniMap params={params} edit={edit} stage={stage}/>
         {are}
         <div className={styles.main}>
         <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
-        <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>
+        <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
         </div>
     </div>;
 };

@@ -32,11 +32,11 @@ export interface EditState{
     /**
      * エディットモード
      */
-    mode: string; // TODO
+    mode: editActions.ChangeModeAction['mode'];
     /**
      * 一時的（現在）
      */
-    mode_current: string; // TODO
+    mode_current: editActions.ChangeModeAction['mode'];
     /**
      * ペン（メインマップ）
      */

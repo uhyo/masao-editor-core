@@ -6,7 +6,10 @@ import * as chip from '../../scripts/chip';
 import * as editActions from '../../actions/edit';
 import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
-import { MapState } from '../../stores/map';
+import {
+    MapState,
+    StageData,
+} from '../../stores/map';
 
 //色の対応
 const colors: Record<string, string> = {
@@ -22,7 +25,7 @@ const colors: Record<string, string> = {
 export interface IPropMiniMap{
     params: ParamsState;
     edit: EditState;
-    map: MapState;
+    stage: StageData;
 }
 interface IStateMiniMap{
     mouse_down: boolean;
@@ -59,20 +62,18 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
             const {
                 params,
                 edit,
-                map: {
-                    data,
-                },
+                stage,
             } = this.props;
-            const mapdata = data[edit.stage-1].map;
+            const mapdata = stage.map;
             //bg
             const bgc=util.stageBackColor(params, edit);
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
             //draw
-            for(let y=0; y < 30; y++){
+            for(let y=0; y < stage.size.y; y++){
                 const a = mapdata[y];
-                for(let x=0; x < 180; x++){
+                for(let x=0; x < stage.size.x; x++){
                     const c = a[x], t = chip.chipTable[c];
                     if(t){
                         const {
@@ -90,13 +91,13 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
             if(edit.grid===true){
                 ctx.strokeStyle="rgba(0,0,0,.15)";
                 ctx.lineWidth=1;
-                for(let y=edit.view_height;y < 60; y+=edit.view_height){
+                for(let y=edit.view_height;y < stage.size.y; y+=edit.view_height){
                     ctx.beginPath();
                     ctx.moveTo(0,y*2);
                     ctx.lineTo(canvas.width,y*2);
                     ctx.stroke();
                 }
-                for(let x=edit.view_width;x < 180; x+=edit.view_width){
+                for(let x=edit.view_width;x < stage.size.x; x+=edit.view_width){
                     ctx.beginPath();
                     ctx.moveTo(x*2,0);
                     ctx.lineTo(x*2,canvas.height);

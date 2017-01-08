@@ -23,7 +23,10 @@ import {
 import * as editActions from '../../../actions/edit';
 import * as mapActions from '../../../actions/map';
 import { EditState } from '../../../stores/edit';
-import { MapState } from '../../../stores/map';
+import {
+    StageData,
+    LastUpdateData,
+} from '../../../stores/map';
 import { ParamsState } from '../../../stores/params';
 import { ProjectState } from '../../../stores/project';
 
@@ -41,7 +44,9 @@ export interface IPropMapEdit{
     mapchip: string;
     chips: string;
 
-    map: MapState;
+    stage: StageData;
+    lastUpdate: LastUpdateData;
+
     params: ParamsState;
     edit: EditState;
     project: ProjectState;
@@ -87,6 +92,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
 
     componentDidMount(){
+        const {
+            stage,
+            edit: {
+                view_width,
+                view_height,
+            },
+        } = this.props;
+
         // flags
         this.drawing=false;
         this.drawRequest=null;
@@ -103,10 +116,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         });
         // double-buffering 
         // TODO
-        this.updator_map = new MapUpdator(180, 30, this.chipPollution.bind(this, 'map'));
-        this.updator_layer = new MapUpdator(180, 30, this.chipPollution.bind(this, 'layer'));
-        this.backlayer_map = new BackLayer(180, 30, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
-        this.backlayer_layer = new BackLayer(180, 30, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
+        this.updator_map = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'map'));
+        this.updator_layer = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'layer'));
+        this.backlayer_map = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
+        this.backlayer_layer = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
 
         // timers
         this.timers = new Timers();
@@ -116,7 +129,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         if (ctx == null){
             return;
         }
-        const {view_width, view_height} = this.props.edit;
         ctx.strokeStyle="rgba(0,0,0,.25)";
         for(let x=1; x < view_width; x++){
             ctx.beginPath();
@@ -166,9 +178,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.draw();
             return;
         }
-        if (prevProps.map.lastUpdate !== this.props.map.lastUpdate){
+        if (prevProps.lastUpdate !== this.props.lastUpdate){
             // mapのupdateがあったから反応
-            this.updateBacklayer(this.props.map.lastUpdate);
+            this.updateBacklayer(this.props.lastUpdate);
             this.draw();
         }else{
             if(pe.render_map!==e.render_map ||
@@ -207,32 +219,23 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     resetMap(){
         const {
-            edit: {
-                stage,
-            },
-            map: {
-                data,
-            },
+            stage,
         } = this.props;
-        this.updator_map.resetMap(data[stage-1].map);
-        this.updator_layer.resetMap(data[stage-1].layer);
+        this.updator_map.resetMap(stage.map);
+        this.updator_layer.resetMap(stage.layer);
     }
     /* TODO */
-    updateBacklayer(lastUpdate: any){
+    updateBacklayer(lastUpdate: LastUpdateData){
         // map storeのlastUpdateを見てbacklayerをアップデートする
         if (lastUpdate == null){
             return;
         }
         const {
-            edit: {
-                stage,
-            },
-            map: {
-                data,
+            stage: {
+                map,
+                layer,
             },
         } = this.props;
-        const map = data[stage-1].map;
-        const layer = data[stage-1].layer;
         switch (lastUpdate.type){
             case 'all': {
                 // 刷新されちゃった
@@ -278,7 +281,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 backlayer_map,
                 backlayer_layer,
                 props: {
-                    map,
+                    stage,
+
                     params,
                     edit,
                 },
@@ -301,7 +305,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             const width=view_width*32;
             const height=view_height*32;
 
-            const mapData=map.data[edit.stage-1].map, layerData=map.data[edit.stage-1].layer;
+            const mapData=stage.map, layerData=stage.layer;
 
             // バックバッファで描画
             if (screen === 'map' || render_map === true){
@@ -350,11 +354,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     drawChipOn(type: 'map' | 'layer', ctx: CanvasRenderingContext2D, x: number, y: number){
         // 指定された座標に描画
         const {
-            map: {
-                data,
-            },
+            stage,
             edit: {
-                stage,
                 scroll_x,
                 scroll_y,
                 view_width,
@@ -362,12 +363,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             },
         } = this.props;
         if (type === 'map'){
-            const mapData = data[stage-1].map;
-            const c = mapData[y][x];
+            const c = stage.map[y][x];
             this.drawChip(ctx, c, x*32, y*32);
         }else if (type === 'layer'){
-            const layerData = data[stage-1].layer;
-            const c = layerData[y][x];
+            const c = stage.layer[y][x];
             this.drawLayer(ctx, c, x*32, y*32);
         }
     }
@@ -398,22 +397,30 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     render(){
         const {
-            view_width,
-            view_height,
-            scroll_x,
-            scroll_y,
-        } = this.props.edit;
-        var width=view_width*32, height=view_height*32;
-        var style={
+            edit: {
+                view_width,
+                view_height,
+                scroll_x,
+                scroll_y,
+                grid,
+            },
+            stage: {
+                size,
+            },
+        } = this.props;
+        const width = view_width*32;
+        const height = view_height*32;
+
+        const style = {
             // width: width+"px"
         };
-        var c2style={
-            opacity: this.props.edit.grid ? 1 : 0
+        const c2style = {
+            opacity: grid ? 1 : 0
         };
 
         // TODO
-        return <div className={styles.wrapper}style={style}>
-            <Scroll width={180-view_width} height={30-view_height}
+        return <div className={styles.wrapper} style={style}>
+            <Scroll width={size.x-view_width} height={size.y-view_height}
                 x={scroll_x} y={scroll_y}
                 screenX={view_width}
                 screenY={view_height}
@@ -440,15 +447,26 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         });
     }
     handleMouseDown<T>(e: React.MouseEvent<T>){
+        const {
+            edit,
+            stage,
+        } = this.props;
         //マウスが下がった
         e.preventDefault();
-        var {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-        var mx=Math.floor((e.pageX-canvas_x)/32), my=Math.floor((e.pageY-canvas_y)/32);
-        var screen=this.props.edit.screen;
-        var mode;
+        const {
+            x:canvas_x,
+            y:canvas_y,
+        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
+        const mx = Math.floor((e.pageX-canvas_x)/32);
+        const my = Math.floor((e.pageY-canvas_y)/32);
+        const {
+            screen,
+        } = edit;
+
+        let mode: editActions.ChangeModeAction['mode'];
         if(e.button===0){
             //左クリック
-            mode=this.props.edit.mode;
+            mode = edit.mode;
         }else if(e.button===1){
             //中クリック
             mode="hand";
@@ -458,18 +476,19 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }else{
             return;
         }
-        if(mode==="spuit"){
+        if(mode === 'spuit'){
             //スポイトは1回限り
-            const edit = this.props.edit, mxx=mx+edit.scroll_x, myy=my+edit.scroll_y, stage=edit.stage;
-            if(screen==="layer"){
-                const map = this.props.map.data[stage-1].layer;
+            const mxx = mx+edit.scroll_x;
+            const myy = my+edit.scroll_y;
+            if(screen ==='layer'){
+                const map = stage.layer;
                 const c = map[myy] ? map[myy][mxx] || 0 : 0;
                 editActions.changePenLayer({
                     pen: c,
                     mode: true,
                 });
             }else{
-                let map=this.props.map.data[stage-1].map;
+                const map = stage.map;
                 let c = map[myy] ? map[myy][mxx] || 0 : 0;
                 editActions.changePen({
                     pen: c,
@@ -495,59 +514,66 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.mouseMoves(this.props.edit.mode_current, e.pageX, e.pageY);
     }
     mouseMoves(mode: string, pageX: number, pageY: number){
-        const {x:canvas_x, y:canvas_y} = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-        var mx=Math.floor((pageX-canvas_x)/32), my=Math.floor((pageY-canvas_y)/32);
+        const {
+            x:canvas_x,
+            y:canvas_y,
+        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
+
+        const mx = Math.floor((pageX-canvas_x)/32);
+        const my = Math.floor((pageY-canvas_y)/32);
 
         const {
             edit,
-            map,
+            stage,
         } = this.props;
         const {
             screen,
-            stage,
         } = edit;
 
-        const mapdata = screen==="layer" ? map.data[stage-1].layer : map.data[stage-1].map;
-        let pen = screen==="layer" ? edit.pen_layer : edit.pen;
+        const mapdata = screen==='layer' ? stage.layer : stage.map;
+        let pen = screen==='layer' ? edit.pen_layer : edit.pen;
         let pen_default = 0;
 
         if(mode==="pen"){
             //ペンモード
             //座標
-            let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
+            const cx = mx+edit.scroll_x;
+            const cy = my+edit.scroll_y;
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen){
-                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage,
+                (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
+                    stage: edit.stage,
                     x: cx,
                     y: cy,
                     chip: pen
                 });
             }
-        }else if(mode==="eraser"){
+        }else if(mode==='eraser'){
             //イレイサーモード
-            let cx=mx+edit.scroll_x, cy=my+edit.scroll_y;
+            const cx = mx+edit.scroll_x;
+            const cy = my+edit.scroll_y;
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
-                (screen==="layer" ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage,
+                (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
+                    stage: edit.stage,
                     x: cx,
                     y: cy,
                     chip: pen_default
                 });
             }
-        }else if(mode==="hand"){
+        }else if(mode==='hand'){
             //ハンドモード（つかんでスクロール）
-            let sx=edit.mouse_sx-mx+edit.scroll_sx, sy=edit.mouse_sy-my+edit.scroll_sy;
+            let sx = edit.mouse_sx-mx+edit.scroll_sx;
+            let sy = edit.mouse_sy-my+edit.scroll_sy;
             if(sx < 0){
                 sx=0;
-            }else if(sx > 180-edit.view_width){
-                sx = 180 - edit.view_width;
+            }else if(sx > stage.size.x-edit.view_width){
+                sx = stage.size.x - edit.view_width;
             }
             if(sy < 0){
                 sy=0;
-            }else if(sy > 30-edit.view_height){
-                sy = 30 - edit.view_height;
+            }else if(sy > stage.size.y-edit.view_height){
+                sy = stage.size.y - edit.view_height;
             }
             if(sx!==edit.scroll_x || sy!==edit.scroll_y){
                 editActions.scroll({
