@@ -5,6 +5,8 @@ import { ProjectState } from '../../stores/project';
 
 import Select from './util/select';
 
+import * as styles from './css/project-edit.css';
+
 export interface IPropProjectEdit{
     project: ProjectState;
 }
@@ -31,8 +33,14 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
             }
         };
         return <div>
-            <p>正男のバージョンを以下から選択してください：</p>
-            <Select contents={contents} valueLink={valueLink}/>
+            <section className={styles.sect}>
+                <h1>正男のバージョン</h1>
+                <Select contents={contents} valueLink={valueLink}/>
+            </section>
+            <section className={styles.sect}>
+                <h1>第3版マップデータ</h1>
+                <p>マップのサイズをデフォルトの180×30から変更するには、第3版マップデータを有効にしてください。</p>
+            </section>
         </div>
     }
 }

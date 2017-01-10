@@ -1,0 +1,17 @@
+.sect {
+  width: auto;
+  margin: 0.4em;
+  padding: 0.4em;
+
+
+  h1 {
+    font-size: 1em;
+    font-weight: bold;
+    color: #555555;
+  }
+
+  p {
+    color: #555555;
+    font-size: 0.9em;
+  }
+}
