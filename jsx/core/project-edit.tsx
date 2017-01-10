@@ -16,26 +16,23 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
         const contents = [
             {
                 key: "2.8",
-                value: "2.8"
+                label: "2.8"
             },
             {
                 key: "fx16",
-                value: "FX"
+                label: "FX"
             },
             {
                 key: "kani2",
-                value: "MasaoKani2"
+                label: "MasaoKani2"
             }
-        ], valueLink={
-            value: project.version,
-            requestChange:(version: '2.8' | 'fx16' | 'kani2')=>{
-                projectActions.changeVersion({version});
-            }
+        ], onVersionChange = (version: '2.8' | 'fx16' | 'kani2')=>{
+            projectActions.changeVersion({version});
         };
         return <div>
             <section className={styles.sect}>
                 <h1>正男のバージョン</h1>
-                <Select contents={contents} valueLink={valueLink}/>
+                <Select contents={contents} value={project.version} onChange={onVersionChange}/>
             </section>
             <section className={styles.sect}>
                 <h1>第3版マップデータ</h1>

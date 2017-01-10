@@ -5,10 +5,8 @@ import * as styles from './switch.css';
 
 export interface IPropSwitch{
     label: string;
-    valueLink: {
-        value: boolean;
-        requestChange(value: boolean): void;
-    };
+    value: boolean;
+    onChange(value: boolean): void;
 }
 export default class Switch extends React.Component<IPropSwitch, {}>{
     constructor(props: IPropSwitch){
@@ -16,12 +14,15 @@ export default class Switch extends React.Component<IPropSwitch, {}>{
         this.handleClick = this.handleClick.bind(this);
     }
     render(){
-        const c = this.props.valueLink.value === true ? styles.switchYes : styles.switchNormal;
+        const c = this.props.value === true ? styles.switchYes : styles.switchNormal;
         return <div className={c} onClick={this.handleClick}>{this.props.label}</div>;
     }
     handleClick<T>(e: React.MouseEvent<T>){
-        var valueLink=this.props.valueLink;
+        const {
+            value,
+            onChange,
+        } = this.props;
         e.preventDefault();
-        valueLink.requestChange(!valueLink.value);
+        onChange(!value);
     }
 }

@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as styles from './button.css';
 
 export interface IPropButton{
-    label: string;
+    label?: string;
     onClick?(e: React.MouseEvent<HTMLDivElement>): void;
 }
 export default class Button extends React.Component<IPropButton, {}>{
@@ -11,8 +11,10 @@ export default class Button extends React.Component<IPropButton, {}>{
         const {
             label,
             onClick,
+            children,
         } = this.props;
-        return <div className={styles.button} onClick={onClick}>{label}</div>;
+        const child = React.Children.count(children) > 0 ? children : label;
+        return <div className={styles.button} onClick={onClick}>{child}</div>;
     }
 }
 

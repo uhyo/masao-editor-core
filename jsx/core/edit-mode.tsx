@@ -22,19 +22,19 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
         const contents=[
             {
                 key:"pen",
-                value:"ペンモード"
+                label:"ペンモード"
             },
             {
                 key:"eraser",
-                value:"イレイサーモード"
+                label:"イレイサーモード"
             },
             {
                 key:"hand",
-                value:"ハンドモード"
+                label:"ハンドモード"
             },
             {
                 key:"spuit",
-                value:"スポイト"
+                label:"スポイト"
             }
         ];
         const contents2=[];
@@ -42,68 +42,53 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
         for (let i = 1; i <= stage_number; i++){
             contents2.push({
                 key: String(i),
-                value: `ステージ${i}`,
+                label: `ステージ${i}`,
             });
         }
-        const mode_valueLink = {
-            value: edit.mode,
-            requestChange: (key: editActions.ChangeModeAction['mode'])=>{
-                editActions.changeMode({
-                    mode: key
-                });
-            }
+        const mode_change = (key: editActions.ChangeModeAction['mode'])=>{
+            editActions.changeMode({
+                mode: key
+            });
         };
-        const grid_valueLink = {
-            value: edit.grid,
-            requestChange: (grid: boolean)=>{
-                editActions.changeGrid({
-                    grid
-                });
-            }
-        };
-        const stage_valueLink = {
-            value: String(edit.stage),
-            requestChange: (key: string)=>{
-                editActions.changeStage({
-                    stage: Number(key),
-                });
-            },
+        const stage_change = (key: string)=>{
+            editActions.changeStage({
+                stage: Number(key),
+            });
         };
 
         let renderSwitch;
         if(this.props.edit.screen === 'layer'){
-            let vl = {
-                value: edit.render_map,
-                requestChange: (key: boolean)=>{
-                    editActions.changeRenderMode({
-                        render_map: key
-                    });
-                },
+            const onChange = (key: boolean)=>{
+                editActions.changeRenderMode({
+                    render_map: key
+                });
             };
-            renderSwitch=<Switch label="マップも表示" valueLink={vl}/>;
+            renderSwitch=<Switch label="マップも表示" value={edit.render_map} onChange={onChange}/>;
         }else{
-            let vl = {
-                value: edit.render_layer,
-                requestChange: (key: boolean)=>{
-                    editActions.changeRenderMode({
-                        render_layer: key
-                    });
-                },
+            const onChange = (key: boolean)=>{
+                editActions.changeRenderMode({
+                    render_layer: key
+                });
             };
-            renderSwitch=<Switch label="背景レイヤーも表示" valueLink={vl}/>;
+            renderSwitch=<Switch label="背景レイヤーも表示" value={edit.render_layer} onChange={onChange}/>;
         }
+        const grid_change = (grid: boolean)=>{
+            editActions.changeGrid({
+                grid,
+            });
+        };
         return <div className={style.wrapper}>
             <div>
-                <Select contents={contents} valueLink={mode_valueLink}/>
+                <Select contents={contents} value={edit.mode} onChange={mode_change}/>
             </div>
             <div>
-                <Switch label="グリッドを表示" valueLink={grid_valueLink}/>
+                <Switch label="グリッドを表示" value={edit.grid} onChange={grid_change}/>
             </div>
             <div>
                 {renderSwitch}
             </div>
             <div>
-                <Select contents={contents2} valueLink={stage_valueLink}/>
+                <Select contents={contents2} value={String(edit.stage)} onChange={stage_change}/>
             </div>
         </div>
     }

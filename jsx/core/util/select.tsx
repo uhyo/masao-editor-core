@@ -7,30 +7,32 @@ export interface IPropSelect{
     disabled?: boolean;
     contents: Array<{
         key: string;
-        value: string;
+        label: string;
     }>;
-    valueLink: {
-        value: string;
-        requestChange(key: string): void;
-    };
+    value: string;
+    onChange(key: string): void;
 }
 export default class Select extends React.Component<IPropSelect, {}>{
     static defaultProps = {
         disabled: false,
     };
     render(){
-        const valueLink=this.props.valueLink;
+        const {
+            value,
+            onChange,
+            contents,
+        } = this.props;
         return <div className={styles.wrapper}>{
-            this.props.contents.map(({key, value}, i)=>{
-                const c = key === valueLink.value ? styles.buttonCurrent : styles.button;
-                return <div key={i} className={c} onClick={this.handleClick(key)}>{value}</div>;
+            contents.map(({key, label}, i)=>{
+                const c = key === value ? styles.buttonCurrent : styles.button;
+                return <div key={i} className={c} onClick={this.handleClick(key)}>{label}</div>;
             })
         }</div>;
     }
     handleClick<E>(key: string){
         return (e: React.MouseEvent<E>)=>{
             e.preventDefault();
-            this.props.valueLink.requestChange(key);
+            this.props.onChange(key);
         };
     }
 }

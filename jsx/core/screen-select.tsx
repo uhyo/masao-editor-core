@@ -14,31 +14,28 @@ export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>
         const contents=[
             {
                 key:"map",
-                value:"マップ編集"
+                label:"マップ編集",
             },
             {
                 key:"layer",
-                value:"背景レイヤー編集"
+                label:"背景レイヤー編集",
             },
             {
                 key:"params",
-                value:"param編集"
+                label:"param編集",
             },
             {
                 key:"project",
-                value:"プロジェクト設定"
+                label:"プロジェクト設定",
             }
         ];
-        const valueLink={
-            value: this.props.edit.screen,
-            requestChange: (key: 'map' | 'layer' | 'params' | 'project')=>{
-                editActions.changeScreen({
-                    screen: key,
-                });
-            }
+        const onScreenChange = (key: 'map' | 'layer' | 'params' | 'project')=>{
+            editActions.changeScreen({
+                screen: key,
+            });
         };
         return <div>
-            <Select contents={contents} valueLink={valueLink}/>
+            <Select contents={contents} value={edit.screen} onChange={onScreenChange}/>
         </div>
     }
 }

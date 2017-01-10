@@ -37,20 +37,18 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
         const keys = Object.keys(data);
         const paramTypesContents=[{
             key: "",
-            value: "全て表示"
+            label: "全て表示"
         }].concat(Object.keys(masao.paramTypes).map((key)=>{
             return {
                 key,
-                value: masao.paramTypes[key].name
+                label: masao.paramTypes[key].name,
             };
-        })), paramTypeLink={
-            value: param_type,
-            requestChange: (param_type: string)=>{
-                editActions.changeParamType({param_type});
-            }
+        }));
+        const onParamtypeChange = (param_type: string)=>{
+            editActions.changeParamType({param_type});
         };
         const typeMenu=<div className={styles.menu}>
-            <Select contents={paramTypesContents} valueLink={paramTypeLink}/>
+            <Select contents={paramTypesContents} value={param_type} onChange={onParamtypeChange}/>
         </div>;
 
         return <div className={styles.wrapper}>
@@ -64,21 +62,19 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                         //色コントロールを設置
                         let key_red=key.replace("@@@","red"), key_green=key.replace("@@@","green"), key_blue=key.replace("@@@","blue");
                         obj=data[key_red];
-                        let colorLink={
-                            value: {
-                                red: Number(params[key_red]),
-                                green: Number(params[key_green]),
-                                blue: Number(params[key_blue])
-                            },
-                            requestChange: ({red, green, blue}: {red: number; green: number; blue: number})=>{
-                                paramActions.changeParams({
-                                    [key_red]: String(red),
-                                    [key_green]: String(green),
-                                    [key_blue]: String(blue)
-                                });
-                            }
+                        const color = {
+                            red: Number(params[key_red]),
+                            green: Number(params[key_green]),
+                            blue: Number(params[key_blue])
                         };
-                        field= <Color colorLink={colorLink}/>;
+                        const onChange = ({red, green, blue}: {red: number; green: number; blue: number})=>{
+                            paramActions.changeParams({
+                                [key_red]: String(red),
+                                [key_green]: String(green),
+                                [key_blue]: String(blue)
+                            });
+                        };
+                        field= <Color value={color} onChange={onChange}/>;
                         description=obj.description.replace(/（.+）$/,"");
                     }else{
                         obj=data[key];

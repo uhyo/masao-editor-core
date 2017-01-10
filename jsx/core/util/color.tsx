@@ -3,14 +3,12 @@ import * as React from 'react';
 import * as styles from './color.css';
 
 export interface IPropColor{
-    colorLink: {
-        value: {
-            red: number;
-            green: number;
-            blue: number;
-        };
-        requestChange(value: {red: number; green: number; blue: number}): void;
+    value: {
+        red: number;
+        green: number;
+        blue: number;
     };
+    onChange(value: {red: number; green: number; blue: number}): void;
 }
 //color select control
 export default class Color extends React.Component<IPropColor, {}>{
@@ -21,7 +19,9 @@ export default class Color extends React.Component<IPropColor, {}>{
         this.handleChangeBlue = this.handleChangeBlue.bind(this);
     }
     render(){
-        const color=this.props.colorLink.value;
+        const {
+            value: color,
+        } = this.props;
         const style={
             backgroundColor: `rgb(${color.red},${color.green},${color.blue})`,
             color: `rgb(${255-color.red},${255-color.green},${255-color.blue})`
@@ -44,23 +44,44 @@ export default class Color extends React.Component<IPropColor, {}>{
         </span>;
     }
     handleChangeRed(e: React.SyntheticEvent<HTMLInputElement>): void{
-        this.props.colorLink.requestChange({
+        const {
+            onChange,
+            value: {
+                green,
+                blue,
+            },
+        } = this.props;
+        onChange({
             red: Number(e.currentTarget.value),
-            green: this.props.colorLink.value.green,
-            blue: this.props.colorLink.value.blue,
+            green,
+            blue,
         });
     }
     handleChangeGreen(e: React.SyntheticEvent<HTMLInputElement>): void{
-        this.props.colorLink.requestChange({
-            red: this.props.colorLink.value.red,
+        const {
+            onChange,
+            value: {
+                red,
+                blue,
+            },
+        } = this.props;
+        onChange({
+            red,
             green: Number(e.currentTarget.value),
-            blue: this.props.colorLink.value.blue,
+            blue,
         });
     }
     handleChangeBlue(e: React.SyntheticEvent<HTMLInputElement>): void{
-        this.props.colorLink.requestChange({
-            red: this.props.colorLink.value.red,
-            green: this.props.colorLink.value.green,
+        const {
+            onChange,
+            value: {
+                red,
+                green,
+            },
+        } = this.props;
+        onChange({
+            red,
+            green,
             blue: Number(e.currentTarget.value),
         });
     }
