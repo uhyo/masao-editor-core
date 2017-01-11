@@ -15,3 +15,85 @@
     font-size: 0.9em;
   }
 }
+
+
+.stage-control {
+  margin: 0.8em;
+  /* width: ex; */
+
+  display: flex;
+  flex-flow: row nowrap;
+}
+.stage-control-row {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+}
+
+.stage-control-row-hor {
+  composes: stage-control-row;
+}
+.stage-control-row-ver {
+  composes: stage-control-row;
+}
+.stage-control-row-hor2 {
+  composes: stage-control-row;
+  justify-content: flex-end;
+}
+
+.stage-control-set {
+  display: flex;
+}
+
+.stage-button {
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 1.6ex;
+  cursor: default;
+
+  font-size: 2.6em;
+  background-color: #999999;
+  color: #ffffff;
+  padding: 3px;
+  margin: 3px;
+
+  text-align: center;
+  font-family: 'Nunito';
+  font-weight: bold;
+  line-height: 1em;
+}
+
+.stage-size {
+  composes: stage-button;
+}
+
+.stage-diff {
+  composes: stage-button;
+
+  background-color: #b3b3b3;
+}
+
+.stage-control-row-hor .stage-diff {
+  min-width: 2em;
+}
+.stage-control-row-ver .stage-diff {
+  flex: auto 1 0;
+}
+
+.stage-diff-plus {
+  composes: stage-diff;
+
+  background-color: #ffaaaa;
+}
+
+.stage-diff-minus {
+  composes: stage-diff;
+
+  background-color: #aaaaff;
+}
+
+.stage-button-ok {
+  composes: stage-button;
+
+  background-color: #88df88;
+}

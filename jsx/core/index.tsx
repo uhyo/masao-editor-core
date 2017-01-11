@@ -29,6 +29,7 @@ import ParamEdit from './param-edit';
 import ProjectEdit from './project-edit';
 import Button from './util/button';
 
+import './css/init.css';
 import * as styles from './css/index.css';
 
 export interface IDefnMasaoEditorCore{
@@ -100,7 +101,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="project"){
-            screen=<ProjectScreen project={project}/>;
+            screen=<ProjectScreen project={project} map={map} edit={edit}/>;
         }
         let external_buttons=null;
         if(this.props.externalCommands != null){
@@ -237,10 +238,12 @@ const ParamScreen = (props: IPropParamScreen)=>{
 
 interface IPropProjectScreen{
     project: ProjectState;
+    map: MapState;
+    edit: EditState;
 }
 const ProjectScreen = (props: IPropProjectScreen)=>{
     return <div>
-    <ProjectEdit project={props.project}/>
+    <ProjectEdit {...props} />
     </div>;
 };
 

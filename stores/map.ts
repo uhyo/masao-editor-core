@@ -12,7 +12,10 @@ import * as mapActions from '../actions/map';
 import * as paramActions from '../actions/params';
 
 export interface MapState{
+    // advancedステージデータを使用するか
     advanced: boolean;
+    // ステージ数
+    stages: number;
     data: Array<StageData>;
     lastUpdate: LastUpdateData;
 }
@@ -46,6 +49,7 @@ export class MapStore extends Store<MapState>{
         const data = [0, 1, 2, 3].map(()=> this.initStage());
         this.state = {
             advanced: false,
+            stages: 4,
             data,
             lastUpdate: {
                 type: 'all',
@@ -76,6 +80,11 @@ export class MapStore extends Store<MapState>{
             map,
             layer,
         };
+    }
+    private onSetAdvanced({advanced}: mapActions.SetAdvancedAction){
+        this.setState({
+            advanced,
+        });
     }
     private onUpdateMap({stage,x,y,chip}: mapActions.UpdateMapAction){
         const {

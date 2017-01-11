@@ -16,3 +16,19 @@ export interface UpdateLayerAction{
 }
 export const updateMap = createAction<UpdateMapAction>();
 export const updateLayer = createAction<UpdateLayerAction>();
+
+export interface SetAdvancedAction{
+    advanced: boolean;
+}
+export const setAdvanced = createAction<SetAdvancedAction>();
+
+export interface ResizeMapAction{
+    stage: number;
+
+    // 4方向の大きさ変更
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+}
+export const resizeMap = createAction<ResizeMapAction>();
