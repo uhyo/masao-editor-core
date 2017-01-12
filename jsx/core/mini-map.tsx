@@ -113,8 +113,20 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         });
     }
     render(){
-        const mousemove = this.state.mouse_down ? this.handleMouseMove : void 0;
-        return <canvas ref="canvas" width="360" height="60" onMouseDown={this.handleMouseDown} onMouseMove={mousemove}/>;
+        const {
+            props: {
+                stage: {
+                    size,
+                },
+            },
+            state: {
+                mouse_down,
+            },
+            handleMouseMove,
+            handleMouseDown,
+        } = this;
+        const mousemove = mouse_down ? handleMouseMove : void 0;
+        return <canvas ref="canvas" width={size.x*2} height={size.y*2} onMouseDown={handleMouseDown} onMouseMove={mousemove}/>;
     }
     handleMouseDown<T>(e: React.MouseEvent<T>){
         this.setState({
@@ -132,7 +144,11 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         document.addEventListener("mouseup",handler,false);
     }
     handleMouseMove<T>(e: React.MouseEvent<T>){
-        const edit=this.props.edit;
+        const {
+            edit,
+            stage,
+        } = this.props;
+
         e.preventDefault();
         //canvasの位置
         const {x:left, y:top} = util.getAbsolutePosition(this.refs['canvas'] as HTMLCanvasElement);
@@ -141,8 +157,8 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);
 
         // 右と下の上限 (TODO)
-        const r = 180 - edit.view_width;
-        const b = 30 - edit.view_height;
+        const r = stage.size.x - edit.view_width;
+        const b = stage.size.y - edit.view_height;
         if(sx < 0){
             sx = 0;
         }else if(sx > r){

@@ -89,6 +89,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         super(props);
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleResize = this.handleResize.bind(this);
     }
 
     componentDidMount(){
@@ -434,10 +435,22 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             </Scroll>
         </div>;
     }
-    handleResize(width: number, height: number){
+    handleResize(widthr: number, heightr: number){
+        const {
+            stage: {
+                size,
+            },
+            edit,
+        } =this.props;
+        const width = Math.floor(widthr/32);
+        const height = Math.floor(heightr/32);
         editActions.changeView({
-            width: Math.floor(width/32),
-            height: Math.floor(height/32),
+            width,
+            height,
+        });
+        editActions.scroll({
+            x: Math.max(0, Math.min(edit.scroll_x, size.x - width)),
+            y: Math.max(0, Math.min(edit.scroll_y, size.y - height)),
         });
     }
     handleScroll(x: number, y: number){

@@ -145,12 +145,9 @@ export class EditStore extends Store<EditState>{
         });
     }
     onChangeView({width, height}: editActions.ChangeViewAction){
-        // TODO
         this.setState({
             view_width: width,
             view_height: height,
-            scroll_x: Math.min(this.state.scroll_x, 180 - width),
-            scroll_y: Math.min(this.state.scroll_y, 30 - height),
         });
     }
     onChangePen({pen,mode}: editActions.ChangePenAction){

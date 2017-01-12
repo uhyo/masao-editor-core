@@ -12,6 +12,8 @@ import { EditState } from '../../stores/edit';
 import Select from './util/select';
 import ToggleButton from './util/toggle-button';
 
+import propChanged from './util/changed';
+
 import * as styles from './css/project-edit.css';
 
 export interface IPropProjectEdit{
@@ -112,6 +114,33 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize>{
             bottom: 0,
             left: 0,
         };
+    }
+    componentWillReceiveProps(newProps: IPropStageSize){
+        if (this.props.index !== newProps.index){
+            this.setState({
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+            });
+            return;
+        }
+        const data1 = this.props.stage;
+        const data2 = newProps.stage;
+        if (data1 === data2){
+            return;
+        }
+
+        if (propChanged(data1.size, data2.size, ['x', 'y'])){
+            this.setState({
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+            });
+            return;
+        }
+
     }
     render(){
         const {

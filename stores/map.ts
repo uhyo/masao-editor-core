@@ -220,6 +220,62 @@ export class MapStore extends Store<MapState>{
             });
         }
     }
+    private onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){
+        if (!this.state.advanced){
+            return;
+        }
+        if (stage < 0 || this.state.stages <= stage){
+            return;
+        }
+        const data = this.state.data.map((st, i)=>{
+            if (i !== stage){
+                return st;
+            }
+            // サイズを変更
+            const size = {
+                x: st.size.x + left + right,
+                y: st.size.y + top + bottom,
+            };
+            const map: Array<Array<number>> = [];
+            const layer: Array<Array<number>> = [];
+            for (let y = 0; y < size.y; y++){
+                const y2 = y - top;
+                const rowm: Array<number> = new Array(size.x);
+                const rowl: Array<number> = new Array(size.y);
+                if (y2 < 0 || st.size.y <= y2){
+                    // データが存在しない領域
+                    rowm.fill(0);
+                    rowl.fill(0);
+                }else{
+                    const drm = st.map[y2];
+                    const drl = st.layer[y2];
+                    for (let x = 0; x < size.x; x++){
+                        const x2 = x - left;
+                        if (x2 < 0 || st.size.x <= x2){
+                            rowm[x] = 0;
+                            rowl[x] = 0;
+                        }else{
+                            rowm[x] = drm[x2];
+                            rowl[x] = drl[x2];
+                        }
+                    }
+                }
+                map.push(rowm);
+                layer.push(rowl);
+            }
+            return {
+                size,
+                map,
+                layer,
+            };
+        });
+        this.setState({
+            data,
+            lastUpdate: {
+                type: 'all',
+            },
+        });
+    }
 }
 
 

@@ -90,9 +90,12 @@ class RenderedRegions{
 
             const cols = this.tree.search(item);
 
-            const startX = force ? minX : Math.max(minX, this.leftFrontier);
-            for (let cx = startX; cx < maxX; cx++){
-                for (let cy = minY; cy < maxY; cy++){
+            const startX = Math.max(0, force ? minX : Math.max(minX, this.leftFrontier));
+            const endX = Math.min(maxX, this.width);
+            for (let cx = startX; cx < endX; cx++){
+                const startY = Math.max(0, minY);
+                const endY = Math.min(maxY, this.height);
+                for (let cy = startY; cy < endY; cy++){
                     if (!force){
                         for (let rect of cols){
                             if (rect.minY <= cy && cy < rect.maxY && rect.minX <= cx && cx < rect.maxX){
@@ -157,13 +160,14 @@ class RenderedRegions{
         if (this.leftFrontier >= this.width){
             return false;
         }
+        const exp = Math.min(this.expandWidth, this.width - this.leftFrontier);
         this.requestRender([{
             x: this.leftFrontier,
             y: 0,
-            width: this.expandWidth,
+            width: exp,
             height: this.height,
         }]);
-        this.leftFrontier += this.expandWidth;
+        this.leftFrontier += exp;
         return this.leftFrontier < this.width;
     }
 }
