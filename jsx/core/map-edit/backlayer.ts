@@ -72,10 +72,10 @@ class RenderedRegions{
         const targets = [];
         // colsはitemとintersectする矩形の集合
         for(let {x, y, width, height} of rects){
-            const minX = x;
-            const minY = y;
-            const maxX = x + width;
-            const maxY = y + height;
+            const minX = Math.max(0, Math.min(x, this.width));
+            const minY = Math.max(0, Math.min(y, this.height));
+            const maxX = Math.min(this.width, Math.max(0, x + width));
+            const maxY = Math.min(this.height, Math.max(0, y + height));
 
             if (!force && maxX <= this.leftFrontier){
                 continue;
