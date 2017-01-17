@@ -555,6 +555,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             //座標
             const cx = mx+edit.scroll_x;
             const cy = my+edit.scroll_y;
+
+            // マップ外はアレしない
+            if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
+                return;
+            }
+
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen){
                 (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
@@ -568,6 +574,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             //イレイサーモード
             const cx = mx+edit.scroll_x;
             const cy = my+edit.scroll_y;
+
+            if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
+                return;
+            }
             //違ったらイベント発行
             if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
                 (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
