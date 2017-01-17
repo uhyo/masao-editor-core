@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import * as projectActions from '../../actions/project';
 import * as mapActions from '../../actions/map';
+import * as editLogics from '../../logics/edit';
 import { ProjectState } from '../../stores/project';
 import {
     MapState,
@@ -87,8 +88,13 @@ const AdvancedPain = ({map}: IPropAdvancedPain)=>{
         <h1>マップサイズ</h1>
         {
             Array.from(new Array(map.stages).keys()).map(i=>{
+                const stage = Number(i);
+                const data = map.data[i];
+                const onResize = (resize: IStateStageSize)=>{
+                    editLogics.resizeMapData(stage, resize);
+                };
                 return <div key={i}>
-                    <StageSize index={Number(i)} stage={map.data[i]} />
+                    <StageSize index={stage} stage={data} onResize={onResize} />
                 </div>;
             })
         }
@@ -98,6 +104,7 @@ const AdvancedPain = ({map}: IPropAdvancedPain)=>{
 interface IPropStageSize{
     index: number;
     stage: StageData;
+    onResize(size: IStateStageSize): void;
 }
 interface IStateStageSize{
     top: number;
@@ -148,6 +155,7 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize>{
             stage: {
                 size,
             },
+            onResize,
         } = this.props;
         const {
             top,
@@ -166,9 +174,7 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize>{
         };
 
         const saveButton = ()=>{
-            console.log(this.state);
-            mapActions.resizeMap({
-                stage: index,
+            onResize({
                 ...this.state,
             });
         };

@@ -419,9 +419,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             opacity: grid ? 1 : 0
         };
 
+        const scrollWidth = Math.max(0, size.x - view_width);
+        const scrollHeight = Math.max(0, size.y - view_height);
+
         // TODO
         return <div className={styles.wrapper} style={style}>
-            <Scroll width={size.x-view_width} height={size.y-view_height}
+            <Scroll width={scrollWidth} height={scrollHeight}
                 x={scroll_x} y={scroll_y}
                 screenX={view_width}
                 screenY={view_height}
