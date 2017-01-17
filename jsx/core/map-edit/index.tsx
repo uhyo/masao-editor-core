@@ -316,10 +316,17 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 backlayer_layer.prerender(scroll_x, scroll_y, view_width, view_height);
             }
 
-            // まず背景色で塗りつぶす
-            let bgc=util.stageBackColor(params, edit);
-            ctx.fillStyle=bgc;
-            ctx.fillRect(0,0,width,height);
+            // 全体をクリア
+            ctx.clearRect(0, 0, width, height);
+
+            // ステージ範囲を背景色で塗りつぶす
+            const bgc = util.stageBackColor(params, edit);
+            ctx.fillStyle = bgc;
+            const fillLeft = Math.max(0, -scroll_x*32);
+            const fillTop = Math.max(0, -scroll_y*32);
+            const fillWidth = Math.min(width - fillLeft, (stage.size.x - scroll_x)*32);
+            const fillHeight = Math.min(height - fillTop, (stage.size.y - scroll_y)*32);
+            ctx.fillRect(fillLeft, fillTop, fillWidth, fillHeight);
             // バックバッファから
             if (screen === 'layer' || render_layer === true){
                 ctx.save();

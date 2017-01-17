@@ -5,6 +5,19 @@
 
 .canvas-wrapper {
   position: relative;
+  width: 100%;
+  height: 100%;
+  
+  --back-color: #e6e6e6;
+  --check-color: #a0a0a0;
+
+  /* 背景の模様 */
+  background-color: var(--back-color);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  background-image: linear-gradient(45deg,  var(--check-color) 25%, var(--check-color) 25%, transparent 25%, transparent 75%, var(--check-color) 75%, var(--check-color) 75%),
+                    linear-gradient(-135deg, var(--check-color) 25%, var(--check-color) 25%, transparent 25%, transparent 75%, var(--check-color) 75%, var(--check-color) 75%);
+
 
   & > canvas {
     position: absolute;
