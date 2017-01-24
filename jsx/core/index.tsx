@@ -149,7 +149,10 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             params,
         } = this.state;
 
-        const mp = mapToParam(map);
+        const {
+            params: mp,
+            advancedMap,
+        } = mapToParam(map);
 
         const version = project.version;
         const allParams = masao.param.sanitize({
@@ -157,10 +160,14 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             ...mp,
         });
 
+
+
         const obj = masao.format.make({
             params: allParams,
             version,
+            'advanced-map': advancedMap,
         });
+        console.log('MADE', obj);
         return obj;
     }
     public getCurrentStage(): number{
@@ -249,27 +256,66 @@ const ProjectScreen = (props: IPropProjectScreen)=>{
 
 
 //map to param
-function mapToParam(map: MapState){
-    const result: Record<string, string> = {};
-    for(let stage=0; stage<4; stage++){
-        let stagechar="";
-        if(stage===1){
-            stagechar="-s";
-        }else if(stage===2){
-            stagechar="-t";
-        }else if(stage===3){
-            stagechar="-f";
+type AdvancedMap = masao.format.MasaoJSONFormat['advanced-map'];
+type StageObject = masao.format.StageObject;
+function mapToParam(map: MapState): {
+    params: Record<string, string>;
+    advancedMap: AdvancedMap;
+}{
+    if (map.advanced){
+        // advancedなmapを発行
+        const stages: Array<StageObject> = [];
+        for (let i=0; i < map.stages; i++){
+            const st = map.data[i];
+            type LayerObject = StageObject['layers'][number];
+            const layers: Array<LayerObject> = [
+                {
+                    type: 'main',
+                    map: st.map,
+                },
+                {
+                    type: 'mapchip',
+                    map: st.layer,
+                },
+            ];
+            const obj: StageObject = {
+                size: st.size,
+                layers,
+            };
+            stages.push(obj);
         }
-        for(let y=0; y < 30; y++){
-            const j = map.data[stage].map[y].map(chipToMapString).join("");
-            result[`map0-${y}${stagechar}`]=j.slice(0,60);
-            result[`map1-${y}${stagechar}`]=j.slice(60,120);
-            result[`map2-${y}${stagechar}`]=j.slice(120,180);
-            const k = map.data[stage].layer[y].map(chipToLayerString).join("");
-            result[`layer0-${y}${stagechar}`]=k.slice(0,120);
-            result[`layer1-${y}${stagechar}`]=k.slice(120,240);
-            result[`layer2-${y}${stagechar}`]=k.slice(240,360);
+        return {
+            params: {},
+            advancedMap: {
+                stages,
+            },
+        };
+    }else{
+        // 昔のmap形式
+        const params: Record<string, string> = {};
+        for(let stage=0; stage<4; stage++){
+            let stagechar="";
+            if(stage===1){
+                stagechar="-s";
+            }else if(stage===2){
+                stagechar="-t";
+            }else if(stage===3){
+                stagechar="-f";
+            }
+            for(let y=0; y < 30; y++){
+                const j = map.data[stage].map[y].map(chipToMapString).join("");
+                params[`map0-${y}${stagechar}`]=j.slice(0,60);
+                params[`map1-${y}${stagechar}`]=j.slice(60,120);
+                params[`map2-${y}${stagechar}`]=j.slice(120,180);
+                const k = map.data[stage].layer[y].map(chipToLayerString).join("");
+                params[`layer0-${y}${stagechar}`]=k.slice(0,120);
+                params[`layer1-${y}${stagechar}`]=k.slice(120,240);
+                params[`layer2-${y}${stagechar}`]=k.slice(240,360);
+            }
         }
+        return {
+            params,
+            advancedMap: void 0,
+        };
     }
-    return result;
 }

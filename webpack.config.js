@@ -57,7 +57,8 @@ module.exports={
     ],
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        modules: [path.resolve(__dirname, 'node_modules')],
+        // modules: [path.resolve(__dirname, 'node_modules')],
+        modules: ['node_modules'],
     },
     externals: {
         react: {

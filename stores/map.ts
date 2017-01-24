@@ -241,7 +241,7 @@ export class MapStore extends Store<MapState>{
             for (let y = 0; y < size.y; y++){
                 const y2 = y - top;
                 const rowm: Array<number> = new Array(size.x);
-                const rowl: Array<number> = new Array(size.y);
+                const rowl: Array<number> = new Array(size.x);
                 if (y2 < 0 || st.size.y <= y2){
                     // データが存在しない領域
                     rowm.fill(0);
@@ -269,6 +269,7 @@ export class MapStore extends Store<MapState>{
                 layer,
             };
         });
+        console.log('M', data);
         this.setState({
             data,
             lastUpdate: {
