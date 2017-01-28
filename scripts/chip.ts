@@ -758,7 +758,7 @@ export function chipToLayerString(chip: number): string{
     if (chip === 0){
         return '..';
     }else if (chip < 0x10){
-        return '.' + chip.toString(16);
+        return '0' + chip.toString(16);
     }else {
         return chip.toString(16);
     }
