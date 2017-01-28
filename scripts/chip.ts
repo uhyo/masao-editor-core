@@ -497,6 +497,14 @@ export const chipList = Object.keys(chipTable).map(key=> Number(key));
 
 //仕掛けのparamに応じたやつ
 var athleticTable: Record<string, Chip> = {
+    "1": {
+        pattern: [50,{
+            subx: 0,
+            suby: 16
+        }],
+        name: "ファイヤーバー（左回り）",
+        category: "athletic"
+    },
     "2": {
         pattern: {
             chip: 180,
@@ -2641,17 +2649,22 @@ export function chipFor(params: Record<string, string>, chip: number): Chip{
             name: "下り坂（透明）",
             category: "block"
         };
-    }else{
-        const obj = chipTable[chip];
+    }else if (chip >= 1000 && chip < 5000){
+        // athleticだ
+        const obj = athleticTable[chip - 1000];
         if (obj != null){
             return obj;
         }
-        // 不明だ
-        return {
-            pattern: unknown_pattern,
-            name: '不明',
-        };
     }
+    const obj = chipTable[chip];
+    if (obj != null){
+        return obj;
+    }
+    // 不明だ
+    return {
+        pattern: unknown_pattern,
+        name: '不明',
+    };
 }
 
 // 従来の文字列表現チップと数値の相互変換
