@@ -14,6 +14,7 @@ import {
 
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
+import * as mapActions from '../../actions/map';
 
 import mapStore, { MapState } from '../../stores/map';
 import paramStore, { ParamsState } from '../../stores/params';
@@ -66,24 +67,54 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         const g = this.props.defaultGame;
         if(g){
             //default
-            const v = masao.acceptVersion(g.version);
-            const params = masao.param.addDefaults(g.params, v);
-
-            paramActions.resetParams(params);
-            projectActions.changeVersion({version: v});
+            this.loadGame(g);
         }
     }
     componentWillReceiveProps(newProps: IPropMasaoEditorCore){
         if(this.props.defaultGame !== newProps.defaultGame && newProps.defaultGame != null){
-            const g = newProps.defaultGame;
-            const version = masao.acceptVersion(g.version);
-            const params = masao.param.addDefaults(g.params, version);
-
-            paramActions.resetParams(params);
-            projectActions.changeVersion({version});
+            this.loadGame(newProps.defaultGame);
         }else if(this.props.defaultParams !== newProps.defaultParams && newProps.defaultParams != null){
             paramActions.resetParams(newProps.defaultParams);
             projectActions.changeVersion({version: masao.acceptVersion(newProps.defaultGame.version)});
+        }
+    }
+    private loadGame(game: masao.format.MasaoJSONFormat){
+        const version = masao.acceptVersion(game.version);
+        const params = masao.param.addDefaults(game.params, version);
+
+        const advanced = game['advanced-map'] != null;
+
+        mapActions.setAdvanced({
+            advanced,
+        });
+        paramActions.resetParams(params);
+        projectActions.changeVersion({version});
+        if (advanced){
+            const a = game['advanced-map']!;
+            const stageLen = a.stages.length;
+            for (let i = 0; i < stageLen; i++){
+                // 暫定的に4まで対応
+                if (i >= 4){
+                    break;
+                }
+                const stage = a.stages[i];
+                let map;
+                let layer;
+                for (let obj of stage.layers){
+                    if (obj.type === 'main'){
+                        map = obj.map;
+                    }else if (obj.type === 'mapchip'){
+                        layer = obj.map;
+                    }
+                }
+                // サイズ
+                mapActions.loadMap({
+                    stage: i,
+                    size: stage.size,
+                    map,
+                    layer,
+                });
+            }
         }
     }
     render(){
@@ -214,15 +245,23 @@ const MapScreen = (props: IPropMapScreen)=>{
     // いまのステージ
     const stage = data[edit.stage-1];
 
+    const mapsClass = stage.size.x >= stage.size.y ? styles.mapsColumn : styles.mapsRow;
+
     return <div>
         <div className={styles.mapInfo}>
-        <EditMode edit={edit} params={params}/>
+            <EditMode edit={edit} params={params}/>
         </div>
-        <MiniMap params={params} edit={edit} stage={stage}/>
-        {are}
-        <div className={styles.main}>
-        <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
-        <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
+        <div className={mapsClass}>
+            <div>
+                <MiniMap params={params} edit={edit} stage={stage}/>
+            </div>
+            <div>
+                {are}
+                <div className={styles.main}>
+                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
+                    <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
+                </div>
+            </div>
         </div>
     </div>;
 };

@@ -32,3 +32,15 @@ export interface ResizeMapAction{
     bottom: number;
 }
 export const resizeMap = createAction<ResizeMapAction>();
+
+// advanced-mapを全部読んだときの顔
+export interface LoadAdvancedMapAction{
+    stage: number;
+    size: {
+        x: number;
+        y: number;
+    };
+    map?: Array<Array<string | number>>;
+    layer?: Array<Array<string | number>>;
+}
+export const loadMap = createAction<LoadAdvancedMapAction>();

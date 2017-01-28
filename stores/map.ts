@@ -269,7 +269,30 @@ export class MapStore extends Store<MapState>{
                 layer,
             };
         });
-        console.log('M', data);
+        this.setState({
+            data,
+            lastUpdate: {
+                type: 'all',
+            },
+        });
+    }
+    private onLoadMap({stage, size, map, layer}: mapActions.LoadAdvancedMapAction){
+        console.log('Lodge', stage);
+        if (stage < 0 || this.state.stages <= stage){
+            return;
+        }
+        const data = this.state.data.map((st, i)=>{
+            if (i !== stage){
+                return st;
+            }
+            const newmap = map != null ? map.map(row=> [...row]) : (new Array(size.x).fill(0));
+            const newlayer = layer != null ? layer.map(row => [...row]) : (new Array(size.x).fill(0));
+            return {
+                size,
+                map: newmap,
+                layer: newlayer,
+            };
+        });
         this.setState({
             data,
             lastUpdate: {
