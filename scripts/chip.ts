@@ -44,6 +44,14 @@ const emptyblock_pattern: ChipRendering = {
     width: 32,
     height: 32
 };
+const unknown_pattern: ChipRendering = {
+    subx: 160,
+    suby: 0,
+    dx: -16,
+    dy: -16,
+    width: 32,
+    height: 32,
+};
 
 export interface Chip{
     pattern: number | ChipRendering | Array<number | ChipRendering>;
@@ -2634,7 +2642,15 @@ export function chipFor(params: Record<string, string>, chip: number): Chip{
             category: "block"
         };
     }else{
-        return chipTable[chip];
+        const obj = chipTable[chip];
+        if (obj != null){
+            return obj;
+        }
+        // 不明だ
+        return {
+            pattern: unknown_pattern,
+            name: '不明',
+        };
     }
 }
 
