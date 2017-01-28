@@ -241,6 +241,7 @@ const MapScreen = (props: IPropMapScreen)=>{
     const {
         lastUpdate,
         data,
+        advanced,
     } = map;
     // いまのステージ
     const stage = data[edit.stage-1];
@@ -258,7 +259,7 @@ const MapScreen = (props: IPropMapScreen)=>{
             <div>
                 {are}
                 <div className={styles.main}>
-                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project}/>
+                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
                     <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
                 </div>
             </div>

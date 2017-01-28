@@ -25,6 +25,9 @@ export interface IPropChipSelect{
     mapchip: string;
     chips: string;
 
+    // advanced-mapか
+    advanced: boolean;
+
     params: ParamsState;
     edit: EditState;
     project: ProjectState;
@@ -65,7 +68,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             });
         }else if(propChanged(prevProps.edit, this.props.edit, ['screen', 'stage', 'chipselect_width', 'chipselect_height', 'chipselect_scroll']) ||
                  prevProps.project.version !== this.props.project.version ||
-                 prevProps.params !== this.props.params){
+                 prevProps.params !== this.props.params ||
+                 prevProps.advanced !== this.props.advanced){
             this.draw(true);
         }else if(propChanged(prevProps.edit, this.props.edit, ['pen', 'pen_layer'])){
             this.draw(false);
@@ -85,7 +89,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             },
             project: {
                 version,
-            }
+            },
+            advanced,
         } = this.props;
 
         if(full){
@@ -98,6 +103,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             //まず背景を塗る
             ctx.fillStyle = util.stageBackColor(params, this.props.edit);
             ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            const chipList = advanced ? chip.advancedChipList : chip.chipList;
 
             let x=0, y=0, i=chipselect_width*chipselect_scroll;
             if(this.props.edit.screen==="layer"){
@@ -113,8 +120,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     }
                 }
             }else{
-                while(i < chip.chipList.length && y < chipselect_height*32){
-                    let c = chip.chipList[i];
+                while(i < chipList.length && y < chipselect_height*32){
+                    let c = chipList[i];
                     if(version!=='2.8' || (c!==123 && c!==91 && c!==93 && c!==60 && c!==62)){
                         chip.drawChip(ctx, this.images, params, c, x, y, false);
                     }
@@ -146,13 +153,16 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     }
     render(){
         const {
-            screen,
-            chipselect_width,
-            chipselect_height,
-            chipselect_scroll,
-        } = this.props.edit;
+            edit: {
+                screen,
+                chipselect_width,
+                chipselect_height,
+                chipselect_scroll,
+            },
+            advanced,
+        } = this.props;
         // var w= screen==="layer" ? 16 : 8;
-        const ks = chip.chipList;
+        // const ks = advanced ? chip.advancedChipList : chip.chipList;
         // var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
         let pen, name;
         if(screen === 'layer'){
@@ -199,10 +209,15 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     // チップの数
     private chipNumber(){
         const {
-            screen,
-        } = this.props.edit;
+            edit: {
+                screen,
+            },
+            advanced,
+        } = this.props;
         if (screen === 'layer'){
             return 256;
+        }else if (advanced){
+            return chip.advancedChipList.length;
         }else{
             return chip.chipList.length;
         }
@@ -231,20 +246,26 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     handleClick<T>(e: React.MouseEvent<T>){
         //canvasをクリックした
         const {
-            chipselect_width,
-            chipselect_scroll,
-        } = this.props.edit;
+            edit: {
+                chipselect_width,
+                chipselect_scroll,
+            },
+            advanced,
+        } = this.props;
 
         const {target, pageX, pageY} = e;
         const {x: tx, y: ty} = util.getAbsolutePosition(target as HTMLElement);
         const x=pageX-tx, y=pageY-ty;
 
         const penidx = Math.floor(x/32) + (Math.floor(y/32) + chipselect_scroll)*chipselect_width;
-        console.log(penidx, Math.floor(x/32), Math.floor(y/32), chipselect_scroll, chipselect_width);
 
         if(this.props.edit.screen==="layer"){
             editActions.changePenLayer({
                 pen: penidx,
+            });
+        }else if (advanced){
+            editActions.changePen({
+                pen: chip.advancedChipList[penidx],
             });
         }else{
             editActions.changePen({

@@ -1,6 +1,10 @@
 import * as extend from 'extend';
 import * as editActions from '../actions/edit';
 import {
+    setAdvanced,
+    SetAdvancedAction,
+} from '../actions/map';
+import {
     Store,
 } from '../scripts/reflux-util';
 
@@ -100,7 +104,9 @@ export interface EditState{
 export class EditStore extends Store<EditState>{
     constructor(){
         super();
-        this.listenables = editActions;
+        this.listenables = [editActions, {
+            setAdvanced,
+        }];
         this.state = {
             screen: 'map',
             view_width: 16,
@@ -217,6 +223,12 @@ export class EditStore extends Store<EditState>{
                 chipselect_scroll: y,
             });
         }
+    }
+    onSetAdvanced({}: SetAdvancedAction){
+        // advancedのON/OFFでchipselectの大きさが変わるので
+        this.setState({
+            chipselect_scroll: 0,
+        });
     }
 }
 
