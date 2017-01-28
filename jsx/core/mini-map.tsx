@@ -74,7 +74,9 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
             for(let y=0; y < stage.size.y; y++){
                 const a = mapdata[y];
                 for(let x=0; x < stage.size.x; x++){
-                    const c = a[x], t = chip.chipTable[c];
+                    const c = a[x];
+                    // const t = chip.chipTable[c];
+                    const t = chip.chipFor(params, c);
                     if(t){
                         const {
                             category,

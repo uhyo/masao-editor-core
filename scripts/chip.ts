@@ -43,7 +43,7 @@ function keyToNum<T>(obj: Record<string, T>):Record<string, T>{
     }
     return result;
 };
-export const chipTable: Record<string, Chip> = keyToNum({
+const chipTable: Record<string, Chip> = keyToNum({
     A: {
         pattern: 100,
         name: "主人公",

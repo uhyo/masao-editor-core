@@ -152,7 +152,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             chipselect_scroll,
         } = this.props.edit;
         // var w= screen==="layer" ? 16 : 8;
-        const ks=Object.keys(chip.chipTable);
+        const ks = chip.chipList;
         // var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
         let pen, name;
         if(screen === 'layer'){
@@ -204,7 +204,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         if (screen === 'layer'){
             return 256;
         }else{
-            return Object.keys(chip.chipTable).length;
+            return chip.chipList.length;
         }
     }
     handleResize(width: number, height: number){
