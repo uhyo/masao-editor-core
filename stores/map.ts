@@ -84,9 +84,22 @@ export class MapStore extends Store<MapState>{
         };
     }
     private onSetAdvanced({advanced}: mapActions.SetAdvancedAction){
-        this.setState({
-            advanced,
-        });
+        if (this.state.advanced === true && advanced === false){
+            // マップから変なのを消す
+            const data = this.state.data.map(({size, map, layer})=>({
+                size,
+                map: map.map(row=> row.map(c=> 'number' === typeof c && 0 <= c && c < 256 ? c : 0)),
+                layer,
+            }));
+            this.setState({
+                advanced,
+                data,
+            });
+        }else{
+            this.setState({
+                advanced,
+            });
+        }
     }
     private onUpdateMap({stage,x,y,chip}: mapActions.UpdateMapAction){
         const {

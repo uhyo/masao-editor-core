@@ -3,6 +3,9 @@ import * as React from 'react';
 import * as projectActions from '../../actions/project';
 import * as mapActions from '../../actions/map';
 import * as editLogics from '../../logics/edit';
+import {
+    setAdvanced,
+} from '../../logics/advanced';
 import { ProjectState } from '../../stores/project';
 import {
     MapState,
@@ -57,11 +60,32 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
                 label: '有効',
             },
         ], onAdvancedChange = (advanced: 'false' | 'true')=>{
-            mapActions.setAdvanced({
-                advanced: advanced === 'true',
-            });
+            setAdvanced(advanced === 'true');
         };
         const advpain = map.advanced ? <AdvancedPain map={map} edit={edit}/> : null;
+        
+        const adv_onoff_select = <Select contents={advancedContents} value={String(map.advanced)} onChange={onAdvancedChange} />;
+        // advanced-mapをoffに戻せるための条件
+        const stage_cond = map.data.every(({size})=> size.x === 180 && size.y === 30);
+        const adv_onoff = !map.advanced ?
+            <div>
+                <p>マップのサイズをデフォルトの180×30から変更したり、任意個の種類の仕掛けを置いたりするには、第3版マップデータを有効にしてください。</p>
+                <div>
+                    {adv_onoff_select}
+                </div>
+            </div> :
+            stage_cond ?
+                <div>
+                    <p>第3版マップデータを無効にすると、標準マップチップ以外のマップチップは消去されます。</p>
+                    <div>
+                        {adv_onoff_select}
+                    </div>
+                </div> :
+                <div>
+                    <p>第3版マップデータを無効にするには、全てのステージのサイズを180×30に設定してください。</p>
+                </div>;
+
+                
         return <div>
             <section className={styles.sect}>
                 <h1>正男のバージョン</h1>
@@ -69,10 +93,7 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}>{
             </section>
             <section className={styles.sect}>
                 <h1>第3版マップデータ</h1>
-                <p>マップのサイズをデフォルトの180×30から変更するには、第3版マップデータを有効にしてください。</p>
-                <div>
-                    <Select contents={advancedContents} value={String(map.advanced)} onChange={onAdvancedChange} />
-                </div>
+                {adv_onoff}
             </section>
             {advpain}
         </div>
