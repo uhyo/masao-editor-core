@@ -131,6 +131,9 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         </div>;
     }
     handleMouseDown<T>(e: React.MouseEvent<T>){
+        if (e.button !== 0){
+            return;
+        }
         this.setState({
             mouse_down: true
         });

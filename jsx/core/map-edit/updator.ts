@@ -60,6 +60,16 @@ export class TileDependency{
     }
 
     /**
+     * サイズ変更
+     * @param {number} width 横幅
+     * @param {number} height 縦幅
+     */
+    resize(width: number, height: number){
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
      * 指定した位置のタイルが影響を与える範囲を返す
      */
     toRegion(...points: Array<Point>): Array<TileDep>{
@@ -211,6 +221,17 @@ export default class MapUpdator{
         const points1 = [...oldPoints, ...newPoints].sort(({x: x1, y: y1}, {x: x2, y: y2})=> (x1 - x2) * height + (y1 - y2));
         const points = sortedUniq(points1, ({x: x1, y: y1}, {x: x2, y: y2})=> x1 === x2 && y1 === y2);
         return points;
+    }
+
+    /**
+     * マップのサイズを変更
+     * @param {number} width 横幅
+     * @param {number} height 縦幅
+     */
+    resize(width: number, height: number){
+        this.width = width;
+        this.height = height;
+        this.deps.resize(width, height);
     }
 
     /**

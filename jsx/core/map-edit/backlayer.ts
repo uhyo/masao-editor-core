@@ -63,6 +63,16 @@ class RenderedRegions{
     }
 
     /**
+     * サイズを変更
+     * @param {number} width 新しい横幅
+     * @param {number} height 新しい縦幅
+     */
+    resize(width: number, height: number): void{
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
      * 指定した範囲のレンダリングを要求する
      * @param {Object[]} rects レンダリングする範囲
      * @param {boolean} [force=false] 描画済でももう一度描画
@@ -257,11 +267,32 @@ export default class BackLayer{
 
         regions.clear();
 
+
         const ctx = canvas.getContext('2d');
         if (ctx == null){
             return;
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    /**
+     * リサイズ
+     * @param {number} width 横幅
+     * @param {number} height 縦幅
+     */
+    resize(width: number, height: number){
+        const {
+            canvas,
+            size,
+        } = this;
+        this.width = width;
+        this.height = height;
+        this.regions.resize(width, height);
+        // canvasのサイズを変更
+        canvas.width = width * size;
+        canvas.height = height * size;
+
+        this.clear();
     }
 
     /**

@@ -112,7 +112,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 mapchip,
                 chips
             };
-            this.resetBacklayer();
+            this.resetBacklayer(false);
             this.draw();
         });
         // double-buffering 
@@ -144,7 +144,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             ctx.stroke();
         }
 
-        this.resetMap();
+        this.resetMap(false);
     }
     componentWillUnmount(){
         this.timers.clean();
@@ -160,7 +160,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     mapchip,
                     chips
                 };
-                this.resetBacklayer();
+                this.resetBacklayer(true);
                 this.draw();
             });
         }
@@ -174,8 +174,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             return;
         }
         if (pe.stage !== e.stage){
-            this.resetMap();
-            this.resetBacklayer();
+            this.resetMap(true);
+            this.resetBacklayer(true);
             this.draw();
             return;
         }
@@ -194,9 +194,22 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
         }
     }
-    resetBacklayer(){
-        this.backlayer_map.clear();
-        this.backlayer_layer.clear();
+    resetBacklayer(size: boolean){
+        if (size){
+            const {
+                stage: {
+                    size: {
+                        x,
+                        y,
+                    },
+                },
+            } = this.props;
+            this.backlayer_map.resize(x, y);
+            this.backlayer_layer.resize(x, y);
+        }else{
+            this.backlayer_map.clear();
+            this.backlayer_layer.clear();
+        }
 
         const expandMap = ()=>{
             this.timers.addTimer('expand-map', 1000, ()=>{
@@ -218,12 +231,23 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         };
         expandMap();
     }
-    resetMap(){
+    resetMap(size: boolean){
         const {
-            stage,
+            stage: {
+                size: {
+                    x,
+                    y,
+                },
+                map,
+                layer,
+            },
         } = this.props;
-        this.updator_map.resetMap(stage.map);
-        this.updator_layer.resetMap(stage.layer);
+        if (size){
+            this.updator_map.resize(x, y);
+            this.updator_layer.resize(x, y);
+        }
+        this.updator_map.resetMap(map);
+        this.updator_layer.resetMap(layer);
     }
     /* TODO */
     updateBacklayer(lastUpdate: LastUpdateData){
@@ -240,8 +264,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         switch (lastUpdate.type){
             case 'all': {
                 // 刷新されちゃった
-                this.resetMap();
-                this.resetBacklayer();
+                this.resetMap(lastUpdate.size);
+                this.resetBacklayer(lastUpdate.size);
+                console.log('reset');
                 break;
             }
             case 'map':

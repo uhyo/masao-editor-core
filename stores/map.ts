@@ -29,6 +29,7 @@ export interface StageData{
 }
 export type LastUpdateData = {
     type: 'all';
+    size: boolean;
 } | {
     type: 'map';
     x: number;
@@ -53,6 +54,7 @@ export class MapStore extends Store<MapState>{
             data,
             lastUpdate: {
                 type: 'all',
+                size: true,
             },
         };
     }
@@ -216,6 +218,7 @@ export class MapStore extends Store<MapState>{
                 data: newData,
                 lastUpdate: {
                     type: 'all',
+                    size: true,
                 },
             });
         }
@@ -273,11 +276,11 @@ export class MapStore extends Store<MapState>{
             data,
             lastUpdate: {
                 type: 'all',
+                size: true,
             },
         });
     }
     private onLoadMap({stage, size, map, layer}: mapActions.LoadAdvancedMapAction){
-        console.log('Lodge', stage);
         if (stage < 0 || this.state.stages <= stage){
             return;
         }
@@ -297,6 +300,7 @@ export class MapStore extends Store<MapState>{
             data,
             lastUpdate: {
                 type: 'all',
+                size: true,
             },
         });
     }
