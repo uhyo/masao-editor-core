@@ -21,6 +21,7 @@ import mapStore, { MapState } from '../../stores/map';
 import paramStore, { ParamsState } from '../../stores/params';
 import editStore, { EditState } from '../../stores/edit';
 import projectStore, { ProjectState } from '../../stores/project';
+import historyStore, { HistoryState } from '../../stores/history';
 
 import MapEdit from './map-edit/index';
 import ChipSelect from './chip-select';
@@ -39,6 +40,7 @@ export interface IDefnMasaoEditorCore{
     params: ParamsState;
     edit: EditState;
     project: ProjectState;
+    history: HistoryState;
 }
 export interface IPropMasaoEditorCore{
     filename_pattern: string;
@@ -62,6 +64,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             params: paramStore,
             edit: editStore,
             project: projectStore,
+            history: historyStore,
         });
     }
     componentWillMount(){
@@ -119,12 +122,13 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             params,
             edit,
             project,
+            history,
         } = this.state;
         const chips: string = require('../../images/chips.png');
 
         let screen = null;
         if(edit.screen==="map" || edit.screen==="layer"){
-            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={chips} map={map} params={params} edit={edit} project={project}/>;
+            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={chips} map={map} params={params} edit={edit} project={project} history={history}/>;
         }else if(edit.screen==="params"){
             screen=<ParamScreen params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="project"){
@@ -156,6 +160,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 project,
                 edit,
                 params,
+                history,
             } = this.state;
             e.preventDefault();
 
@@ -164,6 +169,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 project,
                 edit,
                 params,
+                history,
             });
         };
     }
@@ -218,6 +224,7 @@ interface IPropMapScreen{
     params: ParamsState;
     map: MapState;
     project: ProjectState;
+    history: HistoryState;
 }
 const MapScreen = (props: IPropMapScreen)=>{
     const {
@@ -225,6 +232,8 @@ const MapScreen = (props: IPropMapScreen)=>{
         params,
         edit,
         project,
+        history,
+
         pattern,
         mapchip,
         chips,
@@ -246,7 +255,7 @@ const MapScreen = (props: IPropMapScreen)=>{
 
     return <div>
         <div className={styles.mapInfo}>
-            <EditMode edit={edit} params={params}/>
+            <EditMode edit={edit} params={params} history={history} />
         </div>
         <div className={mapsClass}>
             <div>

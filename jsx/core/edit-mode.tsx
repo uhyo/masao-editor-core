@@ -3,7 +3,9 @@ import * as React from 'react';
 import * as editActions from '../../actions/edit';
 import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
+import { HistoryState } from '../../stores/history';
 
+import Button from './util/button';
 import Select from './util/select';
 import Switch from './util/switch';
 
@@ -12,12 +14,14 @@ import * as style from './css/edit-mode.css';
 export interface IPropEditMode{
     edit: EditState;
     params: ParamsState;
+    history: HistoryState;
 }
 export default class EditMode extends React.Component<IPropEditMode, {}>{
     render(){
         const {
             edit,
             params,
+            history,
         } = this.props;
         const contents=[
             {
@@ -77,18 +81,34 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
                 grid,
             });
         };
+
+        // history関連のボタン
+        const stage = edit.stage-1;
+        const back_disabled = history.data[stage].prev.length === 0;
+        const forward_disabled = history.data[stage].future.length === 0;
+
         return <div className={style.wrapper}>
-            <div>
-                <Select contents={contents} value={edit.mode} onChange={mode_change}/>
+            <div className={style.row}>
+                <div>
+                    <Select contents={contents} value={edit.mode} onChange={mode_change}/>
+                </div>
+                <div>
+                    <Switch label="グリッドを表示" value={edit.grid} onChange={grid_change}/>
+                </div>
+                <div>
+                    {renderSwitch}
+                </div>
+                <div>
+                    <Select contents={contents2} value={String(edit.stage)} onChange={stage_change}/>
+                </div>
             </div>
-            <div>
-                <Switch label="グリッドを表示" value={edit.grid} onChange={grid_change}/>
-            </div>
-            <div>
-                {renderSwitch}
-            </div>
-            <div>
-                <Select contents={contents2} value={String(edit.stage)} onChange={stage_change}/>
+            <div className={style.row}>
+                <div>
+                    <Button label="戻る" disabled={back_disabled} />
+                </div>
+                <div>
+                    <Button label="進む" disabled={forward_disabled} />
+                </div>
             </div>
         </div>
     }
