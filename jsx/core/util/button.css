@@ -8,6 +8,8 @@
   transition: background-color 0.3s ease;
 
   cursor: pointer;
+
+  user-select: none;
 }
 
 .button:not(.disabled):hover {

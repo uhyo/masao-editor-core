@@ -154,7 +154,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
     handleExternal<T>(req: (game: any, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
-        return (e: React.MouseEvent<T>)=>{
+        return ()=>{
             const {
                 map,
                 project,
@@ -162,7 +162,6 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 params,
                 history,
             } = this.state;
-            e.preventDefault();
 
             req(this.getCurrentGame(), {
                 map,

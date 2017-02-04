@@ -4,7 +4,7 @@ import * as styles from './button.css';
 
 export interface IPropButton{
     label?: string;
-    onClick?(e: React.MouseEvent<HTMLDivElement>): void;
+    onClick?(): void;
     disabled?: boolean;
 }
 export default class Button extends React.Component<IPropButton, {}>{
@@ -17,7 +17,14 @@ export default class Button extends React.Component<IPropButton, {}>{
         } = this.props;
         const child = React.Children.count(children) > 0 ? children : label;
         const cl = disabled ? styles.disabled : styles.button;
-        return <div className={cl} onClick={disabled ? undefined : onClick}>{child}</div>;
+
+        const handler = (e: React.MouseEvent<HTMLDivElement>)=>{
+            e.preventDefault();
+            if (onClick != null){
+                onClick();
+            }
+        };
+        return <div className={cl} onClick={disabled ? undefined : handler}>{child}</div>;
     }
 }
 
