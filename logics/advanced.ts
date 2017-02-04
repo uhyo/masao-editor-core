@@ -2,6 +2,7 @@
 
 import * as editActions from '../actions/edit';
 import * as mapActions from '../actions/map';
+import * as historyActions from '../actions/history';
 import editStore from '../stores/edit';
 import mapStore from '../stores/map';
 
@@ -22,5 +23,13 @@ export function setAdvanced(advanced: boolean): void{
         mapActions.setAdvanced({
             advanced,
         });
+        // historyを消す
+        for (let i = 0; i < mapStore.state.stages; i++){
+            const stageData = mapStore.state.data[i];
+            historyActions.newHistory({
+                stage: i+1,
+                stageData,
+            });
+        }
     }
 }
