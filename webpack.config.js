@@ -2,6 +2,15 @@
 const path=require('path');
 const webpack=require('webpack');
 
+const plugins = 
+    process.env.NODE_ENV === 'production' ?
+    [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+    ] :
+    [];
+
 module.exports={
     devtool: 'source-map',
     entry: {
@@ -58,8 +67,7 @@ module.exports={
            */
         ]
     },
-    plugins: [
-    ],
+    plugins,
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         // modules: [path.resolve(__dirname, 'node_modules')],

@@ -1,4 +1,3 @@
-import * as extend from 'extend';
 import * as editActions from '../actions/edit';
 import {
     setAdvanced,

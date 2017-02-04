@@ -1,5 +1,4 @@
 //map store
-import * as extend from 'extend';
 import {
     Store,
 } from '../scripts/reflux-util';
@@ -10,6 +9,9 @@ import {
 
 import * as mapActions from '../actions/map';
 import * as paramActions from '../actions/params';
+
+// チップデータ （メイン用）
+export type Chip = mapActions.Chip;
 
 export interface MapState{
     // advancedステージデータを使用するか
@@ -24,9 +26,10 @@ export interface StageData{
         x: number;
         y: number;
     };
-    map: Array<Array<number>>;
+    map: Array<Array<Chip>>;
     layer: Array<Array<number>>;
 }
+
 export type LastUpdateData = {
     type: 'all';
     size: boolean;
@@ -45,7 +48,7 @@ export type LastUpdateData = {
 export class MapStore extends Store<MapState>{
     constructor(){
         super();
-        this.listenables = [mapActions, {resetParams: paramActions.resetParams}];
+        this.listenables = [mapActions];
         // TODO
         const data = [0, 1, 2, 3].map(()=> this.initStage());
         this.state = {
@@ -195,47 +198,6 @@ export class MapStore extends Store<MapState>{
             }
         }
     }
-    private onResetParams(params: Record<string, string>){
-        //mapに対する変更があったら検知する
-        if (this.state.advanced){
-            // advanced時はparamから変更しない
-            return;
-        }
-        const newData = [0, 1, 2, 3].map(this.initStage);
-        let flag = false;
-        // TODO
-        for (let h = 0; h < 4; h++) {
-            const ssfx = ['', '-s', '-t', '-f'][h];
-            for (let i = 0; i < 3; i++) {
-                for(let j=0; j < 30; j++){
-                    let p = params[`map${i}-${j}${ssfx}`];
-                    if(p != null){
-                        flag = true;
-                        for(let k=0; k < 60; k++){
-                            newData[h].map[j][i*60+k] = mapStringToChip(p.charAt(k));
-                        }
-                    }
-                    p = params[`layer${i}-${j}${ssfx}`];
-                    if(p != null){
-                        flag = true;
-                        for(let k=0; k < 60; k++){
-                            newData[h].layer[j][i*60+k] = layerStringToChip(p.slice(k*2,k*2+2));
-                        }
-                    }
-                }
-            }
-        }
-        if (flag === true){
-            this.setState({
-                advanced: false,
-                data: newData,
-                lastUpdate: {
-                    type: 'all',
-                    size: true,
-                },
-            });
-        }
-    }
     private onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){
         if (!this.state.advanced){
             return;
@@ -252,11 +214,11 @@ export class MapStore extends Store<MapState>{
                 x: st.size.x + left + right,
                 y: st.size.y + top + bottom,
             };
-            const map: Array<Array<number>> = [];
+            const map: Array<Array<Chip>> = [];
             const layer: Array<Array<number>> = [];
             for (let y = 0; y < size.y; y++){
                 const y2 = y - top;
-                const rowm: Array<number> = new Array(size.x);
+                const rowm: Array<Chip> = new Array(size.x);
                 const rowl: Array<number> = new Array(size.x);
                 if (y2 < 0 || st.size.y <= y2){
                     // データが存在しない領域
@@ -293,6 +255,7 @@ export class MapStore extends Store<MapState>{
             },
         });
     }
+    // マップをそのまま受け入れる
     private onLoadMap({stage, size, map, layer}: mapActions.LoadAdvancedMapAction){
         if (stage < 0 || this.state.stages <= stage){
             return;
@@ -301,12 +264,10 @@ export class MapStore extends Store<MapState>{
             if (i !== stage){
                 return st;
             }
-            const newmap = map != null ? map.map(row=> [...row]) : (new Array(size.x).fill(0));
-            const newlayer = layer != null ? layer.map(row => [...row]) : (new Array(size.x).fill(0));
             return {
                 size,
-                map: newmap,
-                layer: newlayer,
+                map,
+                layer,
             };
         });
         this.setState({

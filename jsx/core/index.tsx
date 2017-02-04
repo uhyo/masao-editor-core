@@ -15,6 +15,7 @@ import {
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
 import * as mapActions from '../../actions/map';
+import * as mapLogics from '../../logics/map';
 
 import mapStore, { MapState } from '../../stores/map';
 import paramStore, { ParamsState } from '../../stores/params';
@@ -75,6 +76,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             this.loadGame(newProps.defaultGame);
         }else if(this.props.defaultParams !== newProps.defaultParams && newProps.defaultParams != null){
             paramActions.resetParams(newProps.defaultParams);
+            mapLogics.loadParamMap(newProps.defaultParams);
             projectActions.changeVersion({version: masao.acceptVersion(newProps.defaultGame.version)});
         }
     }
@@ -88,16 +90,11 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             advanced,
         });
         paramActions.resetParams(params);
+        mapLogics.loadParamMap(params);
         projectActions.changeVersion({version});
         if (advanced){
             const a = game['advanced-map']!;
-            const stageLen = a.stages.length;
-            for (let i = 0; i < stageLen; i++){
-                // 暫定的に4まで対応
-                if (i >= 4){
-                    break;
-                }
-                const stage = a.stages[i];
+            mapLogics.loadAdvancedMap(a.stages.map(stage=>{
                 let map;
                 let layer;
                 for (let obj of stage.layers){
@@ -107,14 +104,12 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                         layer = obj.map;
                     }
                 }
-                // サイズ
-                mapActions.loadMap({
-                    stage: i,
+                return {
                     size: stage.size,
                     map,
                     layer,
-                });
-            }
+                };
+            }));
         }
     }
     render(){

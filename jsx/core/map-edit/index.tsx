@@ -22,6 +22,7 @@ import {
 
 import * as editActions from '../../../actions/edit';
 import * as mapActions from '../../../actions/map';
+import * as historyActions from '../../../actions/history';
 import { EditState } from '../../../stores/edit';
 import {
     StageData,
@@ -301,7 +302,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
-            console.time("draw");
+            if (process.env.NODE_ENV !== 'production'){
+                console.time("draw");
+            }
 
             const {
                 backlayer_map,
@@ -367,7 +370,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
 
             this.drawing=false;
-            console.timeEnd("draw");
+            if (process.env.NODE_ENV !== 'production'){
+                console.timeEnd("draw");
+            }
         });
     }
     drawChip(ctx: CanvasRenderingContext2D, c: number, x: number, y: number): void{
@@ -551,6 +556,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         //マウスが上がったときの処理
         const mouseUpHandler=()=>{
+            if (mode === 'pen' || mode === 'eraser'){
+                historyActions.addHistory({
+                    stage: edit.stage,
+                    stageData: this.props.stage,
+                });
+            }
             editActions.mouseUp({});
             //上がったらおわり
             document.body.removeEventListener("mouseup", mouseUpHandler, false);

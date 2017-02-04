@@ -1,4 +1,3 @@
-import * as extend from 'extend';
 import * as masao from 'masao';
 import {
     Store,
@@ -14,15 +13,15 @@ export class ParamsStore extends Store<ParamsState>{
         this.state = masao.param.addDefaults({});
     }
     private onChangeParam({param,value}: paramActions.ChangeParamAction){
-        this.setState(extend({}, this.state, {
+        this.setState({
             [param]: value,
-        }));
+        });
     }
     private onChangeParams(obj: Record<string, string>){
-        this.setState(extend({}, this.state, obj));
+        this.setState(obj);
     }
     private onResetParams(obj: Record<string, string>){
-        this.setState(extend({}, obj));
+        this.setState(obj);
     }
 }
 export default new ParamsStore();

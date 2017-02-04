@@ -2,11 +2,13 @@ import {
     createAction,
 } from '../scripts/reflux-util';
 
+export type Chip = number;
+
 export interface UpdateMapAction{
     stage: number;
     x: number;
     y: number;
-    chip: number;
+    chip: Chip;
 }
 export interface UpdateLayerAction{
     stage: number;
@@ -40,7 +42,7 @@ export interface LoadAdvancedMapAction{
         x: number;
         y: number;
     };
-    map?: Array<Array<string | number>>;
-    layer?: Array<Array<string | number>>;
+    map: Array<Array<number>>;
+    layer: Array<Array<number>>;
 }
 export const loadMap = createAction<LoadAdvancedMapAction>();

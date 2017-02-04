@@ -496,7 +496,9 @@ export interface ImagesObject{
     chips: HTMLImageElement;
 }
 export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject, params: Record<string, string>, chip: number, x: number, y: number, full: boolean){
-    console.log("drawchip");
+    if (process.env.NODE_ENV !== 'production'){
+        console.log("drawchip", process.env.NODE_ENV);
+    }
     if(chip === 0){
         return;
     }
