@@ -5,6 +5,8 @@ import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
 import { HistoryState } from '../../stores/history';
 
+import * as historyLogics from '../../logics/history';
+
 import Button from './util/button';
 import Select from './util/select';
 import Switch from './util/switch';
@@ -87,6 +89,13 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
         const back_disabled = history.data[stage].prev.length === 0;
         const forward_disabled = history.data[stage].future.length === 0;
 
+        const back = ()=>{
+            historyLogics.back(edit.stage);
+        };
+        const forward = ()=>{
+            historyLogics.forward(edit.stage);
+        };
+
         return <div className={style.wrapper}>
             <div className={style.row}>
                 <div>
@@ -104,10 +113,10 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
             </div>
             <div className={style.row}>
                 <div>
-                    <Button label="戻る" disabled={back_disabled} />
+                    <Button label="戻る" disabled={back_disabled} onClick={back} />
                 </div>
                 <div>
-                    <Button label="進む" disabled={forward_disabled} />
+                    <Button label="進む" disabled={forward_disabled} onClick={forward} />
                 </div>
             </div>
         </div>

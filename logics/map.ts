@@ -48,10 +48,10 @@ export function loadAdvancedMap(data: Array<{
             size,
             map: map2,
             layer: layer2,
-            stage: i,
+            stage: i+1,
         });
         historyActions.newHistory({
-            stage: i,
+            stage: i+1,
             stageData: {
                 size,
                 map: map2,
@@ -92,13 +92,13 @@ export function loadParamMap(params: Record<string, string>): void{
             }
         }
         mapActions.loadMap({
-            stage: i,
+            stage: i+1,
             size,
             map,
             layer,
         });
         historyActions.newHistory({
-            stage: i,
+            stage: i+1,
             stageData: {
                 size,
                 map,

@@ -256,12 +256,12 @@ export class MapStore extends Store<MapState>{
         });
     }
     // マップをそのまま受け入れる
-    private onLoadMap({stage, size, map, layer}: mapActions.LoadAdvancedMapAction){
-        if (stage < 0 || this.state.stages <= stage){
+    private onLoadMap({stage, size, map, layer}: mapActions.LoadMapAction){
+        if (stage <= 0 || this.state.stages < stage){
             return;
         }
         const data = this.state.data.map((st, i)=>{
-            if (i !== stage){
+            if (i !== stage-1){
                 return st;
             }
             return {
