@@ -109,7 +109,7 @@ const AdvancedPain = ({map}: IPropAdvancedPain)=>{
         <h1>マップサイズ</h1>
         {
             Array.from(new Array(map.stages).keys()).map(i=>{
-                const stage = Number(i);
+                const stage = Number(i)+1;
                 const data = map.data[i];
                 const onResize = (resize: IStateStageSize)=>{
                     editLogics.resizeMapData(stage, resize);

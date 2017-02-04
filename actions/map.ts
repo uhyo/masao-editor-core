@@ -5,12 +5,14 @@ import {
 export type Chip = number;
 
 export interface UpdateMapAction{
+    // 1 -- 4
     stage: number;
     x: number;
     y: number;
     chip: Chip;
 }
 export interface UpdateLayerAction{
+    // 1 -- 4
     stage: number;
     x: number;
     y: number;
@@ -25,6 +27,7 @@ export interface SetAdvancedAction{
 export const setAdvanced = createAction<SetAdvancedAction>();
 
 export interface ResizeMapAction{
+    // 1 -- 4
     stage: number;
 
     // 4方向の大きさ変更
@@ -37,6 +40,7 @@ export const resizeMap = createAction<ResizeMapAction>();
 
 // advanced-mapを全部読んだときの顔
 export interface LoadMapAction{
+    // 1 -- 4
     stage: number;
     size: {
         x: number;

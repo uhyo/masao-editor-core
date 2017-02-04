@@ -41,7 +41,7 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
         stage,
         ...resize,
     });
-    if (stage+1 === editStore.state.stage){
+    if (stage === editStore.state.stage){
         changeMapSize(newwidth, newheight);
     }
 }

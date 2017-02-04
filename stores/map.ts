@@ -202,11 +202,11 @@ export class MapStore extends Store<MapState>{
         if (!this.state.advanced){
             return;
         }
-        if (stage < 0 || this.state.stages <= stage){
+        if (stage <= 0 || this.state.stages < stage){
             return;
         }
         const data = this.state.data.map((st, i)=>{
-            if (i !== stage){
+            if (i !== stage-1){
                 return st;
             }
             // サイズを変更
