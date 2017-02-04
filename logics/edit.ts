@@ -1,6 +1,7 @@
 // logic
 import * as editActions from '../actions/edit';
 import * as mapActions from '../actions/map';
+import * as historyActions from '../actions/history';
 import editStore from '../stores/edit';
 import mapStore from '../stores/map';
 
@@ -40,6 +41,10 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
     mapActions.resizeMap({
         stage,
         ...resize,
+    });
+    historyActions.addHistory({
+        stage,
+        stageData: mapStore.state.data[stage-1],
     });
     if (stage === editStore.state.stage){
         changeMapSize(newwidth, newheight);
