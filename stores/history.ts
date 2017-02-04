@@ -15,6 +15,7 @@ export interface HistoryLine{
 }
 // ステージごとに履歴を持つ
 export interface HistoryState{
+    buffer: number;
     data: Array<HistoryLine>;
 }
 
@@ -22,11 +23,14 @@ export class HistoryStore extends Store<HistoryState>{
     constructor(){
         super();
         this.listenables = historyActions;
-        this.state.data = mapStore.state.data.map(current=>({
-            prev: [],
-            current,
-            future: [],
-        }));
+        this.state = {
+            buffer: 256,
+            data: mapStore.state.data.map(current=>({
+                prev: [],
+                current,
+                future: [],
+            })),
+        };
     }
     private onAddHistory({stage, stageData}: historyActions.AddHistoryAction){
         this.setState({
@@ -36,8 +40,12 @@ export class HistoryStore extends Store<HistoryState>{
                         prev,
                         current,
                     } = st;
+                    const prev2 = [...prev, current];
+                    if (prev2.length > this.state.buffer){
+                        prev2.shift();
+                    }
                     return {
-                        prev: [...prev, current],
+                        prev: prev2,
                         current: stageData,
                         future: [],
                     };
