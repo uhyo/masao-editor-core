@@ -166,14 +166,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             });
         }
         let pe=prevProps.edit, e=this.props.edit;
-        if(pe.screen !== e.screen){
-            this.draw();
-            return;
-        }
-        if (prevProps.params !== this.props.params){
-            this.draw();
-            return;
-        }
         if (pe.stage !== e.stage){
             this.resetMap(true);
             this.resetBacklayer(true);
@@ -184,15 +176,23 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             // mapのupdateがあったから反応
             this.updateBacklayer(this.props.lastUpdate);
             this.draw();
-        }else{
-            if(pe.render_map!==e.render_map ||
-               pe.render_layer!==e.render_layer ||
-               pe.scroll_x!==e.scroll_x ||
-               pe.scroll_y!==e.scroll_y ||
-               pe.view_width!==e.view_width ||
-               pe.view_height!==e.view_height){
-                this.draw();
-            }
+        }
+
+        if(pe.screen !== e.screen){
+            this.draw();
+            return;
+        }
+        if (prevProps.params !== this.props.params){
+            this.draw();
+            return;
+        }
+        if(pe.render_map!==e.render_map ||
+           pe.render_layer!==e.render_layer ||
+           pe.scroll_x!==e.scroll_x ||
+           pe.scroll_y!==e.scroll_y ||
+           pe.view_width!==e.view_width ||
+           pe.view_height!==e.view_height){
+            this.draw();
         }
     }
     resetBacklayer(size: boolean){

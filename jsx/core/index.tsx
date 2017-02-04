@@ -90,7 +90,6 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             advanced,
         });
         paramActions.resetParams(params);
-        mapLogics.loadParamMap(params);
         projectActions.changeVersion({version});
         if (advanced){
             const a = game['advanced-map']!;
@@ -110,6 +109,8 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                     layer,
                 };
             }));
+        }else{
+            mapLogics.loadParamMap(params);
         }
     }
     render(){
