@@ -4,14 +4,20 @@ import {
     SetAdvancedAction,
 } from '../actions/map';
 import {
+    Mode,
+    ToolState,
+} from '../actions/edit';
+import {
     Store,
 } from '../scripts/reflux-util';
+
+// ツールの使用中状態
 
 export interface EditState{
     /**
      * スクリーン
      */
-    screen: 'map' | 'layer' | 'params' | 'project';
+    screen: 'map' | 'layer' | 'params' | 'project' | 'rect';
     /**
      * マップ編集画面の大きさx
      */
@@ -35,11 +41,7 @@ export interface EditState{
     /**
      * エディットモード
      */
-    mode: editActions.ChangeModeAction['mode'];
-    /**
-     * 一時的（現在）
-     */
-    mode_current: editActions.ChangeModeAction['mode'];
+    mode: Mode;
     /**
      * ペン（メインマップ）
      */
@@ -67,25 +69,9 @@ export interface EditState{
     render_layer: boolean;
 
     /**
-     * マップが押されているか
+     * ツール状態
      */
-    mouse_down: boolean;
-    /**
-     * マウスが押された場所x
-     */
-    mouse_sx: number;
-    /**
-     * マウスが押された場所y
-     */
-    mouse_sy: number;
-    /**
-     * マウスが押されたときのスクロール状態x
-     */
-    scroll_sx: number;
-    /**
-     * マウスが押されたときのスクロール状態y
-     */
-    scroll_sy: number;
+    tool: ToolState | null;
 
     /**
      * チップ選択画面の横幅
@@ -114,18 +100,13 @@ export class EditStore extends Store<EditState>{
             scroll_y: 20,
             stage: 1,
             mode: 'pen',
-            mode_current: 'pen',
             pen: 0,
             pen_layer: 0,
             param_type: '',
             grid: false,
             render_map: false,
             render_layer: false,
-            mouse_down: false,
-            mouse_sx: Number.NaN,
-            mouse_sy: Number.NaN,
-            scroll_sx: Number.NaN,
-            scroll_sy: Number.NaN,
+            tool: null,
             chipselect_width: 8,
             chipselect_height: 9,
             chipselect_scroll: 0,
@@ -183,21 +164,32 @@ export class EditStore extends Store<EditState>{
             render_layer: render_layer != null ? render_layer : this.state.render_layer,
         });
     }
-    onMouseDown({x,y,mode}: editActions.MouseDownAction){
+    onSetTool({tool}: editActions.SetToolAction){
         this.setState({
-            mouse_down: true,
-            mouse_sx: x,
-            mouse_sy: y,
-            scroll_sx: this.state.scroll_x,
-            scroll_sy: this.state.scroll_y,
-            mode_current: mode || this.state.mode,
+            tool,
         });
     }
-    onMouseUp(){
+    onMouseDown({x,y,mode}: editActions.MouseDownAction){
+        let tool: ToolState | null = null;
+        if (mode === 'pen'){
+            tool =  {
+                type: 'pen',
+            };
+        }else if (mode === 'eraser'){
+            tool = {
+                type: 'eraser',
+            };
+        }else if (mode === 'hand'){
+            tool = {
+                type: 'hand',
+                mouse_sx: x,
+                mouse_sy: y,
+                scroll_sx: this.state.scroll_x,
+                scroll_sy: this.state.scroll_y,
+            };
+        }
         this.setState({
-            mouse_down: false,
-            mouse_sx: Number.NaN,
-            mouse_sy: Number.NaN,
+            tool,
         });
     }
     onScroll({x,y}: editActions.ScrollAction){

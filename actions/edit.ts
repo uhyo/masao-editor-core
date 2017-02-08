@@ -3,6 +3,38 @@ import {
     createAction,
 } from '../scripts/reflux-util';
 
+export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit';
+
+// ツールの使用中状態
+export interface PenTool{
+    type: 'pen';
+}
+export interface EraserTool{
+    type: 'eraser';
+}
+export interface HandTool{
+    type: 'hand';
+
+    /**
+     * マウスが押された場所x
+     */
+    mouse_sx: number;
+    /**
+     * マウスが押された場所y
+     */
+    mouse_sy: number;
+    /**
+     * マウスが押されたときのスクロール状態x
+     */
+    scroll_sx: number;
+    /**
+     * マウスが押されたときのスクロール状態y
+     */
+    scroll_sy: number;
+}
+
+export type ToolState = PenTool | EraserTool | HandTool;
+
 export interface ChangeScreenAction {
     screen: 'map' | 'layer' | 'params' | 'project';
 }
@@ -14,7 +46,7 @@ export interface ChangeStageAction {
 export const changeStage = createAction<ChangeStageAction>();
 
 export interface ChangeModeAction {
-    mode: 'pen' | 'eraser' | 'hand' | 'spuit';
+    mode: Mode;
 }
 export const changeMode = createAction<ChangeModeAction>();
 
@@ -71,16 +103,17 @@ export interface ChangeRenderModeAction {
 }
 export const changeRenderMode = createAction<ChangeRenderModeAction>();
 
+export interface SetToolAction {
+    tool: ToolState | null;
+}
+export const setTool = createAction<SetToolAction>();
+
 export interface MouseDownAction {
     x: number;
     y: number;
-    mode?: ChangeModeAction['mode'];
+    mode?: Mode;
 }
 export const mouseDown = createAction<MouseDownAction>();
-
-export interface MouseUpAction {
-}
-export const mouseUp = createAction<MouseUpAction>();
 
 export interface ScrollAction {
     x: number;

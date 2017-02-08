@@ -27,21 +27,25 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
         } = this.props;
         const contents=[
             {
-                key:"pen",
-                label:"ペンモード"
+                key: 'pen',
+                label: 'ペンモード',
             },
             {
-                key:"eraser",
-                label:"イレイサーモード"
+                key: 'eraser',
+                label: 'イレイサーモード',
             },
             {
-                key:"hand",
-                label:"ハンドモード"
+                key: 'hand',
+                label: 'ハンドモード',
             },
             {
-                key:"spuit",
-                label:"スポイト"
-            }
+                key: 'spuit',
+                label: 'スポイト',
+            },
+            {
+                key: 'rect',
+                label: '矩形',
+            },
         ];
         const contents2=[];
         const stage_number = Number(params['stage_max']);
@@ -51,7 +55,7 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
                 label: `ステージ${i}`,
             });
         }
-        const mode_change = (key: editActions.ChangeModeAction['mode'])=>{
+        const mode_change = (key: editActions.Mode)=>{
             editActions.changeMode({
                 mode: key
             });

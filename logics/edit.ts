@@ -50,3 +50,30 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
         changeMapSize(newwidth, newheight);
     }
 }
+
+// マウスによるツールの設定
+export function mouseDown(mode: editActions.Mode, x: number, y: number): editActions.ToolState | null{
+    const edit = editStore.state;
+    let tool: editActions.ToolState | null = null;
+    if (mode === 'pen'){
+        tool =  {
+            type: 'pen',
+        };
+    }else if (mode === 'eraser'){
+        tool = {
+            type: 'eraser',
+        };
+    }else if (mode === 'hand'){
+        tool = {
+            type: 'hand',
+            mouse_sx: x,
+            mouse_sy: y,
+            scroll_sx: edit.scroll_x,
+            scroll_sy: edit.scroll_y,
+        };
+    }
+    editActions.setTool({
+        tool,
+    });
+    return tool;
+}

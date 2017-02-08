@@ -31,6 +31,8 @@ import {
 import { ParamsState } from '../../../stores/params';
 import { ProjectState } from '../../../stores/project';
 
+import * as editLogics from '../../../logics/edit';
+
 /**
  * 画像リソースたち
  */
@@ -469,7 +471,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
                     <div className={styles.canvasWrapper}>
                         <canvas ref="canvas" width={width} height={height}/>
-                        <canvas ref="canvas2" className={styles.overlapCanvas} style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.mouse_down===true ? this.handleMouseMove : void 0} onContextMenu={this.handleContextMenu}/>
+                        <canvas ref="canvas2" className={styles.overlapCanvas} style={c2style} width={width} height={height} onMouseDown={this.handleMouseDown} onMouseMove={this.props.edit.tool != null ? this.handleMouseMove : void 0} onContextMenu={this.handleContextMenu}/>
                     </div>
                 </Resizable>
             </Scroll>
@@ -512,11 +514,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
         const mx = Math.floor((e.pageX-canvas_x)/32);
         const my = Math.floor((e.pageY-canvas_y)/32);
+
         const {
             screen,
         } = edit;
 
-        let mode: editActions.ChangeModeAction['mode'];
+        let mode: editActions.Mode;
         if(e.button===0){
             //左クリック
             mode = edit.mode;
@@ -549,9 +552,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 });
             }
         }
+        const tool = editLogics.mouseDown(mode, mx, my);
         editActions.mouseDown({x: mx, y: my, mode});
-        if(mode!=="hand"){
-            this.mouseMoves(mode, e.pageX, e.pageY);
+        if(mode!=='hand'){
+            this.mouseMoves(tool, e.pageX, e.pageY);
         }
 
         //マウスが上がったときの処理
@@ -562,7 +566,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     stageData: this.props.stage,
                 });
             }
-            editActions.mouseUp({});
+            editActions.setTool({
+                tool: null,
+            });
             //上がったらおわり
             document.body.removeEventListener("mouseup", mouseUpHandler, false);
         };
@@ -570,9 +576,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     handleMouseMove<T>(e: React.MouseEvent<T>){
         e.preventDefault();
-        this.mouseMoves(this.props.edit.mode_current, e.pageX, e.pageY);
+        this.mouseMoves(this.props.edit.tool, e.pageX, e.pageY);
     }
-    mouseMoves(mode: string, pageX: number, pageY: number){
+    mouseMoves(tool: editActions.ToolState | null, pageX: number, pageY: number){
         const {
             x:canvas_x,
             y:canvas_y,
@@ -589,11 +595,15 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             screen,
         } = edit;
 
+        if (tool == null){
+            return;
+        }
+
         const mapdata = screen==='layer' ? stage.layer : stage.map;
         let pen = screen==='layer' ? edit.pen_layer : edit.pen;
         let pen_default = 0;
 
-        if(mode==="pen"){
+        if(tool.type === 'pen'){
             //ペンモード
             //座標
             const cx = mx+edit.scroll_x;
@@ -613,7 +623,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     chip: pen
                 });
             }
-        }else if(mode==='eraser'){
+        }else if(tool.type === 'eraser'){
             //イレイサーモード
             const cx = mx+edit.scroll_x;
             const cy = my+edit.scroll_y;
@@ -630,10 +640,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     chip: pen_default
                 });
             }
-        }else if(mode==='hand'){
+        }else if(tool.type === 'hand'){
             //ハンドモード（つかんでスクロール）
-            let sx = edit.mouse_sx-mx+edit.scroll_sx;
-            let sy = edit.mouse_sy-my+edit.scroll_sy;
+            let sx = tool.mouse_sx -mx +tool.scroll_sx;
+            let sy = tool.mouse_sy -my +tool.scroll_sy;
             if(sx < 0){
                 sx=0;
             }else if(sx > stage.size.x-edit.view_width){
