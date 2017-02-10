@@ -534,28 +534,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }else{
             return;
         }
-        if(mode === 'spuit'){
-            //スポイトは1回限り
-            const mxx = mx+edit.scroll_x;
-            const myy = my+edit.scroll_y;
-            if(screen ==='layer'){
-                const map = stage.layer;
-                const c = map[myy] ? map[myy][mxx] || 0 : 0;
-                editActions.changePenLayer({
-                    pen: c,
-                    mode: true,
-                });
-            }else{
-                const map = stage.map;
-                let c = map[myy] ? map[myy][mxx] || 0 : 0;
-                editActions.changePen({
-                    pen: c,
-                    mode: true,
-                });
-            }
-        }
         const tool = editLogics.mouseDown(mode, mx, my);
-        if(mode!=='hand'){
+        if(tool != null && mode!=='hand'){
             this.mouseMoves(tool, e.pageX, e.pageY);
         }
 

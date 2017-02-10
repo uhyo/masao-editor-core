@@ -56,6 +56,12 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
 // マウスによるツールの設定
 export function mouseDown(mode: editActions.Mode, x: number, y: number): editActions.ToolState | null{
     const edit = editStore.state;
+    const {
+        scroll_x,
+        scroll_y,
+        screen,
+        stage,
+    } = edit;
     let tool: editActions.ToolState | null = null;
     if (mode === 'pen'){
         tool =  {
@@ -70,12 +76,31 @@ export function mouseDown(mode: editActions.Mode, x: number, y: number): editAct
             type: 'hand',
             mouse_sx: x,
             mouse_sy: y,
-            scroll_sx: edit.scroll_x,
-            scroll_sy: edit.scroll_y,
+            scroll_sx: scroll_x,
+            scroll_sy: scroll_y,
         };
+    }else if(mode === 'spuit'){
+        const rx = x + scroll_x;
+        const ry = y + scroll_y;
+
+        if (screen === 'layer'){
+            const map = mapStore.state.data[stage-1].layer;
+            const chip = map[ry] ? map[ry][rx] || 0 : 0;
+            editActions.changePenLayer({
+                pen: chip,
+                mode: true,
+            });
+        }else{
+            const map = mapStore.state.data[stage-1].map;
+            const chip = map[ry] ? map[ry][rx] || 0 : 0;
+            editActions.changePen({
+                pen: chip,
+                mode: true,
+            });
+        }
     }else if (mode === 'rect'){
-        const rx = x + edit.scroll_x;
-        const ry = y + edit.scroll_y;
+        const rx = x + scroll_x;
+        const ry = y + scroll_y;
         tool = {
             type: 'rect',
             start_x: rx,
