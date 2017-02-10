@@ -305,6 +305,9 @@ export class MapStore extends Store<MapState>{
             size,
             map,
         } = this.state.data[stage-1];
+        if (chip === map[y][x]){
+            return;
+        }
         const {
             map: map2,
             left,
@@ -339,6 +342,9 @@ export class MapStore extends Store<MapState>{
             size,
             layer,
         } = this.state.data[stage-1];
+        if (chip === layer[y][x]){
+            return;
+        }
         const {
             map: layer2,
             left,
@@ -454,6 +460,15 @@ export class MapStore extends Store<MapState>{
 function fillMap<C>(x: number, y: number, chip: C, map: Array<Array<C>>, width: number, height: number){
     // これと同じのは塗りつぶす
     const f = map[y][x];
+    if (f === chip){
+        return {
+            map,
+            left: x,
+            top: y,
+            right: x,
+            bottom: y,
+        };
+    }
     // いわゆるscanline algorithm
 
     // まずはshallow copy
