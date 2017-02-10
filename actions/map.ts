@@ -37,6 +37,18 @@ export interface UpdateMapRectAction<C>{
 export const updateMapRect = createAction<UpdateMapRectAction<Chip>>();
 export const updateLayerRect = createAction<UpdateMapRectAction<number>>();
 
+/**
+ * 塗りつぶし
+ */
+export interface UpdateMapFillAction<C>{
+    stage: number;
+    x: number;
+    y: number;
+    chip: C;
+}
+export const updateMapFill = createAction<UpdateMapFillAction<Chip>>();
+export const updateLayerFill = createAction<UpdateMapFillAction<number>>();
+
 export interface SetAdvancedAction{
     advanced: boolean;
 }

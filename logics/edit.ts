@@ -108,6 +108,22 @@ export function mouseDown(mode: editActions.Mode, x: number, y: number): editAct
             end_x: rx,
             end_y: ry,
         };
+    }else if (mode === 'fill'){
+        const rx = x + scroll_x;
+        const ry = y + scroll_y;
+
+        const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
+
+        mapUpdateFillAction(screen)({
+            stage,
+            x: rx,
+            y: ry,
+            chip: pen,
+        });
+        historyActions.addHistory({
+            stage,
+            stageData: mapStore.state.data[stage-1],
+        });
     }
     editActions.setTool({
         tool,
@@ -276,5 +292,12 @@ function mapUpdateRectAction(screen: Screen){
         return mapActions.updateLayerRect;
     }else{
         return mapActions.updateMapRect;
+    }
+}
+function mapUpdateFillAction(screen: Screen){
+    if (screen === 'layer'){
+        return mapActions.updateLayerFill;
+    }else{
+        return mapActions.updateMapFill;
     }
 }

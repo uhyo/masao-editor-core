@@ -300,6 +300,74 @@ export class MapStore extends Store<MapState>{
             });
         }
     }
+    private onUpdateMapFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<Chip>){
+        const {
+            size,
+            map,
+        } = this.state.data[stage-1];
+        const {
+            map: map2,
+            left,
+            right,
+            top,
+            bottom,
+        } = fillMap(x, y, chip, map, size.x, size.y);
+        const data = this.state.data.map((st, i)=>{
+            if (i !== stage-1){
+                return st;
+            }else{
+                return {
+                    ...st,
+                    map: map2,
+                };
+            }
+        });
+        this.setState({
+            data,
+            lastUpdate: {
+                type: 'map',
+                stage,
+                x: left,
+                y: top,
+                width: right-left+1,
+                height: bottom-top+1.
+            },
+        });
+    }
+    private onUpdateLayerFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<number>){
+        const {
+            size,
+            layer,
+        } = this.state.data[stage-1];
+        const {
+            map: layer2,
+            left,
+            right,
+            top,
+            bottom,
+        } = fillMap(x, y, chip, layer, size.x, size.y);
+        const data = this.state.data.map((st, i)=>{
+            if (i !== stage-1){
+                return st;
+            }else{
+                return {
+                    ...st,
+                    layer: layer2,
+                };
+            }
+        });
+        this.setState({
+            data,
+            lastUpdate: {
+                type: 'layer',
+                stage,
+                x: left,
+                y: top,
+                width: right-left+1,
+                height: bottom-top+1.
+            },
+        });
+    }
     private onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){
         if (!this.state.advanced){
             return;
@@ -380,6 +448,123 @@ export class MapStore extends Store<MapState>{
             },
         });
     }
+}
+
+// 塗りつぶし
+function fillMap<C>(x: number, y: number, chip: C, map: Array<Array<C>>, width: number, height: number){
+    // これと同じのは塗りつぶす
+    const f = map[y][x];
+    // いわゆるscanline algorithm
+
+    // まずはshallow copy
+    const newmap = [...map];
+    newmap[y] = [... newmap[y]];
+    // mapに変更が加わった範囲
+    let ctop = y;
+    let cbottom = y;
+    let cleft = x;
+    let cright = x;
+
+    const stack: Array<{
+        left: number;
+        right: number;
+        y: number;
+    }> = [];
+    stack.push({
+        left: scanLeft(x, y),
+        right: scanRight(x, y),
+        y,
+    });
+
+    while (stack.length > 0){
+        const {
+            left,
+            right,
+            y,
+        } = stack.shift()!;
+
+        updateLine(left, right, y);
+        // 上下を探索
+        if (0 < y){
+            searchLine(left, right, y-1);
+        }
+        if (y < height-1){
+            searchLine(left, right, y+1);
+        }
+    }
+    // 変更が加わった範囲をアレする
+    return {
+        map: newmap,
+        left: cleft,
+        top: ctop,
+        right: cright,
+        bottom: cbottom,
+    };
+
+    function updateLine(left: number, right: number, y: number){
+        if (left < cleft){
+            cleft = left;
+        }
+        if (right > cright){
+            cright = right;
+        }
+        if (y < ctop){
+            ctop = y;
+            newmap[y] = [... newmap[y]];
+        }else if (y > cbottom){
+            cbottom = y;
+            newmap[y] = [... newmap[y]];
+        }
+        for (let x = left; x <= right; x++){
+            newmap[y][x] = chip;
+        }
+    }
+
+    function searchLine(left: number, right: number, y: number){
+        let l = null;
+        for (let x = left; x <= right; x++){
+            const c = newmap[y][x];
+            if (c === f && l == null){
+                l = x;
+            }else if (c !== f && l != null){
+                let r = x-1;
+                if (l === left){
+                    // 左端へ
+                    l = scanLeft(l, y);
+                }
+                stack.push({
+                    left: l,
+                    right: r,
+                    y,
+                });
+                l = null;
+            }
+        }
+        if (l != null){
+            const r = scanRight(right, y);
+            stack.push({
+                left: l,
+                right: r,
+                y: y,
+            });
+        }
+    }
+
+    function scanLeft(x: number, y: number): number{
+        let result = x;
+        while (0 < result && newmap[y][result-1] === f){
+            result--;
+        }
+        return result;
+    }
+    function scanRight(x: number, y: number): number{
+        let result = x;
+        while (result < width-1 && newmap[y][result+1] === f){
+            result++;
+        }
+        return result;
+    }
+    
 }
 
 

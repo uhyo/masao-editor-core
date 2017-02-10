@@ -46,6 +46,10 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
                 key: 'rect',
                 label: '矩形',
             },
+            {
+                key: 'fill',
+                label: '塗りつぶし',
+            },
         ];
         const contents2=[];
         const stage_number = Number(params['stage_max']);

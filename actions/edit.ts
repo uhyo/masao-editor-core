@@ -3,7 +3,7 @@ import {
     createAction,
 } from '../scripts/reflux-util';
 
-export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect';
+export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
 
 // ツールの使用中状態
 export interface PenTool{
