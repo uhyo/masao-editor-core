@@ -129,7 +129,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         } = this;
         const mousemove = mouse_down ? handleMouseMove : void 0;
         return <div>
-            <canvas ref="canvas" width={size.x*2} height={size.y*2} onMouseDown={handleMouseDown} onMouseMove={mousemove}/>
+            <canvas ref="canvas" width={size.x*2} height={size.y*2} onMouseDown={handleMouseDown}/>
         </div>;
     }
     handleMouseDown<T>(e: React.MouseEvent<T>){
@@ -139,18 +139,24 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         this.setState({
             mouse_down: true
         });
-        this.handleMouseMove(e);
+        this.handleMouseMove(e.nativeEvent as MouseEvent);
 
-        const handler=(e: MouseEvent)=>{
+        const movehandler = (e: MouseEvent)=>{
+            this.handleMouseMove(e);
+        };
+
+        const uphandler=(e: MouseEvent)=>{
             e.preventDefault();
             this.setState({
                 mouse_down: false
             });
-            document.removeEventListener("mouseup",handler,false);
+            document.removeEventListener("mousemove", movehandler, false);
+            document.removeEventListener("mouseup", uphandler, false);
         };
-        document.addEventListener("mouseup",handler,false);
+        document.addEventListener("mousemove", movehandler, false);
+        document.addEventListener("mouseup", uphandler, false);
     }
-    handleMouseMove<T>(e: React.MouseEvent<T>){
+    handleMouseMove(e: MouseEvent){
         const {
             edit,
             stage,
