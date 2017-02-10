@@ -21,6 +21,22 @@ export interface UpdateLayerAction{
 export const updateMap = createAction<UpdateMapAction>();
 export const updateLayer = createAction<UpdateLayerAction>();
 
+/**
+ * 矩形でマップを更新するアクション
+ */
+export interface UpdateMapRectAction<C>{
+    // 1 -- 4
+    stage: number;
+    // 開始位置
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    chip: C;
+}
+export const updateMapRect = createAction<UpdateMapRectAction<Chip>>();
+export const updateLayerRect = createAction<UpdateMapRectAction<number>>();
+
 export interface SetAdvancedAction{
     advanced: boolean;
 }

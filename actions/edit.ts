@@ -3,7 +3,7 @@ import {
     createAction,
 } from '../scripts/reflux-util';
 
-export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit';
+export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect';
 
 // ツールの使用中状態
 export interface PenTool{
@@ -32,8 +32,30 @@ export interface HandTool{
      */
     scroll_sy: number;
 }
+export interface RectTool{
+    type: 'rect';
 
-export type ToolState = PenTool | EraserTool | HandTool;
+    /**
+     * 開始地点x
+     */
+    start_x: number;
+    /**
+     * 開始地点y
+     */
+    start_y: number;
+
+    /**
+     * 終了地点x
+     */
+    end_x: number;
+
+    /**
+     * 終了地点y
+     */
+    end_y: number;
+}
+
+export type ToolState = PenTool | EraserTool | HandTool | RectTool;
 
 export interface ChangeScreenAction {
     screen: 'map' | 'layer' | 'params' | 'project';
@@ -107,13 +129,6 @@ export interface SetToolAction {
     tool: ToolState | null;
 }
 export const setTool = createAction<SetToolAction>();
-
-export interface MouseDownAction {
-    x: number;
-    y: number;
-    mode?: Mode;
-}
-export const mouseDown = createAction<MouseDownAction>();
 
 export interface ScrollAction {
     x: number;

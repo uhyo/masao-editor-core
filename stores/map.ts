@@ -37,11 +37,15 @@ export type LastUpdateData = {
     type: 'map';
     x: number;
     y: number;
+    width: number;
+    height: number;
     stage: number;
 } | {
     type: 'layer';
     x: number;
     y: number;
+    width: number;
+    height: number;
     stage: number;
 };
 
@@ -146,6 +150,8 @@ export class MapStore extends Store<MapState>{
                         stage,
                         x,
                         y,
+                        width: 1,
+                        height: 1,
                     },
                 });
             }
@@ -193,9 +199,105 @@ export class MapStore extends Store<MapState>{
                         stage,
                         x,
                         y, 
+                        width: 1,
+                        height: 1,
                     },
                 });
             }
+        }
+    }
+    private onUpdateMapRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<Chip>): void{
+        const {
+            data,
+        } = this.state;
+        const st = this.state.data[stage-1].map;
+        if (st){
+            const d = data.map((st, i)=>{
+                if (i === stage-1){
+                    const map = st.map.map((row, y)=>{
+                        if (top <= y && y <= bottom){
+                            const row2 = new Array(st.size.x);
+                            let x = 0;
+                            for (; x < left; x++){
+                                row2[x] = row[x];
+                            }
+                            for (; x <= right; x++){
+                                row2[x] = chip;
+                            }
+                            for (; x < st.size.x; x++){
+                                row2[x] = row[x];
+                            }
+                            return row2;
+                        }else{
+                            return row;
+                        }
+                    });
+                    return {
+                        ...st,
+                        map,
+                    };
+                }else{
+                    return st;
+                }
+            });
+            this.setState({
+                data: d,
+                lastUpdate: {
+                    type: 'map',
+                    stage,
+                    x: left,
+                    y: top,
+                    width: right-left+1,
+                    height: bottom-top+1,
+                },
+            });
+        }
+    }
+    private onUpdateLayerRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<number>): void{
+        const {
+            data,
+        } = this.state;
+        const st = this.state.data[stage-1].map;
+        if (st){
+            const d = data.map((st, i)=>{
+                if (i === stage-1){
+                    const layer = st.layer.map((row, y)=>{
+                        if (top <= y && y <= bottom){
+                            const row2 = new Array(st.size.x);
+                            let x = 0;
+                            for (; x < left; x++){
+                                row2[x] = row[x];
+                            }
+                            for (; x <= right; x++){
+                                row2[x] = chip;
+                            }
+                            for (; x < st.size.x; x++){
+                                row2[x] = row[x];
+                            }
+                            return row2;
+                        }else{
+                            return row;
+                        }
+                    });
+                    return {
+                        ...st,
+                        layer,
+                    };
+                }else{
+                    return st;
+                }
+            });
+            this.setState({
+                data: d,
+                lastUpdate: {
+                    type: 'layer',
+                    stage,
+                    x: left,
+                    y: top,
+                    width: right-left+1,
+                    height: bottom-top+1,
+                },
+            });
         }
     }
     private onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){

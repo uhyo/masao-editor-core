@@ -278,16 +278,18 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     stage,
                     x,
                     y,
+                    width,
+                    height,
                 } = lastUpdate;
                 if (this.props.edit.stage !== stage){
                     // 違うステージの話だった
                     return;
                 }
                 if (lastUpdate.type === 'map'){
-                    const points = this.updator_map.update(x, y, map[y][x]);
+                    const points = this.updator_map.update(x, y, width, height, map);
                     this.backlayer_map.update(points);
                 }else{
-                    const points = this.updator_layer.update(x, y, layer[y][x]);
+                    const points = this.updator_layer.update(x, y, width, height, layer);
                     this.backlayer_layer.update(points);
                 }
                 break;
@@ -553,22 +555,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
         }
         const tool = editLogics.mouseDown(mode, mx, my);
-        editActions.mouseDown({x: mx, y: my, mode});
         if(mode!=='hand'){
             this.mouseMoves(tool, e.pageX, e.pageY);
         }
 
         //マウスが上がったときの処理
         const mouseUpHandler=()=>{
-            if (mode === 'pen' || mode === 'eraser'){
-                historyActions.addHistory({
-                    stage: edit.stage,
-                    stageData: this.props.stage,
-                });
-            }
-            editActions.setTool({
-                tool: null,
-            });
+            editLogics.mouseUp();
             //上がったらおわり
             document.body.removeEventListener("mouseup", mouseUpHandler, false);
         };
@@ -587,80 +580,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const mx = Math.floor((pageX-canvas_x)/32);
         const my = Math.floor((pageY-canvas_y)/32);
 
-        const {
-            edit,
-            stage,
-        } = this.props;
-        const {
-            screen,
-        } = edit;
-
-        if (tool == null){
-            return;
-        }
-
-        const mapdata = screen==='layer' ? stage.layer : stage.map;
-        let pen = screen==='layer' ? edit.pen_layer : edit.pen;
-        let pen_default = 0;
-
-        if(tool.type === 'pen'){
-            //ペンモード
-            //座標
-            const cx = mx+edit.scroll_x;
-            const cy = my+edit.scroll_y;
-
-            // マップ外はアレしない
-            if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
-                return;
-            }
-
-            //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!==pen){
-                (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage: edit.stage,
-                    x: cx,
-                    y: cy,
-                    chip: pen
-                });
-            }
-        }else if(tool.type === 'eraser'){
-            //イレイサーモード
-            const cx = mx+edit.scroll_x;
-            const cy = my+edit.scroll_y;
-
-            if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
-                return;
-            }
-            //違ったらイベント発行
-            if(mapdata[cy] && mapdata[cy][cx]!==pen_default){
-                (screen==='layer' ? mapActions.updateLayer : mapActions.updateMap)({
-                    stage: edit.stage,
-                    x: cx,
-                    y: cy,
-                    chip: pen_default
-                });
-            }
-        }else if(tool.type === 'hand'){
-            //ハンドモード（つかんでスクロール）
-            let sx = tool.mouse_sx -mx +tool.scroll_sx;
-            let sy = tool.mouse_sy -my +tool.scroll_sy;
-            if(sx < 0){
-                sx=0;
-            }else if(sx > stage.size.x-edit.view_width){
-                sx = stage.size.x - edit.view_width;
-            }
-            if(sy < 0){
-                sy=0;
-            }else if(sy > stage.size.y-edit.view_height){
-                sy = stage.size.y - edit.view_height;
-            }
-            if(sx!==edit.scroll_x || sy!==edit.scroll_y){
-                editActions.scroll({
-                    x: sx,
-                    y: sy
-                });
-            }
-        }
+        editLogics.mouseMove(mx, my, tool);
     }
     handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();

@@ -190,35 +190,57 @@ export default class MapUpdator{
     /**
      * マップの変更を登録して影響範囲を返す
      *
-     * @param {number} x 変更X座標
-     * @param {number} y 変更Y座標
-     * @param {number} chip マップチップ
+     * @param {number} x 変更開始X座標
+     * @param {number} y 変更開始Y座標
+     * @param {number} width 変更領域X大きさ
+     * @param {number} height 変更領域y大きさ
+     * @param {number[][]} map マップ
      *
      */
-    update(x: number, y: number, chip: number): Array<Point>{
+    update(x: number, y: number, width: number, height: number, map: Array<Array<number>>): Array<Point>{
         const {
             pollutionCallback,
             pollutionCache,
             deps,
-            height,
         } = this;
-        // chipのpollution範囲を計算
-        let pollution = pollutionCache[chip];
-        if (pollution == null){
-            pollution = pollutionCallback(chip);
-            pollutionCache[chip] = pollution;
+        // update範囲
+        const upoints = [];
+        const polls = [];
+        for (let i = 0; i < width; i++){
+            for (let j = 0; j < height; j++){
+                const chip = map[y+j][x+i];
+                // chipのpollution範囲を計算
+                let pollution = pollutionCache[chip];
+                if (pollution == null){
+                    pollution = pollutionCallback(chip);
+                    pollutionCache[chip] = pollution;
+                }
+
+                upoints.push({
+                    x: x+i,
+                    y: y+j,
+                });
+                polls.push(pollution);
+            }
         }
 
         // 変更前の影響範囲
-        const oldPoints = deps.toRegion({x, y});
+        const oldPoints = deps.toRegion(...upoints);
+
         // 変更
-        deps.update(x, y, pollution);
+        for (let i=0, l=upoints.length; i<l; i++){
+            const {
+                x,
+                y,
+            } = upoints[i];
+            deps.update(x, y, polls[i]);
+        }
 
         // 変更後の影響範囲
-        const newPoints = deps.toRegion({x, y});
+        const newPoints = deps.toRegion(...upoints);
 
         // uniq
-        const points1 = [...oldPoints, ...newPoints].sort(({x: x1, y: y1}, {x: x2, y: y2})=> (x1 - x2) * height + (y1 - y2));
+        const points1 = [...oldPoints, ...newPoints].sort(({x: x1, y: y1}, {x: x2, y: y2})=> (x1 - x2) * this.height + (y1 - y2));
         const points = sortedUniq(points1, ({x: x1, y: y1}, {x: x2, y: y2})=> x1 === x2 && y1 === y2);
         return points;
     }
@@ -246,11 +268,7 @@ export default class MapUpdator{
         } = this;
 
         deps.initMap();
-        for (let y = 0; y < height; y++){
-            for (let x = 0; x < width; x++){
-                this.update(x, y, map[y][x]);
-            }
-        }
+        this.update(0, 0, width, height, map);
     }
 }
 

@@ -11,13 +11,14 @@ import {
     Store,
 } from '../scripts/reflux-util';
 
+export type Screen = 'map' | 'layer' | 'params' | 'project';
 // ツールの使用中状態
 
 export interface EditState{
     /**
      * スクリーン
      */
-    screen: 'map' | 'layer' | 'params' | 'project' | 'rect';
+    screen: Screen;
     /**
      * マップ編集画面の大きさx
      */
@@ -165,29 +166,6 @@ export class EditStore extends Store<EditState>{
         });
     }
     onSetTool({tool}: editActions.SetToolAction){
-        this.setState({
-            tool,
-        });
-    }
-    onMouseDown({x,y,mode}: editActions.MouseDownAction){
-        let tool: ToolState | null = null;
-        if (mode === 'pen'){
-            tool =  {
-                type: 'pen',
-            };
-        }else if (mode === 'eraser'){
-            tool = {
-                type: 'eraser',
-            };
-        }else if (mode === 'hand'){
-            tool = {
-                type: 'hand',
-                mouse_sx: x,
-                mouse_sy: y,
-                scroll_sx: this.state.scroll_x,
-                scroll_sy: this.state.scroll_y,
-            };
-        }
         this.setState({
             tool,
         });
