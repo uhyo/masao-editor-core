@@ -80,7 +80,6 @@ class RenderedRegions{
     requestRender(rects: Array<Box>, force: boolean=false){
         // まだrenderされていないところを列挙する
         const targets = [];
-        // colsはitemとintersectする矩形の集合
         for(let {x, y, width, height} of rects){
             const minX = Math.max(0, Math.min(x, this.width));
             const minY = Math.max(0, Math.min(y, this.height));
@@ -98,6 +97,7 @@ class RenderedRegions{
                 maxY,
             };
 
+            // colsはitemとintersectする矩形の集合
             const cols = this.tree.search(item);
 
             const startX = Math.max(0, force ? minX : Math.max(minX, this.leftFrontier));
@@ -161,6 +161,61 @@ class RenderedRegions{
             }
         }
         tree.insert(item);
+    }
+    /**
+     * 指定した領域を描画済み領域から拡張
+     */
+    removeArea(item: Rect){
+        const {
+            minX,
+            minY,
+            maxX,
+            maxY,
+        } = item;
+        const {
+            tree,
+        } = this;
+
+        const cols = tree.search(item);
+        for (let rect of cols){
+            // intersectするやつは範囲をけずる
+            tree.remove(rect);
+            let minX2, minY2, maxX2, maxY2;
+            let flag = 0;
+            if (maxX < rect.maxX){
+                minX2 = maxX;
+                maxX2 = rect.maxX;
+            }else if (rect.minX < minX){
+                minX2 = rect.minX;
+                maxX2 = minX;
+            }else{
+                minX2 = rect.minX;
+                maxX2 = rect.maxX;
+                flag++;
+            }
+            if (maxY < rect.maxY){
+                minY2 = maxY;
+                maxY2 = rect.maxY;
+            }else if (rect.minY < minY){
+                minY2 = rect.minY;
+                maxY2 = minY;
+            }else{
+                minY2 = rect.minY;
+                maxY2 = rect.maxY;
+                flag++;
+            }
+            if (flag < 2){
+                tree.insert({
+                    minX: minX2,
+                    minY: minY2,
+                    maxX: maxX2,
+                    maxY: maxY2,
+                });
+            }
+        }
+        if (this.leftFrontier > minX){
+            this.leftFrontier = minX;
+        }
     }
     /**
      * 描画済み領域を拡張
@@ -316,9 +371,15 @@ export default class BackLayer{
                 width: 1,
                 height: 1,
             });
+            regions.removeArea({
+                minX: x,
+                minY: y,
+                maxX: x+1,
+                maxY: y+1,
+            });
         }
-        // 強制的に再描画
-        regions.requestRender(rects, true);
+        // 描画範囲からクリア
+        // regions.requestRender(rects, true);
     }
 
     /**
