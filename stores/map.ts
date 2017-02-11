@@ -540,13 +540,13 @@ function fillMap<C>(x: number, y: number, chip: C, map: Array<Array<C>>, width: 
         for (let x = left; x <= right; x++){
             const c = newmap[y][x];
             if (c === f && l == null){
-                l = x;
+                if (x === left){
+                    l = scanLeft(x, y);
+                }else{
+                    l = x;
+                }
             }else if (c !== f && l != null){
                 let r = x-1;
-                if (l === left){
-                    // 左端へ
-                    l = scanLeft(l, y);
-                }
                 stack.push({
                     left: l,
                     right: r,
