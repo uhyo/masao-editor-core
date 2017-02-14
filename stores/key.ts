@@ -7,6 +7,24 @@ import {
 } from '../logics/command';
 
 const defaultBinding: Record<string, Command> = {
+    // モード変更
+    'q': 'mode:pen',
+    'w': 'mode:eraser',
+    'e': 'mode:hand',
+    'r': 'mode:spuit',
+    't': 'mode:rect',
+    'y': 'mode:fill',
+
+    // スクロール
+    'Alt:arrowup': 'scroll:up',
+    'Alt:arrowright': 'scroll:right',
+    'Alt:arrowdown': 'scroll:down',
+    'Alt:arrowleft': 'scroll:left',
+    'Alt:k': 'scroll:up',
+    'Alt:l': 'scroll:right',
+    'Alt:j': 'scroll:down',
+    'Alt:h': 'scroll:left',
+
     // 進む-戻る
     'Ctrl:z': 'back',
     'Ctrl:Shift:z': 'forward',

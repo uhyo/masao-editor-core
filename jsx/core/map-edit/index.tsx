@@ -20,7 +20,10 @@ import {
     Rect,
 } from '../../../scripts/rect';
 
-import * as editActions from '../../../actions/edit';
+import {
+    Mode,
+    ToolState,
+} from '../../../actions/edit';
 import * as mapActions from '../../../actions/map';
 import * as historyActions from '../../../actions/history';
 import { EditState } from '../../../stores/edit';
@@ -488,17 +491,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         } =this.props;
         const width = Math.floor(widthr/32);
         const height = Math.floor(heightr/32);
-        editActions.changeView({
+        editLogics.changeView({
             width,
             height,
         });
-        editActions.scroll({
-            x: Math.max(0, Math.min(edit.scroll_x, size.x - width)),
-            y: Math.max(0, Math.min(edit.scroll_y, size.y - height)),
-        });
     }
     handleScroll(x: number, y: number){
-        editActions.scroll({
+        editLogics.scroll({
             x,
             y,
         });
@@ -521,7 +520,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             screen,
         } = edit;
 
-        let mode: editActions.Mode;
+        let mode: Mode;
         if(e.button===0){
             //左クリック
             mode = edit.mode;
@@ -551,7 +550,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         e.preventDefault();
         this.mouseMoves(this.props.edit.tool, e.pageX, e.pageY);
     }
-    mouseMoves(tool: editActions.ToolState | null, pageX: number, pageY: number){
+    mouseMoves(tool: ToolState | null, pageX: number, pageY: number){
         const {
             x:canvas_x,
             y:canvas_y,

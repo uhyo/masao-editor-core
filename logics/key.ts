@@ -21,6 +21,7 @@ export function keyString({key, shift, ctrl, alt}: KeyButton): string{
 
 export function runByKey(key: KeyButton): boolean{
     const k = keyString(key);
+    console.log(k);
 
     const com = keyStore.state.binding[k];
     if (com != null){

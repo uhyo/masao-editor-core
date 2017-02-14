@@ -53,6 +53,60 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
     }
 }
 
+// 画面の大きさを変更
+interface ChangeViewArg{
+    width: number;
+    height: number;
+}
+export function changeView({width, height}: ChangeViewArg): void{
+    editActions.changeView({
+        width,
+        height,
+    });
+    scroll({
+        x: editStore.state.scroll_x,
+        y: editStore.state.scroll_y,
+    });
+}
+
+// スクロールした場合の調整
+export function scroll({x, y}: {x: number; y: number}): void{
+    const {
+        stage,
+        view_width,
+        view_height,
+    } = editStore.state;
+    const {
+        size,
+    } = mapStore.state.data[stage-1];
+
+    if (x > size.x - view_width){
+        x = size.x - view_width;
+    }
+    if (y > size.y - view_height){
+        y = size.y - view_height;
+    }
+    if (x < 0){
+        x = 0;
+    }
+    if (y < 0){
+        y = 0;
+    }
+
+    editActions.scroll({
+        x,
+        y,
+    });
+}
+
+// 差分
+export function scrollBy({x, y}: {x: number; y: number;}): void{
+    scroll({
+        x: editStore.state.scroll_x + x,
+        y: editStore.state.scroll_y + y,
+    });
+}
+
 // マウスによるツールの設定
 export function mouseDown(mode: editActions.Mode, x: number, y: number): editActions.ToolState | null{
     const edit = editStore.state;

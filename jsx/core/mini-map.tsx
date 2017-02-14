@@ -11,6 +11,8 @@ import {
     StageData,
 } from '../../stores/map';
 
+import * as editLogics from '../../logics/edit';
+
 //色の対応
 const colors: Record<string, string> = {
     masao: "#ff0000",
@@ -169,20 +171,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         //そこを中心に
         let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);
 
-        // 右と下の上限 (TODO)
-        const r = stage.size.x - edit.view_width;
-        const b = stage.size.y - edit.view_height;
-        if(sx < 0){
-            sx = 0;
-        }else if(sx > r){
-            sx = r;
-        }
-        if(sy < 0){
-            sy = 0;
-        }else if(sy > b){
-            sy = b;
-        }
-        editActions.scroll({
+        editLogics.scroll({
             x: sx,
             y: sy
         });
