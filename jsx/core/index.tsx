@@ -30,6 +30,8 @@ import MiniMap from './mini-map';
 import ScreenSelect from './screen-select';
 import ParamEdit from './param-edit';
 import ProjectEdit from './project-edit';
+
+import KeyEvent from './key-event';
 import Button from './util/button';
 
 import './css/init.css';
@@ -268,6 +270,7 @@ const MapScreen = (props: IPropMapScreen)=>{
                 </div>
             </div>
         </div>
+        <KeyEvent />
     </div>;
 };
 
