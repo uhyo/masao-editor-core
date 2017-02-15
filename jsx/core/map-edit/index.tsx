@@ -36,6 +36,8 @@ import { ProjectState } from '../../../stores/project';
 
 import * as editLogics from '../../../logics/edit';
 
+import propChanged from '../util/changed';
+
 /**
  * 画像リソースたち
  */
@@ -191,12 +193,15 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.draw();
             return;
         }
-        if(pe.render_map!==e.render_map ||
-           pe.render_layer!==e.render_layer ||
-           pe.scroll_x!==e.scroll_x ||
-           pe.scroll_y!==e.scroll_y ||
-           pe.view_width!==e.view_width ||
-           pe.view_height!==e.view_height){
+        if (propChanged(pe, e, [
+            'render_map',
+            'render_layer',
+            'scroll_x',
+            'scroll_y',
+            'view_width',
+            'view_height',
+            'tool',
+        ])){
             this.draw();
         }
     }
@@ -332,6 +337,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
                 render_map,
                 render_layer,
+
+                tool,
             } = edit;
             const ctx = (this.refs['canvas'] as HTMLCanvasElement).getContext("2d");
             if (ctx == null){
@@ -355,7 +362,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             ctx.clearRect(0, 0, width, height);
 
             // ステージ範囲を背景色で塗りつぶす
-            const bgc = util.stageBackColor(params, edit);
+            const bgc = util.cssColor(util.stageBackColor(params, edit));
             ctx.fillStyle = bgc;
             const fillLeft = Math.max(0, -scroll_x*32);
             const fillTop = Math.max(0, -scroll_y*32);
@@ -376,6 +383,45 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 ctx.restore();
             }
 
+            if (tool && tool.type === 'rect'){
+                const {
+                    start_x,
+                    start_y,
+                    end_x,
+                    end_y,
+                } = tool;
+
+                // 四角形ツールのアレを描画
+                const pcl = util.cssColor(util.complementColor(util.stageBackColor(params, edit)));
+
+                ctx.save();
+                ctx.fillStyle = pcl;
+                ctx.strokeStyle = pcl;
+
+                const left = Math.min(start_x, end_x);
+                const top = Math.min(start_y, end_y);
+                const right = Math.max(start_x, end_x);
+                const bottom = Math.max(start_y, end_y);
+
+                const sx = (left - scroll_x) * 32;
+                const sy = (top - scroll_y) * 32;
+                const w = (right - left) * 32 + 31;
+                const h = (bottom - top) * 32 + 31;
+
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + w, sy);
+                ctx.lineTo(sx + w, sy + h);
+                ctx.lineTo(sx, sy + h);
+                ctx.closePath();
+
+                ctx.globalAlpha = 0.25;
+                ctx.fill();
+                ctx.globalAlpha = 0.75;
+                ctx.stroke();
+
+                ctx.restore();
+            }
             this.drawing=false;
             if (process.env.NODE_ENV !== 'production'){
                 console.timeEnd("draw");

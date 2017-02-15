@@ -101,7 +101,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 return;
             }
             //まず背景を塗る
-            ctx.fillStyle = util.stageBackColor(params, this.props.edit);
+            ctx.fillStyle = util.cssColor(util.stageBackColor(params, this.props.edit));
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
             const chipList = advanced ? chip.advancedChipList : chip.chipList;

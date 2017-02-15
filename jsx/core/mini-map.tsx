@@ -68,7 +68,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
             } = this.props;
             const mapdata = stage.map;
             //bg
-            const bgc=util.stageBackColor(params, edit);
+            const bgc = util.cssColor(util.stageBackColor(params, edit));
             ctx.fillStyle=bgc;
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
@@ -109,7 +109,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 }
             }
             //スクロールビュー
-            let wkc=util.cssColor(255-Number(params['backcolor_red']), 255-Number(params['backcolor_green']), 255-Number(params['backcolor_blue']));
+            const wkc = util.cssColor(util.complementColor(util.stageBackColor(params, edit)));
             ctx.strokeStyle=wkc;
             ctx.lineWidth=1;
             ctx.strokeRect(edit.scroll_x*2+0.5, edit.scroll_y*2+0.5, edit.view_width*2-1, edit.view_height*2-1);
