@@ -15,13 +15,18 @@ import {
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
 import * as mapActions from '../../actions/map';
+import * as keyActions from '../../actions/key';
 import * as mapLogics from '../../logics/map';
+import {
+    Command,
+} from '../../logics/command';
 
 import mapStore, { MapState } from '../../stores/map';
 import paramStore, { ParamsState } from '../../stores/params';
 import editStore, { EditState } from '../../stores/edit';
 import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
+import keyStore from '../../stores/key';
 
 import MapEdit from './map-edit/index';
 import ChipSelect from './chip-select';
@@ -206,6 +211,14 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
     public getCurrentStage(): number{
         return this.state.edit.stage;
+    }
+    public getKeyConfig(): Record<string, Command>{
+        return keyStore.state.binding;
+    }
+    public setKeyConfig(binding: Record<string, Command>){
+        keyActions.setKeyBinding({
+            binding,
+        });
     }
 
     //export stores
