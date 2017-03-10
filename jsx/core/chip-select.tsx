@@ -44,6 +44,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         mapchip: HTMLImageElement;
         chips: HTMLImageElement;
     };
+    private backlayer: HTMLCanvasElement;
     componentDidMount(){
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
@@ -52,8 +53,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 mapchip,
                 chips
             };
-            this.draw(true);
+            this.draw('redraw');
         });
+
+        this.backlayer = document.createElement('canvas');
     }
     componentDidUpdate(prevProps: IPropChipSelect){
         if(propChanged(prevProps, this.props, ['pattern', 'mapchip', 'chips'])){
@@ -64,17 +67,17 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     mapchip,
                     chips
                 };
-                this.draw(true);
+                this.draw('redraw');
             });
         }else if(propChanged(prevProps.edit, this.props.edit, ['screen', 'stage', 'chipselect_width', 'chipselect_height', 'chipselect_scroll']) ||
                  prevProps.project.version !== this.props.project.version ||
                  prevProps.params !== this.props.params ||
-                 prevProps.advanced !== this.props.advanced ||
-                 cursorChanged(prevProps.edit.cursor, this.props.edit.cursor)
-                ){
-            this.draw(true);
+                 prevProps.advanced !== this.props.advanced){
+            this.draw('redraw');
+        }else if(cursorChanged(prevProps.edit.cursor, this.props.edit.cursor)){
+            this.draw('full');
         }else if(propChanged(prevProps.edit, this.props.edit, ['pen', 'pen_layer'])){
-            this.draw(false);
+            this.draw('current');
         }
 
         function cursorChanged(c1: editActions.CursorState | null, c2: editActions.CursorState | null): boolean{
@@ -94,7 +97,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
 
         }
     }
-    draw(full: boolean){
+    draw(mode: 'redraw' | 'full' | 'current'){
         if(this.images == null){
             return;
         }
@@ -114,9 +117,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             cursor,
         } = edit;
 
-        if(full){
+        const maincanvas = this.refs['canvas'] as HTMLCanvasElement;
+        if(mode === 'redraw'){
             //チップセットを書き換える
-            const canvas = this.refs['canvas'] as HTMLCanvasElement;
+            const canvas = this.backlayer;
+            canvas.width = maincanvas.width;
+            canvas.height = maincanvas.height;
+            console.log('CANV', canvas.width, canvas.height);
+
             const ctx = canvas.getContext('2d');
             if (ctx == null){
                 return;
@@ -154,6 +162,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     }
                 }
             }
+        }
+        if (mode === 'redraw' || mode === 'full'){
+            const ctx = maincanvas.getContext('2d');
+            if (ctx == null){
+                return;
+            }
+
+            ctx.drawImage(this.backlayer, 0, 0);
 
             // カーソルの描画
             if (cursor && cursor.type === 'chipselect'){
