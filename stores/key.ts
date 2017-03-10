@@ -29,6 +29,17 @@ const defaultBinding: Record<string, Command> = {
     'Ctrl:z': 'back',
     'Ctrl:Shift:z': 'forward',
     'Ctrl:r': 'forward',
+
+    // カーソル
+    'arrowup': 'cursor:up',
+    'arrowright': 'cursor:right',
+    'arrowdown': 'cursor:down',
+    'arrowleft': 'cursor:left',
+    'k': 'cursor:up',
+    'l': 'cursor:right',
+    'j': 'cursor:down',
+    'h': 'cursor:left',
+    'tab': 'cursor:jump',
 };
 
 export interface KeyState{

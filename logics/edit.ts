@@ -1,4 +1,6 @@
 // logic
+import * as chip from '../scripts/chip';
+
 import * as editActions from '../actions/edit';
 import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
@@ -354,4 +356,115 @@ function mapUpdateFillAction(screen: Screen){
     }else{
         return mapActions.updateMapFill;
     }
+}
+
+// カーソルの移動
+export function moveCursorBy({x, y}: {x: number; y: number}): void{
+    const edit = editStore.state;
+    const {
+        screen,
+        stage,
+        cursor,
+        scroll_x,
+        scroll_y,
+        view_width,
+        view_height,
+        chipselect_width,
+        chipselect_height,
+        chipselect_scroll,
+    } = edit;
+
+    const {
+        size,
+    } = mapStore.state.data[stage-1];
+
+    if (cursor == null){
+        // カーソルがない場合は画面の左上に出現
+        editActions.setCursor({
+            cursor: {
+                type: 'main',
+                x: scroll_x,
+                y: scroll_y,
+            },
+        });
+    }else if(cursor.type === 'main'){
+        // カーソルが移動
+        const x2 = Math.max(0, Math.min(cursor.x + x, size.x-1));
+        const y2 = Math.max(0, Math.min(cursor.y + y, size.y-1));
+
+        editActions.setCursor({
+            cursor: {
+                type: 'main',
+                x: x2,
+                y: y2,
+            },
+        });
+        // スクロールが必要ならスクロール
+        const scroll_x2 = Math.min(x2, Math.max(scroll_x, x2 - view_width + 1));
+        const scroll_y2 = Math.min(y2, Math.max(scroll_y, y2 - view_height + 1));
+
+        if (scroll_x !== scroll_x2 || scroll_y !== scroll_y2){
+            scroll({
+                x: scroll_x2,
+                y: scroll_y2,
+            });
+        }
+    }else if(cursor.type === 'chipselect'){
+        const {
+            id,
+        } = cursor;
+
+        const id2 = Math.max(0, Math.min(id + x + y * chipselect_width, chipLength()-1));
+
+        editActions.setCursor({
+            cursor: {
+                type: 'chipselect',
+                id: id2,
+            },
+        });
+
+        const idy = Math.floor(id2 / chipselect_width);
+
+        const c_sc = Math.min(idy, Math.max(chipselect_scroll, idy - chipselect_height + 1));
+        if (c_sc !== chipselect_scroll){
+            editActions.changeChipselectScroll({
+                y: c_sc,
+            });
+        }
+    }
+}
+export function cursorJump(): void{
+    const {
+        cursor,
+        scroll_x,
+        scroll_y,
+        chipselect_width,
+        chipselect_scroll,
+    } = editStore.state;
+
+    if (cursor == null || cursor.type === 'chipselect'){
+        editActions.setCursor({
+            cursor: {
+                type: 'main',
+                x: scroll_x,
+                y: scroll_y,
+            },
+        });
+    }else if (cursor.type === 'main'){
+        editActions.setCursor({
+            cursor: {
+                type: 'chipselect',
+                id: chipselect_width * chipselect_scroll,
+            },
+        });
+    }
+
+}
+
+// チップの数
+export function chipLength(): number{
+    const {
+        advanced,
+    } = mapStore.state;
+    return advanced ? chip.advancedChipList.length : chip.chipList.length;
 }

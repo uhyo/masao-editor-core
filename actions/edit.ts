@@ -57,6 +57,18 @@ export interface RectTool{
 
 export type ToolState = PenTool | EraserTool | HandTool | RectTool;
 
+export interface MainCursor{
+    type: 'main';
+    x: number;
+    y: number;
+}
+export interface ChipselectCursor{
+    type: 'chipselect';
+    id: number;
+}
+
+export type CursorState = MainCursor | ChipselectCursor;
+
 export interface ChangeScreenAction {
     screen: 'map' | 'layer' | 'params' | 'project';
 }
@@ -146,3 +158,8 @@ export interface ChangeChipselectScrollAction {
     y: number;
 }
 export const changeChipselectScroll = createAction<ChangeChipselectScrollAction>();
+
+export interface SetCursorAction {
+    cursor: CursorState | null;
+}
+export const setCursor = createAction<SetCursorAction>();

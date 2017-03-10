@@ -10,6 +10,9 @@ export type Command =
     'mode:pen' | 'mode:eraser' | 'mode:hand' | 'mode:spuit' | 'mode:rect' | 'mode:fill' |
     // scroll command
     'scroll:up' | 'scroll:right' | 'scroll:down' | 'scroll:left' |
+    // cursor command
+    'cursor:up' | 'cursor:right' | 'cursor:down' | 'cursor:left' |
+    'cursor:jump' | 'cursor:vanish' |
     // history command
     'back' | 'forward';
 
@@ -28,6 +31,13 @@ export const commandNames: Record<Command, string> = {
 
     'back': '戻る',
     'forward': 'やり直す',
+
+    'cursor:up': 'カーソル上',
+    'cursor:right': 'カーソル右',
+    'cursor:down': 'カーソル下',
+    'cursor:left': 'カーソル左',
+    'cursor:jump': 'カーソルフォーカス移動',
+    'cursor:vanish': 'カーソル消去',
 };
 
 export function run(command: Command): void{
@@ -93,6 +103,44 @@ export function run(command: Command): void{
             editLogics.scrollBy({
                 x: -1,
                 y: 0,
+            });
+            break;
+        }
+        case 'cursor:up': {
+            editLogics.moveCursorBy({
+                x: 0,
+                y: -1,
+            });
+            break;
+        }
+        case 'cursor:right': {
+            editLogics.moveCursorBy({
+                x: 1,
+                y: 0,
+            });
+            break;
+        }
+        case 'cursor:down': {
+            editLogics.moveCursorBy({
+                x: 0,
+                y: 1,
+            });
+            break;
+        }
+        case 'cursor:left': {
+            editLogics.moveCursorBy({
+                x: -1,
+                y: 0,
+            });
+            break;
+        }
+        case 'cursor:jump': {
+            editLogics.cursorJump();
+            break;
+        }
+        case 'cursor:vanish': {
+            editActions.setCursor({
+                cursor: null,
             });
             break;
         }

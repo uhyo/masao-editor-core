@@ -69,10 +69,29 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         }else if(propChanged(prevProps.edit, this.props.edit, ['screen', 'stage', 'chipselect_width', 'chipselect_height', 'chipselect_scroll']) ||
                  prevProps.project.version !== this.props.project.version ||
                  prevProps.params !== this.props.params ||
-                 prevProps.advanced !== this.props.advanced){
+                 prevProps.advanced !== this.props.advanced ||
+                 cursorChanged(prevProps.edit.cursor, this.props.edit.cursor)
+                ){
             this.draw(true);
         }else if(propChanged(prevProps.edit, this.props.edit, ['pen', 'pen_layer'])){
             this.draw(false);
+        }
+
+        function cursorChanged(c1: editActions.CursorState | null, c2: editActions.CursorState | null): boolean{
+            if (c1 === c2){
+                return false;
+            }
+            if (c1 == null && c2 != null && c2.type === 'chipselect'){
+                return true;
+            }
+            if (c2 == null && c1 != null && c1.type === 'chipselect'){
+                return true;
+            }
+            if (c1 == null || c2 == null){
+                return false;
+            }
+            return c1.type === 'chipselect' || c2.type === 'chipselect';
+
         }
     }
     draw(full: boolean){
@@ -81,17 +100,19 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         }
         const {
             params,
-            edit: {
-                screen,
-                chipselect_width,
-                chipselect_height,
-                chipselect_scroll,
-            },
+            edit,
             project: {
                 version,
             },
             advanced,
         } = this.props;
+        const {
+            screen,
+            chipselect_width,
+            chipselect_height,
+            chipselect_scroll,
+            cursor,
+        } = edit;
 
         if(full){
             //チップセットを書き換える
@@ -132,6 +153,24 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                         y+=32;
                     }
                 }
+            }
+
+            // カーソルの描画
+            if (cursor && cursor.type === 'chipselect'){
+                ctx.strokeStyle = util.cssColor(util.complementColor(util.stageBackColor(params, edit)));
+
+                ctx.beginPath();
+                const idx = cursor.id % chipselect_width;
+                const idy = Math.floor(cursor.id / chipselect_width);
+                const sx = idx * 32 + 0.5;
+                const sy = (idy - chipselect_scroll) * 32 + 0.5;
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + 31, sy);
+                ctx.lineTo(sx + 31, sy + 31);
+                ctx.lineTo(sx, sy + 31);
+                ctx.closePath();
+
+                ctx.stroke();
             }
         }
 
