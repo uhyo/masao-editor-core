@@ -77,6 +77,7 @@ export function scroll({x, y}: {x: number; y: number}): void{
         stage,
         view_width,
         view_height,
+        cursor,
     } = editStore.state;
     const {
         size,
@@ -99,6 +100,22 @@ export function scroll({x, y}: {x: number; y: number}): void{
         x,
         y,
     });
+
+    if (cursor && cursor.type === 'main'){
+        // カーソルが出ていたら考慮
+        const nx = Math.max(x, Math.min(x + view_width-1, cursor.x));
+        const ny = Math.max(y, Math.min(y + view_height-1, cursor.y));
+
+        if (cursor.x !== nx || cursor.y !== ny){
+            editActions.setCursor({
+                cursor: {
+                    type: 'main',
+                    x: nx,
+                    y: ny,
+                },
+            });
+        }
+    }
 }
 
 // 差分
