@@ -23,6 +23,7 @@ import {
 import {
     Mode,
     ToolState,
+    CursorState,
 } from '../../../actions/edit';
 import * as mapActions from '../../../actions/map';
 import * as historyActions from '../../../actions/history';
@@ -204,6 +205,22 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         ])){
             this.draw();
         }
+        if (cursorChanged(pe.cursor, e.cursor)){
+            this.draw();
+        }
+
+        function cursorChanged(c1: CursorState | null, c2: CursorState | null): boolean{
+            if (c1 === c2){
+                return false;
+            }
+            if (c1 == null){
+                return c2!.type === 'main';
+            }
+            if (c2 == null){
+                return c1.type === 'main';
+            }
+            return c1.type === 'main' || c2.type === 'main';
+        }
     }
     resetBacklayer(size: boolean){
         if (size){
@@ -339,6 +356,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 render_layer,
 
                 tool,
+                cursor,
             } = edit;
             const ctx = (this.refs['canvas'] as HTMLCanvasElement).getContext("2d");
             if (ctx == null){
@@ -418,6 +436,32 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 ctx.globalAlpha = 0.25;
                 ctx.fill();
                 ctx.globalAlpha = 0.75;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+            if (cursor && cursor.type === 'main'){
+                const {
+                    x,
+                    y,
+                } = cursor;
+
+                // カーソルがあるので描画
+                const pcl = util.cssColor(util.complementColor(util.stageBackColor(params, edit)));
+
+                ctx.save();
+                ctx.strokeStyle = pcl;
+
+                const sx = (x - scroll_x) * 32 + 0.5;
+                const sy = (y - scroll_y) * 32 + 0.5;
+
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + 31, sy);
+                ctx.lineTo(sx + 31, sy + 31)
+                ctx.lineTo(sx, sy + 31);
+                ctx.closePath();
+
                 ctx.stroke();
 
                 ctx.restore();
@@ -578,10 +622,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             mode="eraser";
         }else{
             return;
-        }
-        const tool = editLogics.mouseDown(mode, mx, my);
-        if(tool != null && mode!=='hand'){
-            this.mouseMoves(tool, e.pageX, e.pageY);
         }
 
         //マウスが上がったときの処理

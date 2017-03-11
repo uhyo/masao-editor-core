@@ -19,13 +19,14 @@ export function keyString({key, shift, ctrl, alt}: KeyButton): string{
         key.toLowerCase());
 }
 
-export function runByKey(key: KeyButton): boolean{
+export function runByKey(key: KeyButton, keydown: boolean): boolean{
     const k = keyString(key);
     console.log(k);
 
     const com = keyStore.state.binding[k];
     if (com != null){
-        run(com);
+        run(com, keydown);
+
         return true;
     }else{
         return false;

@@ -546,7 +546,7 @@ export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject, pa
                     ctx.translate(-xx-width/2, -yy-height/2);
                 }
                 ctx.drawImage(images.pattern, sx, sy, width, height, xx, yy, width, height);
-                if(pi.rotate>0){
+                if('number' === typeof pi.rotate && pi.rotate>0){
                     ctx.restore();
                 }
             }else{
@@ -571,7 +571,7 @@ export function drawChip(ctx: CanvasRenderingContext2D, images: ImagesObject, pa
                     ctx.translate(-x-16, -y-16);
                 }
                 ctx.drawImage(images.pattern, sx, sy, 32, 32, x, y, 32, 32);
-                if(pi.rotate>0){
+                if('number' === typeof pi.rotate && pi.rotate>0){
                     ctx.restore();
                 }
             }

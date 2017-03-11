@@ -9,6 +9,7 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}>{
         super(props);
 
         this.keydownHandler = this.keydownHandler.bind(this);
+        this.keyupHandler = this.keyupHandler.bind(this);
     }
     private keydownHandler(e: KeyboardEvent){
         const mv = keyLogics.runByKey({
@@ -16,16 +17,29 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}>{
             shift: e.shiftKey,
             ctrl: e.ctrlKey,
             alt: e.altKey,
-        });
+        }, true);
+        if (mv){
+            e.preventDefault();
+        }
+    }
+    private keyupHandler(e: KeyboardEvent){
+        const mv = keyLogics.runByKey({
+            key: e.key,
+            shift: e.shiftKey,
+            ctrl: e.ctrlKey,
+            alt: e.altKey,
+        }, false);
         if (mv){
             e.preventDefault();
         }
     }
     componentDidMount(){
         document.addEventListener('keydown', this.keydownHandler, false);
+        document.addEventListener('keyup', this.keyupHandler, false);
     }
     componentWillUnmount(){
         document.removeEventListener('keydown', this.keydownHandler, false);
+        document.removeEventListener('keyup', this.keyupHandler, false);
     }
     render(){
         return <div/>;

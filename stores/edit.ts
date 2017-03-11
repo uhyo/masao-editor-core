@@ -6,6 +6,7 @@ import {
 import {
     Mode,
     ToolState,
+    CursorState,
 } from '../actions/edit';
 import {
     Store,
@@ -86,6 +87,11 @@ export interface EditState{
      * チップ選択画面のスクロール位置(Y)
      */
     chipselect_scroll: number;
+
+    /**
+     * キーボード用のカーソル
+     */
+    cursor: CursorState | null;
 }
 export class EditStore extends Store<EditState>{
     constructor(){
@@ -111,6 +117,7 @@ export class EditStore extends Store<EditState>{
             chipselect_width: 8,
             chipselect_height: 9,
             chipselect_scroll: 0,
+            cursor: null,
         };
     }
     onChangeScreen({screen}: editActions.ChangeScreenAction){
@@ -197,6 +204,11 @@ export class EditStore extends Store<EditState>{
         // advancedのON/OFFでchipselectの大きさが変わるので
         this.setState({
             chipselect_scroll: 0,
+        });
+    }
+    onSetCursor({cursor}: editActions.SetCursorAction){
+        this.setState({
+            cursor,
         });
     }
 }

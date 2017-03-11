@@ -44,6 +44,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         mapchip: HTMLImageElement;
         chips: HTMLImageElement;
     };
+    private backlayer: HTMLCanvasElement;
     componentDidMount(){
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
@@ -52,8 +53,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 mapchip,
                 chips
             };
-            this.draw(true);
+            this.draw('redraw');
         });
+
+        this.backlayer = document.createElement('canvas');
     }
     componentDidUpdate(prevProps: IPropChipSelect){
         if(propChanged(prevProps, this.props, ['pattern', 'mapchip', 'chips'])){
@@ -64,38 +67,64 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     mapchip,
                     chips
                 };
-                this.draw(true);
+                this.draw('redraw');
             });
         }else if(propChanged(prevProps.edit, this.props.edit, ['screen', 'stage', 'chipselect_width', 'chipselect_height', 'chipselect_scroll']) ||
                  prevProps.project.version !== this.props.project.version ||
                  prevProps.params !== this.props.params ||
                  prevProps.advanced !== this.props.advanced){
-            this.draw(true);
+            this.draw('redraw');
+        }else if(cursorChanged(prevProps.edit.cursor, this.props.edit.cursor)){
+            this.draw('full');
         }else if(propChanged(prevProps.edit, this.props.edit, ['pen', 'pen_layer'])){
-            this.draw(false);
+            this.draw('current');
+        }
+
+        function cursorChanged(c1: editActions.CursorState | null, c2: editActions.CursorState | null): boolean{
+            if (c1 === c2){
+                return false;
+            }
+            if (c1 == null && c2 != null && c2.type === 'chipselect'){
+                return true;
+            }
+            if (c2 == null && c1 != null && c1.type === 'chipselect'){
+                return true;
+            }
+            if (c1 == null || c2 == null){
+                return false;
+            }
+            return c1.type === 'chipselect' || c2.type === 'chipselect';
+
         }
     }
-    draw(full: boolean){
+    draw(mode: 'redraw' | 'full' | 'current'){
         if(this.images == null){
             return;
         }
         const {
             params,
-            edit: {
-                screen,
-                chipselect_width,
-                chipselect_height,
-                chipselect_scroll,
-            },
+            edit,
             project: {
                 version,
             },
             advanced,
         } = this.props;
+        const {
+            screen,
+            chipselect_width,
+            chipselect_height,
+            chipselect_scroll,
+            cursor,
+        } = edit;
 
-        if(full){
+        const maincanvas = this.refs['canvas'] as HTMLCanvasElement;
+        if(mode === 'redraw'){
             //チップセットを書き換える
-            const canvas = this.refs['canvas'] as HTMLCanvasElement;
+            const canvas = this.backlayer;
+            canvas.width = maincanvas.width;
+            canvas.height = maincanvas.height;
+            console.log('CANV', canvas.width, canvas.height);
+
             const ctx = canvas.getContext('2d');
             if (ctx == null){
                 return;
@@ -132,6 +161,32 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                         y+=32;
                     }
                 }
+            }
+        }
+        if (mode === 'redraw' || mode === 'full'){
+            const ctx = maincanvas.getContext('2d');
+            if (ctx == null){
+                return;
+            }
+
+            ctx.drawImage(this.backlayer, 0, 0);
+
+            // カーソルの描画
+            if (cursor && cursor.type === 'chipselect'){
+                ctx.strokeStyle = util.cssColor(util.complementColor(util.stageBackColor(params, edit)));
+
+                ctx.beginPath();
+                const idx = cursor.id % chipselect_width;
+                const idy = Math.floor(cursor.id / chipselect_width);
+                const sx = idx * 32 + 0.5;
+                const sy = (idy - chipselect_scroll) * 32 + 0.5;
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + 31, sy);
+                ctx.lineTo(sx + 31, sy + 31);
+                ctx.lineTo(sx, sy + 31);
+                ctx.closePath();
+
+                ctx.stroke();
             }
         }
 
