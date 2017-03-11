@@ -623,10 +623,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }else{
             return;
         }
-        const tool = editLogics.mouseDown(mode, mx, my);
-        if(tool != null && mode!=='hand'){
-            this.mouseMoves(tool, e.pageX, e.pageY);
-        }
 
         //マウスが上がったときの処理
         const mouseUpHandler=()=>{

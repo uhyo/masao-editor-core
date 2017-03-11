@@ -201,6 +201,10 @@ export function mouseDown(mode: editActions.Mode, x: number, y: number): editAct
     editActions.setTool({
         tool,
     });
+
+    if (tool != null && mode !== 'hand'){
+        mouseMove(x, y, tool);
+    }
     return tool;
 }
 
@@ -389,6 +393,7 @@ export function moveCursorBy({x, y}: {x: number; y: number}): void{
         chipselect_width,
         chipselect_height,
         chipselect_scroll,
+        tool,
     } = edit;
 
     const {
@@ -426,6 +431,8 @@ export function moveCursorBy({x, y}: {x: number; y: number}): void{
                 y: scroll_y2,
             });
         }
+        // さらに移動
+        mouseMove(x2 - scroll_x2, y2 - scroll_y2, tool);
     }else if(cursor.type === 'chipselect'){
         const {
             id,
@@ -477,11 +484,58 @@ export function cursorJump(): void{
     }
 
 }
-
-// チップの数
-export function chipLength(): number{
+export function cursorButton(keydown: boolean){
+    const {
+        screen,
+        mode,
+        scroll_x,
+        scroll_y,
+        cursor,
+        stage,
+    } = editStore.state;
     const {
         advanced,
     } = mapStore.state;
-    return advanced ? chip.advancedChipList.length : chip.chipList.length;
+
+    if (cursor == null){
+        return;
+    }
+
+    if (cursor.type === 'main'){
+        const {
+            x,
+            y,
+        } = cursor;
+
+        if (keydown === true){
+            mouseDown(mode, x - scroll_x, y - scroll_y);
+        }else{
+            mouseUp();
+        }
+    }else if (cursor.type === 'chipselect'){
+        const {
+            id,
+        } = cursor;
+        if (screen === 'layer'){
+            editActions.changePenLayer({
+                pen: id,
+            });
+        }else{
+            editActions.changePen({
+                pen: chipList()[id],
+            });
+        }
+    }
+}
+
+export function chipList(){
+    const {
+        advanced,
+    } = mapStore.state;
+
+    return advanced ? chip.advancedChipList : chip.chipList;
+}
+// チップの数
+export function chipLength(): number{
+    return chipList().length;
 }

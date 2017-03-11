@@ -40,6 +40,8 @@ const defaultBinding: Record<string, Command> = {
     'j': 'cursor:down',
     'h': 'cursor:left',
     'tab': 'cursor:jump',
+    'escape': 'cursor:vanish',
+    'z': 'cursor:button',
 };
 
 export interface KeyState{
