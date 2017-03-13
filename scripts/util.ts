@@ -7,8 +7,8 @@
 export function getAbsolutePosition(elm: HTMLElement){
     const r=elm.getBoundingClientRect();
     return {
-        x: r.left+window.scrollX,
-        y: r.top+window.scrollY,
+        x: r.left,
+        y: r.top,
         // ついでにwidthとheightも返す
         width: r.width,
         height: r.height,
@@ -98,4 +98,7 @@ export function sortedUniq<T>(arr: Array<T>, eq:(x: T, y: T)=>boolean){
     return result;
 }
 
-
+// どれくらいページがズームされているか返す
+export function getPageZoom(): number{
+    return document.body.clientWidth / window.innerWidth;
+}

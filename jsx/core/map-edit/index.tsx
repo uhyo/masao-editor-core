@@ -348,7 +348,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             if (process.env.NODE_ENV !== 'production'){
-                console.time("draw");
+                // console.time("draw");
             }
 
             const {
@@ -484,7 +484,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
             this.drawing=false;
             if (process.env.NODE_ENV !== 'production'){
-                console.timeEnd("draw");
+                // console.timeEnd("draw");
             }
         });
     }
@@ -672,7 +672,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
         // 最初のひとつで処理
         this.touchIdentifier = t.identifier;
-        console.log('touchstart', t.identifier);
 
         const {
             mode,
@@ -682,6 +681,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             x:canvas_x,
             y:canvas_y,
         } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
+
+        // const zoom = util.getPageZoom();
         const mx = Math.floor((t.pageX-canvas_x)/32);
         const my = Math.floor((t.pageY-canvas_y)/32);
 
@@ -689,7 +690,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         const touchEndHandler = (e: TouchEvent)=>{
             for (const t of Array.from(e.changedTouches)){
-                console.log('touchend', t.identifier);
                 if (t.identifier === this.touchIdentifier){
                     this.touchIdentifier = null;
                     editLogics.mouseUp();
