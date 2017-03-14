@@ -149,6 +149,8 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
 
         if (target === this.refs['hor'] || target === this.refs['ver']){
             // 瞬間移動
+            console.log('SCROLL', window.scrollX, window.scrollY);
+            console.log('TARGET', target.getBoundingClientRect());
             this.doFreeScroll(target, elementX, elementY);
             this.registerFreeScroll(target);
             return;
