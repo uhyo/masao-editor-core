@@ -348,7 +348,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
             if (process.env.NODE_ENV !== 'production'){
-                // console.time("draw");
+                console.time("draw");
             }
 
             const {
@@ -484,7 +484,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
             this.drawing=false;
             if (process.env.NODE_ENV !== 'production'){
-                // console.timeEnd("draw");
+                console.timeEnd("draw");
             }
         });
     }
