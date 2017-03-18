@@ -8,6 +8,9 @@ import loadImage from '../../scripts/load-image';
 
 import Resizable from './util/resizable';
 import Scroll from './util/scroll';
+import MousePad, {
+    MousePadEvent,
+} from './util/mousepad';
 
 import * as editActions from '../../actions/edit';
 
@@ -35,9 +38,11 @@ export interface IPropChipSelect{
 export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     constructor(props: IPropChipSelect){
         super(props);
-        this.handleClick = this.handleClick.bind(this);
         this.handleResize = this.handleResize.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
+
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
     }
     private images: {
         pattern: HTMLImageElement;
@@ -247,7 +252,12 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             <div>
                 <Scroll x={0} y={chipselect_scroll} width={chipselect_width} height={scrollHeight} screenX={chipselect_width} screenY={chipselect_height} disableX disableY={scrollHeight === 0} onScroll={this.handleScroll}>
                     <Resizable width={w} height={h} grid={{x: 32, y: 32}} onResize={this.handleResize}>
-                        <canvas ref="canvas" width={w} height={h} onClick={this.handleClick}/>
+                        <MousePad
+                            onMouseDown={this.handleMouseDown}
+                            onMouseMove={this.handleMouseMove}
+                            >
+                            <canvas ref="canvas" width={w} height={h}/>
+                        </MousePad>
                     </Resizable>
                 </Scroll>
             </div>
@@ -298,23 +308,21 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     handleScroll(_: number, y: number){
         editActions.changeChipselectScroll({y});
     }
-    handleClick<T>(e: React.MouseEvent<T>){
-        //canvasをクリックした
+    handleMouseDown(ev: MousePadEvent){
+        this.handleMouseMove(ev);
+    }
+    handleMouseMove({elementX, elementY}: MousePadEvent){
         const {
             edit: {
                 chipselect_width,
                 chipselect_scroll,
+                screen,
             },
             advanced,
         } = this.props;
 
-        const {target, pageX, pageY} = e;
-        const {x: tx, y: ty} = util.getAbsolutePosition(target as HTMLElement);
-        const x=pageX-tx, y=pageY-ty;
-
-        const penidx = Math.floor(x/32) + (Math.floor(y/32) + chipselect_scroll)*chipselect_width;
-
-        if(this.props.edit.screen==="layer"){
+        const penidx = Math.floor(elementX/32) + (Math.floor(elementY/32) + chipselect_scroll)*chipselect_width;
+        if(screen === 'layer'){
             editActions.changePenLayer({
                 pen: penidx,
             });
@@ -327,7 +335,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 pen: chip.chipList[penidx],
             });
         }
-        e.preventDefault();
     }
 }
 
