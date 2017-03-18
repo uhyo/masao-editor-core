@@ -3,6 +3,10 @@ import * as React from 'react';
 import * as util from '../../scripts/util';
 import * as chip from '../../scripts/chip';
 
+import MousePad, {
+    MousePadEvent,
+} from './util/mousepad';
+
 import * as editActions from '../../actions/edit';
 import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
@@ -42,6 +46,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         };
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
     }
     componentDidMount(){
         this.drawing=false;
@@ -131,49 +136,52 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         } = this;
         const mousemove = mouse_down ? handleMouseMove : void 0;
         return <div>
-            <canvas ref="canvas" width={size.x*2} height={size.y*2} onMouseDown={handleMouseDown}/>
+            <MousePad
+                onMouseDown={this.handleMouseDown}
+                onMouseMove={this.handleMouseMove}
+                onMouseUp={this.handleMouseUp}
+                >
+                <canvas ref="canvas" width={size.x*2} height={size.y*2}/>
+            </MousePad>
         </div>;
     }
-    handleMouseDown<T>(e: React.MouseEvent<T>){
-        if (e.button !== 0){
+    handleMouseDown(ev: MousePadEvent){
+        const {
+            target,
+            elementX,
+            elementY,
+            button,
+            preventDefault,
+        } = ev;
+        const can = this.refs['canvas'] as HTMLCanvasElement;
+
+        if (target !== can || (button !== 0 && button != null)){
+            preventDefault();
             return;
         }
         this.setState({
-            mouse_down: true
+            mouse_down: true,
         });
-        this.handleMouseMove(e.nativeEvent as MouseEvent);
-
-        const movehandler = (e: MouseEvent)=>{
-            this.handleMouseMove(e);
-        };
-
-        const uphandler=(e: MouseEvent)=>{
-            e.preventDefault();
-            this.setState({
-                mouse_down: false
-            });
-            document.removeEventListener("mousemove", movehandler, false);
-            document.removeEventListener("mouseup", uphandler, false);
-        };
-        document.addEventListener("mousemove", movehandler, false);
-        document.addEventListener("mouseup", uphandler, false);
+        this.handleMouseMove(ev);
     }
-    handleMouseMove(e: MouseEvent){
+    handleMouseMove({elementX, elementY}: MousePadEvent){
         const {
             edit,
             stage,
         } = this.props;
 
-        e.preventDefault();
-        //canvasの位置
-        const {x:left, y:top} = util.getAbsolutePosition(this.refs['canvas'] as HTMLCanvasElement);
-        const mx=e.pageX-left, my=e.pageY-top;
         //そこを中心に
-        let sx=Math.floor((mx-edit.view_width)/2), sy=Math.floor((my-edit.view_height)/2);
+        const sx = Math.floor((elementX-edit.view_width)/2);
+        const sy=Math.floor((elementY-edit.view_height)/2);
 
         editLogics.scroll({
             x: sx,
-            y: sy
+            y: sy,
+        });
+    }
+    handleMouseUp(){
+        this.setState({
+            mouse_down: false,
         });
     }
 }
