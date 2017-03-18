@@ -3,6 +3,9 @@ import * as React from 'react';
 
 import Resizable from '../util/resizable';
 import Scroll from '../util/scroll';
+import MousePad, {
+    MousePadEvent,
+} from '../util/mousepad';
 
 import Timers from '../../../scripts/timers';
 import BackLayer from './backlayer';
@@ -95,16 +98,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
      */
     private timers: Timers;
 
-    /**
-     * 現在処理中のTouch
-     */
-    private touchIdentifier: any;
     constructor(props: IPropMapEdit){
         super(props);
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleTouchStart = this.handleTouchStart.bind(this);
-        this.handleTouchMove = this.handleTouchMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleResize = this.handleResize.bind(this);
     }
 
@@ -162,14 +160,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
 
         this.resetMap(false);
-
-        // イベント
-        canvas2.addEventListener('touchstart', this.handleTouchStart, {
-            passive: false,
-        } as any);
-        canvas2.addEventListener('touchmove', this.handleTouchMove, {
-            passive: false,
-        } as any);
     }
     componentWillUnmount(){
         this.timers.clean();
@@ -582,15 +572,19 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
                     <div className={styles.canvasWrapper}>
                         <canvas ref="canvas" width={width} height={height}/>
-                        <canvas ref="canvas2"
-                            className={styles.overlapCanvas}
-                            style={c2style}
-                            width={width}
-                            height={height}
+                        <MousePad
                             onMouseDown={this.handleMouseDown}
-                            onMouseMove={this.props.edit.tool != null ? this.handleMouseMove : void 0}
-                            onContextMenu={this.handleContextMenu}
-                            />
+                            onMouseMove={this.handleMouseMove}
+                            onMouseUp={this.handleMouseUp}
+                            >
+                            <canvas ref="canvas2"
+                                className={styles.overlapCanvas}
+                                style={c2style}
+                                width={width}
+                                height={height}
+                                onContextMenu={this.handleContextMenu}
+                                />
+                        </MousePad>
                     </div>
                 </Resizable>
             </Scroll>
@@ -616,28 +610,31 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             y,
         });
     }
-    handleMouseDown<T>(e: React.MouseEvent<T>){
+    handleMouseDown({target, elementX, elementY, button, preventDefault}: MousePadEvent){
+        //マウスが下がった
+
+        const canvas2 = this.refs['canvas2'] as HTMLCanvasElement;
+        if (target !== canvas2){
+            preventDefault();
+            return;
+        }
+
         const {
             edit,
             stage,
         } = this.props;
-        //マウスが下がった
-        e.preventDefault();
-        const {
-            x:canvas_x,
-            y:canvas_y,
-        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-        const mx = Math.floor((e.pageX-canvas_x)/32);
-        const my = Math.floor((e.pageY-canvas_y)/32);
+
+        const mx = Math.floor(elementX/32);
+        const my = Math.floor(elementY/32);
 
         let mode: Mode;
-        if(e.button===0){
+        if(button===0 || button==null){
             //左クリック
             mode = edit.mode;
-        }else if(e.button===1){
+        }else if(button===1){
             //中クリック
             mode="hand";
-        }else if(e.button===2){
+        }else if(button===2){
             //右クリック
             mode="eraser";
         }else{
@@ -645,101 +642,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
 
         editLogics.mouseDown(mode, mx, my);
-
-        //マウスが上がったときの処理
-        const mouseUpHandler=()=>{
-            editLogics.mouseUp();
-            //上がったらおわり
-            document.body.removeEventListener("mouseup", mouseUpHandler, false);
-        };
-        document.body.addEventListener("mouseup", mouseUpHandler, false);
     }
-    handleMouseMove<T>(e: React.MouseEvent<T>){
-        e.preventDefault();
-        this.mouseMoves(this.props.edit.tool, e.pageX, e.pageY);
+    handleMouseMove({elementX, elementY}: MousePadEvent){
+        this.mouseMoves(this.props.edit.tool, elementX, elementY);
     }
-    handleTouchStart(e: TouchEvent){
-        if (this.touchIdentifier != null){
-            return;
-        }
-        if (e.cancelable){
-            e.preventDefault();
-        }
-        const t = e.changedTouches[0];
-
-        if (t == null){
-            return;
-        }
-        // 最初のひとつで処理
-        this.touchIdentifier = t.identifier;
-
-        const {
-            mode,
-        } = this.props.edit;
-
-        const {
-            x:canvas_x,
-            y:canvas_y,
-        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-
-        // const zoom = util.getPageZoom();
-        const mx = Math.floor((t.pageX-canvas_x)/32);
-        const my = Math.floor((t.pageY-canvas_y)/32);
-
-        editLogics.mouseDown(mode, mx, my);
-
-        const touchEndHandler = (e: TouchEvent)=>{
-            for (const t of Array.from(e.changedTouches)){
-                if (t.identifier === this.touchIdentifier){
-                    this.touchIdentifier = null;
-                    editLogics.mouseUp();
-                    document.body.removeEventListener('touchend', touchEndHandler, false);
-                    document.body.removeEventListener('touchcancel', touchEndHandler, false);
-
-                    break;
-                }
-            }
-        };
-        document.body.addEventListener('touchend', touchEndHandler, false);
-        document.body.addEventListener('touchcancel', touchEndHandler, false);
+    handleMouseUp(){
+        editLogics.mouseUp();
     }
-    handleTouchMove(e: TouchEvent){
-        if (e.cancelable){
-            e.preventDefault();
-        }
-
-        const {
-            touchIdentifier,
-        } = this;
-
-        if (touchIdentifier == null){
-            return;
-        }
-
-        const {
-            x:canvas_x,
-            y:canvas_y,
-        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-
-        for (const t of Array.from(e.changedTouches)){
-            if (t.identifier != touchIdentifier){
-                continue;
-            }
-
-            const mx = Math.floor((t.pageX - canvas_x)/32);
-            const my = Math.floor((t.pageY - canvas_y)/32);
-
-            editLogics.mouseMove(mx, my);
-        }
-    }
-    mouseMoves(tool: ToolState | null, pageX: number, pageY: number){
-        const {
-            x:canvas_x,
-            y:canvas_y,
-        } = util.getAbsolutePosition(this.refs['canvas2'] as HTMLCanvasElement);
-
-        const mx = Math.floor((pageX-canvas_x)/32);
-        const my = Math.floor((pageY-canvas_y)/32);
+    mouseMoves(tool: ToolState | null, elementX: number, elementY: number){
+        const mx = Math.floor(elementX/32);
+        const my = Math.floor(elementY/32);
 
         editLogics.mouseMove(mx, my, tool);
     }
