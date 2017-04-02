@@ -19,7 +19,6 @@ export default class Select extends React.Component<IPropSelect, {}>{
     render(){
         const {
             value,
-            onChange,
             contents,
         } = this.props;
         return <div className={styles.wrapper}>{

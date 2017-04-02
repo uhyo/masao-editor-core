@@ -1,5 +1,4 @@
 import {
-    ChipRendering,
     Chip,
 } from './interface';
 // 敵データのテーブル

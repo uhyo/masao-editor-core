@@ -42,10 +42,10 @@ export class Store<T> extends RefluxStore<T>{
     }
 }
 
-export interface StoreDefinition<T>{
+export interface StoreDefinition{
     init?(): void;
 }
-export function createStore<T>(definition: StoreDefinition<T>): StoreObject<T>{
+export function createStore<T>(definition: StoreDefinition): StoreObject<T>{
     return (Reflux as any).createStore(definition);
 }
 

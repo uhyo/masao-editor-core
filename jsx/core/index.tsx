@@ -1,11 +1,9 @@
 import * as React  from 'react';
-import * as Reflux from 'reflux';
 
 import {
     RefluxComponent,
 } from '../../scripts/reflux-util';
 
-import * as extend from 'extend';
 import * as masao from '../../scripts/masao';
 import {
     chipToMapString,
@@ -159,7 +157,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             {screen}
         </div>;
     }
-    handleExternal<T>(req: (game: any, obj: IDefnMasaoEditorCore)=>void){
+    handleExternal(req: (game: any, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
         return ()=>{
             const {

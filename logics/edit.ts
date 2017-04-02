@@ -383,7 +383,6 @@ function mapUpdateFillAction(screen: Screen){
 export function moveCursorBy({x, y}: {x: number; y: number}): void{
     const edit = editStore.state;
     const {
-        screen,
         stage,
         cursor,
         scroll_x,
@@ -491,11 +490,7 @@ export function cursorButton(keydown: boolean){
         scroll_x,
         scroll_y,
         cursor,
-        stage,
     } = editStore.state;
-    const {
-        advanced,
-    } = mapStore.state;
 
     if (cursor == null){
         return;

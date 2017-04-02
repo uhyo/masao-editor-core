@@ -28,8 +28,6 @@ import {
     ToolState,
     CursorState,
 } from '../../../actions/edit';
-import * as mapActions from '../../../actions/map';
-import * as historyActions from '../../../actions/history';
 import { EditState } from '../../../stores/edit';
 import {
     StageData,
@@ -372,8 +370,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             const width=view_width*32;
             const height=view_height*32;
 
-            const mapData=stage.map, layerData=stage.layer;
-
             // バックバッファで描画
             if (screen === 'map' || render_map === true){
                 backlayer_map.prerender(scroll_x, scroll_y, view_width, view_height);
@@ -496,12 +492,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         // 指定された座標に描画
         const {
             stage,
-            edit: {
-                scroll_x,
-                scroll_y,
-                view_width,
-                view_height,
-            },
         } = this.props;
         if (type === 'map'){
             const c = stage.map[y][x];
@@ -591,12 +581,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         </div>;
     }
     handleResize(widthr: number, heightr: number){
-        const {
-            stage: {
-                size,
-            },
-            edit,
-        } =this.props;
         const width = Math.floor(widthr/32);
         const height = Math.floor(heightr/32);
         editLogics.changeView({
@@ -621,7 +605,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         const {
             edit,
-            stage,
         } = this.props;
 
         const mx = Math.floor(elementX/32);

@@ -1,7 +1,6 @@
 'use strict';
 
 import {
-    containerRect,
     Rect,
 } from '../../../scripts/rect';
 

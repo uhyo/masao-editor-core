@@ -15,7 +15,7 @@ export class ProjectStore extends Store<ProjectState>{
             version: 'fx16',
         };
     }
-    private onChangeVersion({version}: projectActions.ChangeVersionAction){
+    public onChangeVersion({version}: projectActions.ChangeVersionAction){
         this.setState({
             version,
         });

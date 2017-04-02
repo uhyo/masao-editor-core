@@ -1,9 +1,7 @@
 // advanced-mapをON/OFFするlogic
 
-import * as editActions from '../actions/edit';
 import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
-import editStore from '../stores/edit';
 import mapStore from '../stores/map';
 
 export function setAdvanced(advanced: boolean): void{

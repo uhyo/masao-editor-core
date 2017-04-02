@@ -9,13 +9,11 @@ import {
 import {
     MainChipRendering,
     SubChipRendering,
-    ChipRendering,
     Chip,
 } from './chip-data/interface';
 
 import {
     dossunsun_pattern,
-    emptyblock_pattern,
     unknown_pattern,
 } from './chip-data/patterns';
 

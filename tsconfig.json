@@ -1,19 +1,22 @@
 {
-    "compilerOptions":{
-        "lib": ["dom", "es2015"],
-        "noEmitOnError": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": true,
-        "removeComments": true,
-        "strictNullChecks": true,
-        "alwaysStrict": true,
-        "jsx":"react",
-        "module":"commonjs",
-        "target":"es5"
-    },
-    "exclude": ["node_modules"]
+  "compilerOptions":{
+    "lib": ["dom", "es2015"],
+    "alwaysStrict": true,
+    "jsx":"react",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "module":"commonjs",
+    "target":"es5"
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules"]
 }
 
 

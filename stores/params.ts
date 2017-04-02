@@ -12,15 +12,15 @@ export class ParamsStore extends Store<ParamsState>{
         this.listenables = paramActions;
         this.state = masao.param.addDefaults({});
     }
-    private onChangeParam({param,value}: paramActions.ChangeParamAction){
+    public onChangeParam({param,value}: paramActions.ChangeParamAction){
         this.setState({
             [param]: value,
         });
     }
-    private onChangeParams(obj: Record<string, string>){
+    public onChangeParams(obj: Record<string, string>){
         this.setState(obj);
     }
-    private onResetParams(obj: Record<string, string>){
+    public onResetParams(obj: Record<string, string>){
         this.setState(obj);
     }
 }

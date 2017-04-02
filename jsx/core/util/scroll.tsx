@@ -169,7 +169,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             this.doHandScroll(this.hsc_target, pageX, pageY, this.hsc_parent, this.hsc_x, this.hsc_y);
         }
     }
-    handleMouseUp<T>(){
+    handleMouseUp(){
         // free scrollを解除
         if (this.mouse_flag === true){
             this.mouse_flag = false;
@@ -187,11 +187,6 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         }
     }
     registerHandScroll(target: HTMLElement, elementX: number, elementY: number){
-        const {
-            width: target_width,
-            height: target_height,
-        } = getAbsolutePosition(target);
-
         this.hsc_target = target;
         this.hsc_parent =
             target === this.refs['horTip'] ? this.refs['hor'] as HTMLElement :
@@ -229,8 +224,6 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             props: {
                 width,
                 height,
-                x,
-                y,
                 screenX,
                 screenY,
             },
@@ -260,8 +253,6 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             props: {
                 width,
                 height,
-                x,
-                y,
                 screenX,
                 screenY,
             },

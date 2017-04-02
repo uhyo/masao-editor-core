@@ -3,7 +3,6 @@ import {
     Store,
 } from '../scripts/reflux-util';
 import mapStore, {
-    Chip,
     StageData,
 } from './map';
 import * as historyActions from '../actions/history';
@@ -32,7 +31,7 @@ export class HistoryStore extends Store<HistoryState>{
             })),
         };
     }
-    private onAddHistory({stage, stageData}: historyActions.AddHistoryAction){
+    public onAddHistory({stage, stageData}: historyActions.AddHistoryAction){
         this.setState({
             data: this.state.data.map((st, i)=>{
                 if (i === stage-1){
@@ -55,7 +54,7 @@ export class HistoryStore extends Store<HistoryState>{
             }),
         });
     }
-    private onNewHistory({stage, stageData}: historyActions.NewHistoryAction){
+    public onNewHistory({stage, stageData}: historyActions.NewHistoryAction){
         this.setState({
             data: this.state.data.map((st, i)=>{
                 if (i === stage-1){
@@ -70,7 +69,7 @@ export class HistoryStore extends Store<HistoryState>{
             }),
         });
     }
-    private onBack({stage}: historyActions.BackAction){
+    public onBack({stage}: historyActions.BackAction){
         const {
             data,
         } = this.state;
@@ -92,7 +91,7 @@ export class HistoryStore extends Store<HistoryState>{
             }),
         });
     }
-    private onForward({stage}: historyActions.ForwardAction){
+    public onForward({stage}: historyActions.ForwardAction){
         const {
             data,
         } = this.state;

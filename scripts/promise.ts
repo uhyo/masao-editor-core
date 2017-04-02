@@ -5,7 +5,7 @@ const {
 } = require('es6-promise');
 
 
-const p = 'Promise' in this ? Promise : P;
+const p = 'undefined' !== typeof Promise ? Promise : P;
 
 export default p as typeof Promise;
 

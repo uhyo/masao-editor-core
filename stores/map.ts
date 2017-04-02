@@ -2,13 +2,8 @@
 import {
     Store,
 } from '../scripts/reflux-util';
-import {
-    mapStringToChip,
-    layerStringToChip,
-} from '../scripts/chip';
 
 import * as mapActions from '../actions/map';
-import * as paramActions from '../actions/params';
 
 // チップデータ （メイン用）
 export type Chip = mapActions.Chip;
@@ -90,7 +85,7 @@ export class MapStore extends Store<MapState>{
             layer,
         };
     }
-    private onSetAdvanced({advanced}: mapActions.SetAdvancedAction){
+    public onSetAdvanced({advanced}: mapActions.SetAdvancedAction){
         if (this.state.advanced === true && advanced === false){
             // マップから変なのを消す
             const data = this.state.data.map(({size, map, layer})=>({
@@ -108,7 +103,7 @@ export class MapStore extends Store<MapState>{
             });
         }
     }
-    private onUpdateMap({stage,x,y,chip}: mapActions.UpdateMapAction){
+    public onUpdateMap({stage,x,y,chip}: mapActions.UpdateMapAction){
         const {
             data,
         } = this.state;
@@ -157,7 +152,7 @@ export class MapStore extends Store<MapState>{
             }
         }
     }
-    private onUpdateLayer({stage,x,y,chip}: mapActions.UpdateMapAction){
+    public onUpdateLayer({stage,x,y,chip}: mapActions.UpdateMapAction){
         const {
             data,
         } = this.state;
@@ -206,7 +201,7 @@ export class MapStore extends Store<MapState>{
             }
         }
     }
-    private onUpdateMapRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<Chip>): void{
+    public onUpdateMapRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<Chip>): void{
         const {
             data,
         } = this.state;
@@ -253,7 +248,7 @@ export class MapStore extends Store<MapState>{
             });
         }
     }
-    private onUpdateLayerRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<number>): void{
+    public onUpdateLayerRect({stage, left, top, right, bottom, chip}: mapActions.UpdateMapRectAction<number>): void{
         const {
             data,
         } = this.state;
@@ -300,7 +295,7 @@ export class MapStore extends Store<MapState>{
             });
         }
     }
-    private onUpdateMapFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<Chip>){
+    public onUpdateMapFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<Chip>){
         const {
             size,
             map,
@@ -337,7 +332,7 @@ export class MapStore extends Store<MapState>{
             },
         });
     }
-    private onUpdateLayerFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<number>){
+    public onUpdateLayerFill({stage, x, y, chip}: mapActions.UpdateMapFillAction<number>){
         const {
             size,
             layer,
@@ -374,7 +369,7 @@ export class MapStore extends Store<MapState>{
             },
         });
     }
-    private onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){
+    public onResizeMap({stage, left, top, right, bottom}: mapActions.ResizeMapAction){
         if (!this.state.advanced){
             return;
         }
@@ -432,7 +427,7 @@ export class MapStore extends Store<MapState>{
         });
     }
     // マップをそのまま受け入れる
-    private onLoadMap({stage, size, map, layer}: mapActions.LoadMapAction){
+    public onLoadMap({stage, size, map, layer}: mapActions.LoadMapAction){
         if (stage <= 0 || this.state.stages < stage){
             return;
         }

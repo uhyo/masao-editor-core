@@ -304,7 +304,7 @@ export default class BackLayer{
         effecters1.sort(({x: x1, y: y1, big: big1}: any, {x: x2, y: y2, big: big2}: any)=> (big2 - big1) * width * height + (x2 - x1) * height + (y2 - y1));
         const effecters = sortedUniq(effecters1, ({x: x1, y: y1}, {x: x2, y: y2})=> x1 === x2 && y1 === y2);
 
-        for (let {x, y, big} of effecters){
+        for (let {x, y} of effecters){
             this.drawCallback(ctx, x, y, x * size, y * size);
         }
 
@@ -357,10 +357,7 @@ export default class BackLayer{
      */
     update(points: Array<Point>){
         const {
-            canvas,
             regions,
-            size,
-            updator,
         } = this;
 
         const rects = [];   // ついでにrect集合に変換

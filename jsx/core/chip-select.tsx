@@ -219,7 +219,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 chipselect_height,
                 chipselect_scroll,
             },
-            advanced,
         } = this.props;
         // var w= screen==="layer" ? 16 : 8;
         // const ks = advanced ? chip.advancedChipList : chip.chipList;
@@ -290,7 +289,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     handleResize(width: number, height: number){
         const {
             chipselect_width,
-            chipselect_height,
             chipselect_scroll,
         } = this.props.edit;
 

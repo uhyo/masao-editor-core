@@ -78,7 +78,6 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                         description=obj.description.replace(/（.+）$/,"");
                     }else{
                         obj=data[key];
-                        let type=obj.type;
                         description=obj.description;
                         //versionがあれか見る
                         let version = obj.version;
@@ -89,15 +88,6 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                         }
                         //typeに応じて
                         if(obj.type === 'enum'){
-                            const valueLink={
-                                value: params[key],
-                                requestChange:(v: string)=>{
-                                    paramActions.changeParam({
-                                        param: key,
-                                        value: v
-                                    });
-                                }
-                            };
                             let enumValues=obj.enumValues;
                             if(version != null && Array.isArray(version[pv])){
                                 //選択肢の制限
@@ -109,7 +99,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}>{
                                 const value = e.currentTarget.value;
                                 paramActions.changeParam({
                                     param: key,
-                                    value: e.currentTarget.value,
+                                    value,
                                 });
                             };
                             field=<select value={params[key]} onChange={fieldChange}>{

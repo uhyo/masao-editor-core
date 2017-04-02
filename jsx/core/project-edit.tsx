@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import * as projectActions from '../../actions/project';
-import * as mapActions from '../../actions/map';
 import * as editLogics from '../../logics/edit';
 import {
     setAdvanced,

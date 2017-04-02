@@ -7,11 +7,9 @@ import MousePad, {
     MousePadEvent,
 } from './util/mousepad';
 
-import * as editActions from '../../actions/edit';
 import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
 import {
-    MapState,
     StageData,
 } from '../../stores/map';
 
@@ -128,13 +126,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                     size,
                 },
             },
-            state: {
-                mouse_down,
-            },
-            handleMouseMove,
-            handleMouseDown,
         } = this;
-        const mousemove = mouse_down ? handleMouseMove : void 0;
         return <div>
             <MousePad
                 onMouseDown={this.handleMouseDown}
@@ -148,8 +140,6 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
     handleMouseDown(ev: MousePadEvent){
         const {
             target,
-            elementX,
-            elementY,
             button,
             preventDefault,
         } = ev;
@@ -167,7 +157,6 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
     handleMouseMove({elementX, elementY}: MousePadEvent){
         const {
             edit,
-            stage,
         } = this.props;
 
         //そこを中心に
