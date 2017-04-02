@@ -26,7 +26,7 @@ export function changeMapSize(width: number, height: number): void{
     });
 }
 
-interface ResizeData{
+export interface ResizeData{
     top: number;
     right: number;
     bottom: number;
@@ -56,7 +56,7 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
 }
 
 // 画面の大きさを変更
-interface ChangeViewArg{
+export interface ChangeViewArg{
     width: number;
     height: number;
 }

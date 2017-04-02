@@ -33,7 +33,7 @@ export interface StoreObject<T>{
 export interface StoreClass{
     new<T>(): StoreObject<T>;
 }
-const RefluxStore = (Reflux as any).Store as StoreClass;
+export const RefluxStore = (Reflux as any).Store as StoreClass;
 export class Store<T> extends RefluxStore<T>{
     // stateを更新してpublish
     protected setState(obj: Partial<T>){
@@ -50,12 +50,12 @@ export function createStore<T>(definition: StoreDefinition): StoreObject<T>{
 }
 
 // ========= Components ==========
-interface RefluxComponentClass{
+export interface RefluxComponentClass{
     new<P, S>(props: P): IRefluxComponent<P, S>
 }
-interface IRefluxComponent<P, S> extends React.Component<P, S>{
+export interface IRefluxComponent<P, S> extends React.Component<P, S>{
 }
-const _RefluxComponent = (Reflux as any).Component as RefluxComponentClass;
+export const _RefluxComponent = (Reflux as any).Component as RefluxComponentClass;
 
 export class RefluxComponent<D, P, S> extends _RefluxComponent<P, S & D>{
     constructor(props: P, definition: {[K in keyof D]: Store<D[K]>}){

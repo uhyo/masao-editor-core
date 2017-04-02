@@ -5,7 +5,7 @@ const Resizable: any = require('react-resizable-box');
 
 import * as styles from './resizable.css';
 
-interface IPropResizableBox{
+export interface IPropResizableBox{
     width: number;
     height: number;
 

@@ -1,9 +1,14 @@
 import {
+    Action,
     createAction,
 } from '../scripts/reflux-util';
 import {
     StageData,
 } from '../stores/map';
+
+export {
+    Action,
+};
 
 export interface AddHistoryAction{
     stage: number;

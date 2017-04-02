@@ -1,7 +1,11 @@
 import {
+    Action,
     createAction,
 } from '../scripts/reflux-util';
 
+export {
+    Action,
+};
 export type Chip = number;
 
 export interface UpdateMapAction{

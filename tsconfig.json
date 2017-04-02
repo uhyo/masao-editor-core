@@ -2,7 +2,10 @@
   "compilerOptions":{
     "lib": ["dom", "es2015"],
     "alwaysStrict": true,
+    "declaration": true,
     "jsx":"react",
+    "module": "es2015",
+    "moduleResolution": "Node",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -11,11 +14,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
+    "rootDir": "./",
     "strictNullChecks": true,
-    "module":"commonjs",
     "target":"es5"
   },
-  "include": ["./**/*.ts"],
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }
 

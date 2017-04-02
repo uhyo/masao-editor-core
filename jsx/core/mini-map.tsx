@@ -31,7 +31,7 @@ export interface IPropMiniMap{
     edit: EditState;
     stage: StageData;
 }
-interface IStateMiniMap{
+export interface IStateMiniMap{
     mouse_down: boolean;
 }
 export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap>{

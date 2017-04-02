@@ -1,6 +1,11 @@
 import {
+    Action,
     createAction,
 } from '../scripts/reflux-util';
+
+export {
+    Action,
+};
 
 export interface ChangeVersionAction{
     version: '2.8' | 'fx16' | 'kani2';

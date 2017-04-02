@@ -2,7 +2,7 @@ import * as React from 'react';
 // key eventを感知
 import * as keyLogics from '../../logics/key';
 
-interface IPropKeyEvents{
+export interface IPropKeyEvents{
 }
 export default class KeyEvents extends React.Component<IPropKeyEvents, {}>{
     constructor(props: IPropKeyEvents){

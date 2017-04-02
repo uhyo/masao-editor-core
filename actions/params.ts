@@ -1,6 +1,11 @@
 import {
+    Action,
     createAction,
 } from '../scripts/reflux-util';
+
+export {
+    Action,
+};
 
 /*
  * changeParam({

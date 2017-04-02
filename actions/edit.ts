@@ -1,7 +1,12 @@
 //edit actions
 import {
+    Action,
     createAction,
 } from '../scripts/reflux-util';
+
+export {
+    Action,
+};
 
 export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
 

@@ -19,9 +19,18 @@ import {
     Command,
 } from '../../logics/command';
 
-import mapStore, { MapState } from '../../stores/map';
-import paramStore, { ParamsState } from '../../stores/params';
-import editStore, { EditState } from '../../stores/edit';
+import mapStore, {
+    MapState,
+    MapStore,
+} from '../../stores/map';
+import paramStore, {
+    ParamsState,
+    ParamsStore,
+} from '../../stores/params';
+import editStore, {
+    EditState,
+    EditStore,
+} from '../../stores/edit';
 import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
@@ -101,7 +110,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         projectActions.changeVersion({version});
         if (advanced){
             const a = game['advanced-map']!;
-            mapLogics.loadAdvancedMap(a.stages.map(stage=>{
+            mapLogics.loadAdvancedMap(a.stages.map((stage: any)=>{
                 let map;
                 let layer;
                 for (let obj of stage.layers){
@@ -220,9 +229,9 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
 
     //export stores
-    static mapStore = mapStore;
-    static paramStore = paramStore;
-    static editStore = editStore;
+    static mapStore: MapStore = mapStore;
+    static paramStore: ParamsStore = paramStore;
+    static editStore: EditStore = editStore;
 }
 
 //各screen

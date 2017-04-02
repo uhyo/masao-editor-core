@@ -14,7 +14,7 @@ const plugins =
 module.exports={
     devtool: 'source-map',
     entry: {
-        js: './jsx/index.ts',
+        js: './tmp-js/jsx/index.js',
     },
     output: {
         path: path.join(__dirname, 'dist'),
@@ -24,6 +24,7 @@ module.exports={
     },
     module: {
         loaders: [
+            /*
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
@@ -33,16 +34,19 @@ module.exports={
                     //sourceMaps: true
                 }
             },
+           */
             {
                 test: /\.js$/,
                 loader: 'source-map-loader',
                 enforce: 'pre',
             },
+            /*
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules|\.d\.ts$/,
                 loader: 'awesome-typescript-loader',
             },
+           */
             {
                 test: /\.css$/,
                 loaders: ['style-loader', 'css-loader?modules&camelCase', 'postcss-loader'],

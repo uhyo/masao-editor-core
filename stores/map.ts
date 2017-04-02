@@ -574,7 +574,6 @@ function fillMap<C>(x: number, y: number, chip: C, map: Array<Array<C>>, width: 
         }
         return result;
     }
-    
 }
 
 

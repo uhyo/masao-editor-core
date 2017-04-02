@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "description": "Web Masao Editor.",
   "main": "dist/bundle.js",
-  "types": "./index.d.ts",
+  "types": "./dist-types/jsx/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -40,11 +40,13 @@
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "gulp-typed-css-modules": "^1.0.0",
+    "gulp-typescript": "^3.1.6",
     "gulp-uglify": "^2.0.0",
     "gulp-webserver": "^0.9.1",
     "img-loader": "^2.0.0",
     "json-loader": "^0.5.4",
     "masao": "^0.1.0",
+    "merge2": "^1.0.3",
     "postcss-css-variables": "^0.7.0",
     "postcss-loader": "^1.2.1",
     "postcss-nested": "^1.0.0",

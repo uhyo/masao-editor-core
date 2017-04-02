@@ -8,6 +8,7 @@ var duration=require('gulp-duration');
 var uglify=require('gulp-uglify');
 const webpack = require('webpack');
 const gulp_tcm = require('gulp-typed-css-modules');
+const gulp_ts = require('gulp-typescript');
 
 
 var del=require('del');
@@ -15,6 +16,7 @@ var changed=require('gulp-changed');
 var rename=require('gulp-rename');
 var replace=require('gulp-replace');
 var concat=require('gulp-concat');
+const merge2 = require('merge2');
 
 gulp.task('jsx',function(){
     return jsxCompiler(false);
@@ -22,6 +24,38 @@ gulp.task('jsx',function(){
 
 gulp.task('watch-jsx',function(){
     return jsxCompiler(true);
+});
+
+const tsProject = gulp_ts.createProject('tsconfig.json');
+const tsTarget = [
+    './actions/**/*.ts',
+    './logics/**/*.ts',
+    './scripts/**/*.ts',
+    './stores/**/*.ts',
+    './jsx/**/*.ts{,x}',
+];
+
+gulp.task('tsc', ()=>{
+    const stream = gulp.src(tsTarget, {
+        base: '.',
+    }).pipe(tsProject());
+    return merge2([
+        stream.js.pipe(gulp.dest('tmp-js/')),
+        stream.dts.pipe(gulp.dest('dist-types/')),
+    ]);
+});
+gulp.task('watch-tsc', ['tsc'], ()=>{
+    gulp.watch(tsTarget, ['tsc']);
+});
+gulp.task('build-files', ()=>{
+    return gulp.src(['images/**/*', 'jsx/**/*.css'], {
+        base: '.',
+    })
+    .pipe(changed('tmp-js/'))
+    .pipe(gulp.dest('tmp-js/'));
+});
+gulp.task('watch-build-files', ['build-files'], ()=>{
+    gulp.watch(['images/**/*', 'jsx/**/*.css'], ['build-files']);
 });
 
 gulp.task("mc_canvas-static",function(){
@@ -79,13 +113,13 @@ gulp.task('clean',function(cb){
     ],cb);
 });
 
-gulp.task('watch',['tcm', 'watch-jsx', 'html'],function(){
+gulp.task('watch',['tcm', 'watch-tsc', 'watch-build-files', 'watch-jsx', 'html'],function(){
     //w
     gulp.watch('html/*.html', ['html']);
     gulp.watch('jsx/**/*.css', ['tcm']);
 });
 
-gulp.task('default',['tcm', 'jsx', 'mc_canvas']);
+gulp.task('default',['tcm', 'tsc', 'build-files', 'jsx', 'mc_canvas']);
 
 //jsx compiling
 function jsxCompiler(watch){
