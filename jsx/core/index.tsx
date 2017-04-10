@@ -5,6 +5,9 @@ import {
 } from '../../scripts/reflux-util';
 
 import * as masao from '../../scripts/masao';
+
+export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
+
 import {
     chipToMapString,
     chipToLayerString,
@@ -63,10 +66,10 @@ export interface IPropMasaoEditorCore{
     defaultParams?: Record<string, string>;
 
     // TODO
-    defaultGame?: any;
+    defaultGame?: MasaoJSONFormat;
     externalCommands?: Array<{
         label: string;
-        request(game: any, states: IDefnMasaoEditorCore): void;
+        request(game: MasaoJSONFormat, states: IDefnMasaoEditorCore): void;
     }>;
 }
 export interface IStateMasaoEditorCore{
@@ -91,7 +94,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     componentWillReceiveProps(newProps: IPropMasaoEditorCore){
         if(this.props.defaultGame !== newProps.defaultGame && newProps.defaultGame != null){
             this.loadGame(newProps.defaultGame);
-        }else if(this.props.defaultParams !== newProps.defaultParams && newProps.defaultParams != null){
+        }else if(newProps.defaultGame && this.props.defaultParams !== newProps.defaultParams && newProps.defaultParams != null){
             paramActions.resetParams(newProps.defaultParams);
             mapLogics.loadParamMap(newProps.defaultParams);
             projectActions.changeVersion({version: masao.acceptVersion(newProps.defaultGame.version)});
@@ -166,7 +169,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             {screen}
         </div>;
     }
-    handleExternal(req: (game: any, obj: IDefnMasaoEditorCore)=>void){
+    handleExternal(req: (game: MasaoJSONFormat, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
         return ()=>{
             const {
@@ -188,7 +191,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
 
     // get infooooooom API
-    public getCurrentGame(): any{
+    public getCurrentGame(): MasaoJSONFormat{
         const {
             map,
             project,
@@ -205,8 +208,6 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             ...params,
             ...mp,
         });
-
-
 
         const obj = masao.format.make({
             params: allParams,
@@ -323,18 +324,18 @@ const ProjectScreen = (props: IPropProjectScreen)=>{
 
 
 //map to param
-type AdvancedMap = masao.format.MasaoJSONFormat['advanced-map'];
+type AdvancedMap = masao.format.AdvancedMap;
 type StageObject = masao.format.StageObject;
+type LayerObject = masao.format.LayerObject;
 function mapToParam(map: MapState): {
     params: Record<string, string>;
-    advancedMap: AdvancedMap;
+    advancedMap: AdvancedMap | undefined;
 }{
     if (map.advanced){
         // advancedなmapを発行
         const stages: Array<StageObject> = [];
         for (let i=0; i < map.stages; i++){
             const st = map.data[i];
-            type LayerObject = StageObject['layers'][number];
             const layers: Array<LayerObject> = [
                 {
                     type: 'main',
