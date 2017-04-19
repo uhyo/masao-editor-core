@@ -3,6 +3,7 @@
     "lib": ["dom", "es2015"],
     "alwaysStrict": true,
     "declaration": true,
+    "importHelpers": true,
     "jsx":"react",
     "module": "es2015",
     "moduleResolution": "Node",

@@ -84,6 +84,9 @@ module.exports={
             amd: 'react',
             root: 'React',
         },
+        tslib: {
+            commonjs: 'tslib',
+        },
     },
 
     performance: {
