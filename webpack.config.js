@@ -86,6 +86,11 @@ module.exports={
         },
         tslib: {
             commonjs: 'tslib',
+            commonjs2: 'tslib',
+        },
+        masao: {
+            commonjs: 'masao',
+            commonjs2: 'masao',
         },
     },
 
