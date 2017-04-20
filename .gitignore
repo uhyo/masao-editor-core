@@ -1,8 +1,7 @@
 node_modules/
 dist/
+dist-es6/
 dist-types/
-
-tmp-js/
 
 .sass-cache
 

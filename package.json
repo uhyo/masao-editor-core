@@ -3,6 +3,7 @@
   "version": "0.0.5",
   "description": "Web Masao Editor.",
   "main": "dist/bundle.js",
+  "module": "dist-es6/jsx/index.js",
   "types": "./dist-types/jsx/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -50,9 +51,7 @@
     "postcss-loader": "^1.2.1",
     "postcss-nested": "^1.0.0",
     "rbush": "^2.0.1",
-    "react-dom": "^15.4.1",
     "react-resizable-box": "^1.8.1",
-    "reflux": "^6.0.0",
     "source-map-loader": "^0.2.0",
     "style-loader": "^0.14.1",
     "typescript": "^2.1.4",
@@ -69,6 +68,8 @@
     "@types/reflux": "0.4.0",
     "masao": "^0.1.0",
     "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "reflux": "^6.0.0",
     "tslib": "^1.6.0"
   }
 }

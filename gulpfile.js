@@ -18,11 +18,11 @@ var replace=require('gulp-replace');
 var concat=require('gulp-concat');
 const merge2 = require('merge2');
 
-gulp.task('jsx',function(){
+gulp.task('jsx', ['tsc'], ()=>{
     return jsxCompiler(false);
 });
 
-gulp.task('watch-jsx',function(){
+gulp.task('watch-jsx', ['tsc'], ()=>{
     return jsxCompiler(true);
 });
 
@@ -40,7 +40,7 @@ gulp.task('tsc', ()=>{
         base: '.',
     }).pipe(tsProject());
     return merge2([
-        stream.js.pipe(gulp.dest('tmp-js/')),
+        stream.js.pipe(gulp.dest('dist-es6/')),
         stream.dts.pipe(gulp.dest('dist-types/')),
     ]);
 });
@@ -51,8 +51,8 @@ gulp.task('build-files', ()=>{
     return gulp.src(['images/**/*', 'jsx/**/*.css'], {
         base: '.',
     })
-    .pipe(changed('tmp-js/'))
-    .pipe(gulp.dest('tmp-js/'));
+    .pipe(changed('dist-es6/'))
+    .pipe(gulp.dest('dist-es6/'));
 });
 gulp.task('watch-build-files', ['build-files'], ()=>{
     gulp.watch(['images/**/*', 'jsx/**/*.css'], ['build-files']);

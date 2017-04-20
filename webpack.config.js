@@ -14,7 +14,7 @@ const plugins =
 module.exports={
     devtool: 'source-map',
     entry: {
-        js: './tmp-js/jsx/index.js',
+        js: './dist-es6/jsx/index.js',
     },
     output: {
         path: path.join(__dirname, 'dist'),
@@ -91,6 +91,14 @@ module.exports={
         masao: {
             commonjs: 'masao',
             commonjs2: 'masao',
+        },
+        'react-dom': {
+            commonjs: 'react-dom',
+            commonjs2: 'react-dom',
+        },
+        reflux: {
+            commonjs: 'reflux',
+            commonjs2: 'reflux',
         },
     },
 
