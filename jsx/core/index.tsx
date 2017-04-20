@@ -90,6 +90,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             //default
             this.loadGame(g);
         }
+        super.componentWillMount();
     }
     componentWillReceiveProps(newProps: IPropMasaoEditorCore){
         if(this.props.defaultGame !== newProps.defaultGame && newProps.defaultGame != null){

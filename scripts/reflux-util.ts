@@ -1,7 +1,6 @@
 // my lib. to handle Reflux
 import * as React from 'react';
 import * as Reflux from 'reflux';
-import * as extend from 'extend';
 
 // ========== Actions ==========
 export interface Action<T>{
@@ -37,7 +36,10 @@ export const RefluxStore = (Reflux as any).Store as StoreClass;
 export class Store<T> extends RefluxStore<T>{
     // stateを更新してpublish
     protected setState(obj: Partial<T>){
-        this.state = extend({}, this.state, obj as any);
+        this.state = {
+            ...(this.state as any),
+            ...(obj as any),
+        };
         this.trigger(this.state);
     }
 }
@@ -63,14 +65,18 @@ export class RefluxComponent<D, P, S> extends React.Component<P, S & D>{
     protected unlistens: Array<()=>void> = [];
     constructor(props: P, protected definition: {[K in keyof D]: Store<D[K]>}){
         super(props);
-
+    }
+    protected loadCurrentStore(){
         const initialState: any = {};
-        for (const key in definition){
-            const store = definition[key];
+        for (const key in this.definition){
+            const store = this.definition[key];
             initialState[key] = store.state;
         }
 
         this.state = initialState;
+    }
+    componentWillMount(){
+        this.loadCurrentStore();
     }
     componentDidMount(){
         // listen to stores
