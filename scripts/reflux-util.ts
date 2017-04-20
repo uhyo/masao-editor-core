@@ -28,7 +28,7 @@ export interface StoreObject<T>{
     listenTo<U>(action: Action<U>, callback: (act: U)=>void): void;
     listenToMany(actions: any): void;
 
-    listen(callback: (state: T)=>void): void;
+    listen(callback: (state: T)=>void): ()=>void;
 }
 export interface StoreClass{
     new<T>(): StoreObject<T>;
@@ -50,28 +50,45 @@ export function createStore<T>(definition: StoreDefinition): StoreObject<T>{
 }
 
 // ========= Components ==========
+/*
 export interface RefluxComponentClass{
     new<P, S>(props: P): IRefluxComponent<P, S>
 }
 export interface IRefluxComponent<P, S> extends React.Component<P, S>{
 }
 export const _RefluxComponent = (Reflux as any).Component as RefluxComponentClass;
+*/
 
-export class RefluxComponent<D, P, S> extends _RefluxComponent<P, S & D>{
-    constructor(props: P, definition: {[K in keyof D]: Store<D[K]>}){
+export class RefluxComponent<D, P, S> extends React.Component<P, S & D>{
+    protected unlistens: Array<()=>void> = [];
+    constructor(props: P, protected definition: {[K in keyof D]: Store<D[K]>}){
         super(props);
 
         const initialState: any = {};
-        for (let key in definition){
+        for (const key in definition){
             const store = definition[key];
             initialState[key] = store.state;
-            store.listen(state =>{
+        }
+
+        this.state = initialState;
+    }
+    componentDidMount(){
+        // listen to stores
+        for (const key in this.definition){
+            const store = this.definition[key];
+            const unlisten = store.listen(state =>{
                 this.setState({
                     [key]: state,
                 } as any);
             });
+            this.unlistens.push(unlisten);
         }
-
-        this.state = initialState;
+    }
+    componentWillUnmount(){
+        // unlisten
+        for (const unlisten of this.unlistens){
+            unlisten();
+        }
+        this.unlistens = [];
     }
 }

@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@types/extend": "^2.0.30",
-    "@types/node": "7.0.8",
+    "@types/node": "^7.0.13",
     "@types/rbush": "^2.0.2",
     "@types/react": "^15.0.4",
     "@types/react-dom": "^0.14.19",
