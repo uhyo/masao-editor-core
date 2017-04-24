@@ -13,6 +13,7 @@ import {
     chipToLayerString,
 } from '../../scripts/chip';
 
+import * as editActions from '../../actions/edit';
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
 import * as mapActions from '../../actions/map';
@@ -45,6 +46,8 @@ import MiniMap from './mini-map';
 import ScreenSelect from './screen-select';
 import ParamEdit from './param-edit';
 import ProjectEdit from './project-edit';
+import JSWarning from './js-warning';
+import JSEdit from './js-edit';
 
 import KeyEvent from './key-event';
 import Button from './util/button';
@@ -60,6 +63,7 @@ export interface IDefnMasaoEditorCore{
     history: HistoryState;
 }
 export interface IPropMasaoEditorCore{
+    jsWarning?: boolean;
     filename_pattern: string;
     filename_mapchip: string;
 
@@ -104,6 +108,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     private loadGame(game: masao.format.MasaoJSONFormat){
         const version = masao.acceptVersion(game.version);
         const params = masao.param.addDefaults(game.params, version);
+        const script = game.script || '';
 
         const advanced = game['advanced-map'] != null;
 
@@ -112,6 +117,14 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         });
         paramActions.resetParams(params);
         projectActions.changeVersion({version});
+
+        projectActions.changeScript({
+            script,
+        });
+        editActions.jsConfirm({
+            confirm: !!script,
+        });
+
         if (advanced){
             const a = game['advanced-map']!;
             mapLogics.loadAdvancedMap(a.stages.map((stage: any)=>{
@@ -151,6 +164,8 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             screen=<ParamScreen params={params} edit={edit} project={project}/>;
         }else if(edit.screen==="project"){
             screen=<ProjectScreen project={project} map={map} edit={edit}/>;
+        }else if(edit.screen==='js'){
+            screen=<JsScreen jsWarning={!!this.props.jsWarning} edit={edit} project={project} />;
         }
         let external_buttons=null;
         if(this.props.externalCommands != null){
@@ -213,6 +228,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         const obj = masao.format.make({
             params: allParams,
             version,
+            script: project.script || void 0,
             'advanced-map': advancedMap,
         });
         console.log('MADE', obj);
@@ -321,6 +337,32 @@ const ProjectScreen = (props: IPropProjectScreen)=>{
     return <div>
     <ProjectEdit {...props} />
     </div>;
+};
+
+interface IPropJsScreen{
+    jsWarning: boolean;
+    edit: EditState;
+    project: ProjectState;
+}
+const JsScreen = ({
+    jsWarning,
+    edit,
+    project,
+}: IPropJsScreen)=>{
+    if (jsWarning && !edit.js_confirm){
+        const handleConfirm = ()=>{
+            editActions.jsConfirm({
+                confirm: true,
+            });
+        };
+        return <div>
+            <JSWarning onClick={handleConfirm} />
+        </div>;
+    }else{
+        return <div>
+            <JSEdit project={project} />
+        </div>;
+    }
 };
 
 

@@ -27,9 +27,13 @@ export default class ScreenSelect extends React.Component<IPropScreenSelect, {}>
             {
                 key:"project",
                 label:"プロジェクト設定",
-            }
+            },
+            {
+                key:"js",
+                label:"拡張JS",
+            },
         ];
-        const onScreenChange = (key: 'map' | 'layer' | 'params' | 'project')=>{
+        const onScreenChange = (key: 'map' | 'layer' | 'params' | 'project' | 'js')=>{
             editActions.changeScreen({
                 screen: key,
             });

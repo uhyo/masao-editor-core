@@ -75,7 +75,7 @@ export interface ChipselectCursor{
 export type CursorState = MainCursor | ChipselectCursor;
 
 export interface ChangeScreenAction {
-    screen: 'map' | 'layer' | 'params' | 'project';
+    screen: 'map' | 'layer' | 'params' | 'project' | 'js';
 }
 export const changeScreen = createAction<ChangeScreenAction>();
 
@@ -168,3 +168,8 @@ export interface SetCursorAction {
     cursor: CursorState | null;
 }
 export const setCursor = createAction<SetCursorAction>();
+
+export interface JsConfirmAction {
+    confirm: boolean;
+}
+export const jsConfirm = createAction<JsConfirmAction>();

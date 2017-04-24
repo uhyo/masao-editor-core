@@ -12,7 +12,7 @@ import {
     Store,
 } from '../scripts/reflux-util';
 
-export type Screen = 'map' | 'layer' | 'params' | 'project';
+export type Screen = 'map' | 'layer' | 'params' | 'project' | 'js';
 // ツールの使用中状態
 
 export interface EditState{
@@ -92,6 +92,11 @@ export interface EditState{
      * キーボード用のカーソル
      */
     cursor: CursorState | null;
+
+    /**
+     * JSの警告をOKしたか
+     */
+    js_confirm: boolean;
 }
 export class EditStore extends Store<EditState>{
     constructor(){
@@ -118,6 +123,7 @@ export class EditStore extends Store<EditState>{
             chipselect_height: 9,
             chipselect_scroll: 0,
             cursor: null,
+            js_confirm: false,
         };
     }
     onChangeScreen({screen}: editActions.ChangeScreenAction){
@@ -209,6 +215,11 @@ export class EditStore extends Store<EditState>{
     onSetCursor({cursor}: editActions.SetCursorAction){
         this.setState({
             cursor,
+        });
+    }
+    onJsConfirm({confirm}: editActions.JsConfirmAction){
+        this.setState({
+            js_confirm: confirm,
         });
     }
 }
