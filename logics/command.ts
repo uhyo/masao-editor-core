@@ -50,7 +50,6 @@ export function run(command: Command, keydown: boolean): boolean{
         focus,
         cursor,
     } = editStore.state;
-    console.log('aoo----', focus, cursor);
     if (focus == null && command !== 'cursor:jump'){
         return false;
     }

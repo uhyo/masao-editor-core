@@ -518,7 +518,7 @@ export function blur(place: FocusPlace): void{
         cursor,
         focus,
     } = editStore.state;
-    if (focus !== place){
+    if (focus === place){
         editActions.setFocus({
             focus: null,
         });
