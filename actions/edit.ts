@@ -10,6 +10,8 @@ export {
 
 export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
 
+export type FocusPlace = 'main' | 'chipselect';
+
 // ツールの使用中状態
 export interface PenTool{
     type: 'pen';
@@ -168,6 +170,11 @@ export interface SetCursorAction {
     cursor: CursorState | null;
 }
 export const setCursor = createAction<SetCursorAction>();
+
+export interface SetFocusAction {
+    focus: FocusPlace | null;
+}
+export const setFocus = createAction<SetFocusAction>();
 
 export interface JsConfirmAction {
     confirm: boolean;

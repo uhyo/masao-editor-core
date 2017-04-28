@@ -13,6 +13,7 @@ import MousePad, {
 } from './util/mousepad';
 
 import * as editActions from '../../actions/edit';
+import * as editLogics from '../../logics/edit';
 
 import { EditState } from '../../stores/edit';
 import { ParamsState } from '../../stores/params';
@@ -248,7 +249,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             width: `${w}px`,
         };
         return <div className={styles.wrapper}>
-            <div>
+            <div ref="focusarea" tabIndex={0} onFocus={this.handleFocus} onBlur={this.handleBlur}>
                 <Scroll x={0} y={chipselect_scroll} width={chipselect_width} height={scrollHeight} screenX={chipselect_width} screenY={chipselect_height} disableX disableY={scrollHeight === 0} onScroll={this.handleScroll}>
                     <Resizable width={w} height={h} grid={{x: 32, y: 32}} onResize={this.handleResize}>
                         <MousePad
@@ -308,6 +309,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     }
     handleMouseDown(ev: MousePadEvent){
         this.handleMouseMove(ev);
+        (this.refs.focusarea as HTMLElement).focus();
     }
     handleMouseMove({elementX, elementY}: MousePadEvent){
         const {
@@ -333,6 +335,12 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 pen: chip.chipList[penidx],
             });
         }
+    }
+    handleFocus(){
+        editLogics.focus('chipselect');
+    }
+    handleBlur(){
+        editLogics.blur('chipselect');
     }
 }
 

@@ -41,7 +41,23 @@ export const commandNames: Record<Command, string> = {
     'cursor:button': 'カーソルボタン',
 };
 
-export function run(command: Command, keydown: boolean): void{
+/**
+ * コマンドを実行
+ * @returns 有効なコマンドが実行されたか
+ */
+export function run(command: Command, keydown: boolean): boolean{
+    const {
+        focus,
+        cursor,
+    } = editStore.state;
+    console.log('aoo----', focus, cursor);
+    if (focus == null && command !== 'cursor:jump'){
+        return false;
+    }
+    if (focus != null && cursor == null){
+        // カーソルを有効化
+        editLogics.setCursor(focus);
+    }
     if (keydown === true){
         switch(command){
             case 'mode:pen': {
@@ -158,6 +174,9 @@ export function run(command: Command, keydown: boolean): void{
                 historyLogics.forward(editStore.state.stage);
                 break;
             }
+            default: {
+                return false;
+            }
         }
     }else{
         switch(command){
@@ -165,6 +184,10 @@ export function run(command: Command, keydown: boolean): void{
                 editLogics.cursorButton(false);
                 break;
             }
+            default: {
+                return false;
+            }
         }
     }
+    return true;
 }

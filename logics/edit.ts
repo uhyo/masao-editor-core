@@ -9,6 +9,8 @@ import editStore, {
 } from '../stores/edit';
 import mapStore from '../stores/map';
 
+export type FocusPlace = editActions.FocusPlace;
+
 // マップサイズが変更になった場合にeditをうまく調整する
 export function changeMapSize(width: number, height: number): void{
     const {
@@ -459,29 +461,73 @@ export function moveCursorBy({x, y}: {x: number; y: number}): void{
 export function cursorJump(): void{
     const {
         cursor,
+    } = editStore.state;
+
+    if (cursor == null || cursor.type === 'chipselect'){
+        setCursor('main');
+    }else if (cursor.type === 'main'){
+        setCursor('chipselect');
+    }
+}
+export function setCursor(type: FocusPlace): void{
+    const {
         scroll_x,
         scroll_y,
         chipselect_width,
         chipselect_scroll,
     } = editStore.state;
-
-    if (cursor == null || cursor.type === 'chipselect'){
+    if (type === 'main'){
         editActions.setCursor({
             cursor: {
-                type: 'main',
+                type,
                 x: scroll_x,
                 y: scroll_y,
             },
         });
-    }else if (cursor.type === 'main'){
+    }else if (type === 'chipselect'){
         editActions.setCursor({
             cursor: {
-                type: 'chipselect',
+                type,
                 id: chipselect_width * chipselect_scroll,
             },
         });
     }
-
+}
+/**
+ * ある領域にフォーカスした
+ */
+export function focus(place: FocusPlace): void{
+    const {
+        focus,
+        cursorEnabled,
+    } = editStore.state;
+    if (focus !== place){
+        editActions.setFocus({
+            focus: place,
+        });
+        if (cursorEnabled){
+            setCursor(place);
+        }
+    }
+}
+/**
+ * フォーカスが離れた
+ */
+export function blur(place: FocusPlace): void{
+    const {
+        cursor,
+        focus,
+    } = editStore.state;
+    if (focus !== place){
+        editActions.setFocus({
+            focus: null,
+        });
+    }
+    if (cursor != null && cursor.type === place){
+        editActions.setCursor({
+            cursor: null,
+        });
+    }
 }
 export function cursorButton(keydown: boolean){
     const {

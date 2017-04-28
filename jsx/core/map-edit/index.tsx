@@ -554,30 +554,32 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         // TODO
         return <div className={styles.wrapper} style={style}>
-            <Scroll width={scrollWidth} height={scrollHeight}
-                x={scroll_x} y={scroll_y}
-                screenX={view_width}
-                screenY={view_height}
-                onScroll={this.handleScroll}>
-                <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
-                    <div className={styles.canvasWrapper}>
-                        <canvas ref="canvas" width={width} height={height}/>
-                        <MousePad
-                            onMouseDown={this.handleMouseDown}
-                            onMouseMove={this.handleMouseMove}
-                            onMouseUp={this.handleMouseUp}
-                            >
-                            <canvas ref="canvas2"
-                                className={styles.overlapCanvas}
-                                style={c2style}
-                                width={width}
-                                height={height}
-                                onContextMenu={this.handleContextMenu}
-                                />
-                        </MousePad>
-                    </div>
-                </Resizable>
-            </Scroll>
+            <div ref="focusarea" tabIndex={0} onFocus={this.handleFocus} onBlur={this.handleBlur}>
+                <Scroll width={scrollWidth} height={scrollHeight}
+                    x={scroll_x} y={scroll_y}
+                    screenX={view_width}
+                    screenY={view_height}
+                    onScroll={this.handleScroll}>
+                    <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
+                        <div className={styles.canvasWrapper}>
+                            <canvas ref="canvas" width={width} height={height}/>
+                            <MousePad
+                                onMouseDown={this.handleMouseDown}
+                                onMouseMove={this.handleMouseMove}
+                                onMouseUp={this.handleMouseUp}
+                                >
+                                <canvas ref="canvas2"
+                                    className={styles.overlapCanvas}
+                                    style={c2style}
+                                    width={width}
+                                    height={height}
+                                    onContextMenu={this.handleContextMenu}
+                                    />
+                            </MousePad>
+                        </div>
+                    </Resizable>
+                </Scroll>
+            </div>
         </div>;
     }
     handleResize(widthr: number, heightr: number){
@@ -602,6 +604,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             preventDefault();
             return;
         }
+        (this.refs.focusarea as HTMLElement).focus();
 
         const {
             edit,
@@ -640,6 +643,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();
+    }
+    handleFocus(){
+        editLogics.focus('main');
+    }
+    handleBlur(){
+        editLogics.blur('main');
     }
 }
 

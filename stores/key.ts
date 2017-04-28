@@ -39,7 +39,7 @@ const defaultBinding: Record<string, Command> = {
     'l': 'cursor:right',
     'j': 'cursor:down',
     'h': 'cursor:left',
-    'tab': 'cursor:jump',
+    // 'tab': 'cursor:jump',
     'escape': 'cursor:vanish',
     'z': 'cursor:button',
 };

@@ -7,6 +7,7 @@ import {
     Mode,
     ToolState,
     CursorState,
+    FocusPlace,
 } from '../actions/edit';
 import {
     Store,
@@ -89,6 +90,14 @@ export interface EditState{
     chipselect_scroll: number;
 
     /**
+     * フォーカスがどこにあるかを管理
+     */
+    focus: FocusPlace | null;
+    /**
+     * カーソルを利用するか
+     */
+    cursorEnabled: boolean;
+    /**
      * キーボード用のカーソル
      */
     cursor: CursorState | null;
@@ -122,7 +131,9 @@ export class EditStore extends Store<EditState>{
             chipselect_width: 8,
             chipselect_height: 9,
             chipselect_scroll: 0,
+            focus: null,
             cursor: null,
+            cursorEnabled: false,
             js_confirm: false,
         };
     }
@@ -212,9 +223,15 @@ export class EditStore extends Store<EditState>{
             chipselect_scroll: 0,
         });
     }
+    onSetFocus({focus}: editActions.SetFocusAction){
+        this.setState({
+            focus,
+        });
+    }
     onSetCursor({cursor}: editActions.SetCursorAction){
         this.setState({
             cursor,
+            cursorEnabled: this.state.cursorEnabled || cursor != null,
         });
     }
     onJsConfirm({confirm}: editActions.JsConfirmAction){
