@@ -7,6 +7,9 @@ import * as styles from './scroll.css';
 import {
     getAbsolutePosition,
 } from '../../../scripts/util';
+import {
+    getDelta,
+} from '../../../scripts/wheel';
 
 import MousePad, {
     MousePadEvent,
@@ -50,6 +53,7 @@ export interface IPropScroll{
      */
     disableY?: boolean;
 }
+
 export default class Scroll extends React.Component<IPropScroll, {}>{
     /**
      * マウスが押されているフラグ
@@ -81,6 +85,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handlePushButton = this.handlePushButton.bind(this);
+        this.handleWheel = this.handleWheel.bind(this);
     }
     render(){
         const {
@@ -113,7 +118,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
 
         const hor =
             disableX ? null :
-            <div className={styles.horWrap}>
+            <div ref="horWrapper" className={styles.horWrap} onWheel={this.handleWheel}>
                 <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
                 <div ref="hor" className={styles.hor}>
                     <div ref="horTip" className={styles.horTip} style={horStyle} />
@@ -123,7 +128,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
 
         const ver =
             disableY ? null :
-            <div className={styles.verWrap}>
+            <div ref="verWrapper" className={styles.verWrap} onWheel={this.handleWheel}>
                 <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
                 <div ref="ver" className={styles.ver}>
                     <div ref="verTip" className={styles.verTip} style={verStyle} />
@@ -149,8 +154,6 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
 
         if (target === this.refs['hor'] || target === this.refs['ver']){
             // 瞬間移動
-            console.log('SCROLL', window.scrollX, window.scrollY);
-            console.log('TARGET', target.getBoundingClientRect());
             this.doFreeScroll(target, elementX, elementY);
             this.registerFreeScroll(target);
             return;
@@ -275,6 +278,29 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             const pos = Math.round((py - handY)/parent_height * (height + screenY));
             this.setScroll(null, pos);
         }
+    }
+    handleWheel(e: React.WheelEvent<HTMLDivElement>){
+        const {
+            currentTarget,
+        } = e;
+        if (currentTarget === this.refs.horWrapper){
+            e.preventDefault();
+            const {
+                x,
+                y,
+            } = getDelta(e);
+            const sc = this.props.x + (y ? y : x);
+            this.setScroll(sc, null);
+        }else if (currentTarget === this.refs.verWrapper){
+            e.preventDefault();
+            const {
+                x,
+                y,
+            } = getDelta(e);
+            const sc = this.props.y + (y ? y : x);
+            this.setScroll(null, sc);
+        }
+            
     }
     // スクロールを伝達
     setScroll(nx: number | null, ny: number | null){
