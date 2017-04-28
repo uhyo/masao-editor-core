@@ -27,6 +27,9 @@
 }
 
 .overlap-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
   transition: opacity 0.4s ease;
   opacity: 1;
 
