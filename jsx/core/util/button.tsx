@@ -8,6 +8,10 @@ export interface IPropButton{
     disabled?: boolean;
 }
 export default class Button extends React.Component<IPropButton, {}>{
+    constructor(props: IPropButton){
+        super(props);
+        this.handleKey = this.handleKey.bind(this);
+    }
     render(){
         const {
             label,
@@ -24,7 +28,16 @@ export default class Button extends React.Component<IPropButton, {}>{
                 onClick();
             }
         };
-        return <div className={cl} onClick={disabled ? undefined : handler}>{child}</div>;
+        return <div className={cl} tabIndex={disabled ? undefined : 0} onClick={disabled ? undefined : handler} onKeyDown={this.handleKey}>{child}</div>;
+    }
+    handleKey<T>(e: React.KeyboardEvent<T>){
+        const {
+            onClick,
+        } = this.props;
+        if (e.key === ' ' && onClick != null){
+            e.preventDefault();
+            onClick();
+        }
     }
 }
 
