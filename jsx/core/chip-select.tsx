@@ -5,6 +5,9 @@ import Promise from '../../scripts/promise';
 import * as chip from '../../scripts/chip';
 import * as util from '../../scripts/util';
 import loadImage from '../../scripts/load-image';
+import {
+    getDelta,
+} from '../../scripts/wheel';
 
 import Resizable from './util/resizable';
 import Scroll from './util/scroll';
@@ -41,6 +44,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         super(props);
         this.handleResize = this.handleResize.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
+        this.handleWheel = this.handleWheel.bind(this);
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -256,7 +260,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                             onMouseDown={this.handleMouseDown}
                             onMouseMove={this.handleMouseMove}
                             >
-                            <canvas ref="canvas" width={w} height={h}/>
+                            <canvas ref="canvas" width={w} height={h} onWheel={this.handleWheel} />
                         </MousePad>
                     </Resizable>
                 </Scroll>
@@ -335,6 +339,30 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                 pen: chip.chipList[penidx],
             });
         }
+    }
+    handleWheel<T>(e: React.WheelEvent<T>){
+        const {
+            chipselect_width,
+            chipselect_height,
+            chipselect_scroll,
+        } = this.props.edit;
+        const {
+            x,
+            y,
+        } = getDelta(e);
+        let delta;
+        if (y !== 0){
+            delta = y;
+        }else if (x !== 0){
+            delta = x;
+        }else{
+            return;
+        }
+        const allh = Math.ceil(this.chipNumber() / chipselect_width);
+        const newscroll = Math.min(Math.max(0,  chipselect_scroll + delta), allh - chipselect_height);
+        editActions.changeChipselectScroll({
+            y: newscroll,
+        });
     }
     handleFocus(){
         editLogics.focus('chipselect');
