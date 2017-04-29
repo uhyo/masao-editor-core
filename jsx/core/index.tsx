@@ -64,6 +64,7 @@ export interface IDefnMasaoEditorCore{
 }
 export interface IPropMasaoEditorCore{
     jsWarning?: boolean;
+    backupId?: string;
     filename_pattern: string;
     filename_mapchip: string;
 
@@ -79,6 +80,9 @@ export interface IPropMasaoEditorCore{
 export interface IStateMasaoEditorCore{
 }
 export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCore, IPropMasaoEditorCore, IStateMasaoEditorCore>{
+    private autosaveTimer: any = null;
+    private backupField = 'masao-editor-backup';
+    private backupInterval = 60000;
     constructor(props: IPropMasaoEditorCore){
         super(props, {
             map: mapStore,
@@ -89,12 +93,45 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         });
     }
     componentWillMount(){
-        const g = this.props.defaultGame;
-        if(g){
+        // backupがあるか?
+        let g: MasaoJSONFormat | undefined = void 0;
+        if ('undefined' !== typeof localStorage){
+            const b = localStorage.getItem(this.backupFieldName());
+            if (b){
+                try {
+                    g = JSON.parse(b);
+                } catch(e){
+                    g = void 0;
+                }
+            }
+        }
+        if (g == null){
             //default
+            g = this.props.defaultGame;
+        }
+        if(g != null){
             this.loadGame(g);
         }
         super.componentWillMount();
+    }
+    componentDidMount(){
+        const {
+            backupId,
+        } = this.props;
+        if (backupId != null){
+            this.autosaveTimer = setInterval(()=>{
+                this.backup();
+            }, this.backupInterval);
+            this.backup();
+        }
+        super.componentDidMount();
+    }
+    comoponentWillUnmount(){
+        if (this.autosaveTimer != null){
+            clearInterval(this.autosaveTimer);
+            this.clearBackup();
+        }
+        super.componentWillUnmount();
     }
     componentWillReceiveProps(newProps: IPropMasaoEditorCore){
         if(this.props.defaultGame !== newProps.defaultGame && newProps.defaultGame != null){
@@ -204,6 +241,24 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 history,
             });
         };
+    }
+    protected backupFieldName(){
+        const {
+            backupField,
+            props: {
+                backupId,
+            },
+        } = this;
+        return `${backupField}:${backupId}`;
+    }
+    protected backup(){
+        // バックアップを保存
+        const game = this.getCurrentGame();
+        localStorage.setItem(this.backupFieldName(), JSON.stringify(game));
+    }
+    protected clearBackup(){
+        // バックアップを削除
+        localStorage.removeItem(this.backupFieldName());
     }
 
     // get infooooooom API
