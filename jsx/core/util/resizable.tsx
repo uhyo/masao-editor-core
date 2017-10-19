@@ -1,7 +1,7 @@
 "use strict";
 import * as React from 'react';
 
-const Resizable: any = require('react-resizable-box');
+const Resizable: any = require('react-resizable-box').default;
 
 import * as styles from './resizable.css';
 
@@ -25,11 +25,12 @@ export default class ResizableBox extends React.Component<IPropResizableBox, {}>
     constructor(props: IPropResizableBox){
         super(props);
         this.onResize = this.onResize.bind(this);
+        this.onResizeStop = this.onResizeStop.bind(this);
 
         this.prev_width = props.width;
         this.prev_height = props.height;
     }
-    onResize(_: any, styleSize: {width: number; height: number}){
+    onResize(_event: any, _direction: any, _ref: any, delta: {width: number; height: number}){
         const {
             props: {
                 onResize,
@@ -40,12 +41,18 @@ export default class ResizableBox extends React.Component<IPropResizableBox, {}>
         const {
             width,
             height,
-        } = styleSize;
-        if ((width !== prev_width || height !== prev_height) && onResize){
-            this.prev_width = width;
-            this.prev_height = height;
-            onResize(width, height);
+        } = delta;
+        if ((width !== 0 || height !== 0) && onResize){
+            onResize(prev_width + width, prev_height + height);
         }
+    }
+    onResizeStop(_event: any, _direction: any, _ref: any, delta: {width: number; height: number}){
+        const {
+            width,
+            height,
+        } = delta;
+        this.prev_width += width;
+        this.prev_height += height;
     }
     render(){
         const {
@@ -60,8 +67,9 @@ export default class ResizableBox extends React.Component<IPropResizableBox, {}>
         return <div className={styles.wrapper}>
             <Resizable
                 width={width} height={height} minWidth={minWidth} minHeight={minHeight} grid={gr}
-                isResizable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
-                onResize={this.onResize}>
+                enable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
+                onResize={this.onResize}
+                onResizeStop={this.onResizeStop}>
                 <div className={styles.container}>
                     {children}
                 </div>
