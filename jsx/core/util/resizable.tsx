@@ -1,7 +1,7 @@
 "use strict";
 import * as React from 'react';
 
-const Resizable: any = require('react-resizable-box').default;
+import Resizable from 're-resizable';
 
 import * as styles from './resizable.css';
 
@@ -66,7 +66,8 @@ export default class ResizableBox extends React.Component<IPropResizableBox, {}>
         const gr = grid ? [grid.x, grid.y] : void 0;
         return <div className={styles.wrapper}>
             <Resizable
-                width={width} height={height} minWidth={minWidth} minHeight={minHeight} grid={gr}
+                size={{width, height}}
+                minWidth={minWidth} minHeight={minHeight} grid={gr}
                 enable={{left: false, top: false, right: true, bottom: true, topLeft: false, topRight: false, bottomLeft: false, bottomRight: true}}
                 onResize={this.onResize}
                 onResizeStop={this.onResizeStop}>
