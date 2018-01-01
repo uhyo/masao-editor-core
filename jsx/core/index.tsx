@@ -94,9 +94,12 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
     componentWillMount(){
         // backupがあるか?
+        const {
+            backupId,
+        } = this.props;
         let g: MasaoJSONFormat | undefined = void 0;
-        if ('undefined' !== typeof localStorage){
-            const b = localStorage.getItem(this.backupFieldName());
+        if ('undefined' !== typeof localStorage && backupId != null){
+            const b = localStorage.getItem(this.backupFieldName(backupId));
             if (b){
                 try {
                     g = JSON.parse(b);
@@ -242,23 +245,34 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             });
         };
     }
-    protected backupFieldName(){
+    protected backupFieldName(backupId: string){
         const {
             backupField,
-            props: {
-                backupId,
-            },
         } = this;
         return `${backupField}:${backupId}`;
     }
+    /**
+     * バックアップを保存
+     */
     protected backup(){
-        // バックアップを保存
-        const game = this.getCurrentGame();
-        localStorage.setItem(this.backupFieldName(), JSON.stringify(game));
+        const {
+            backupId,
+        } = this.props;
+        if (backupId != null){
+            const game = this.getCurrentGame();
+            localStorage.setItem(this.backupFieldName(backupId), JSON.stringify(game));
+        }
     }
+    /**
+     * バックアップを削除
+     */
     protected clearBackup(){
-        // バックアップを削除
-        localStorage.removeItem(this.backupFieldName());
+        const {
+            backupId,
+        } = this.props;
+        if (backupId != null){
+            localStorage.removeItem(this.backupFieldName(backupId));
+        }
     }
 
     // get infooooooom API
