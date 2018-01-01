@@ -6,6 +6,7 @@
   "module": "dist-es6/jsx/index.js",
   "types": "./dist-types/jsx/index.d.ts",
   "scripts": {
+    "prepare": "NODE_ENV=production gulp default",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
