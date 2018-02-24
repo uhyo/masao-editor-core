@@ -91,8 +91,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             project: projectStore,
             history: historyStore,
         });
-    }
-    componentWillMount(){
+
         // backupがあるか?
         const {
             backupId,
@@ -115,7 +114,6 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         if(g != null){
             this.loadGame(g);
         }
-        super.componentWillMount();
     }
     componentDidMount(){
         const {
