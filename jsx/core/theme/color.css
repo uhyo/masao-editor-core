@@ -1,12 +1,23 @@
 /* Color theme. */
 :root {
+  /* Theme of buttons. */
   --button-surface-color-off: #eeeeee;
   --button-surface-color-on: #66ff33;
   --button-surface-color-hov: #88bb55;
   --button-label-color-disabled: #888888;
 
+  /* Theme of toolbars. */
   --toolbar-surface: #f4f4f4;
   --toolbar-line-color: #cccccc;
+
+  /* Theme for minimap. */
+  --minimap-bg: #e7ffe7;
+
+  /* Theme for main map. */
+  --mainmap-bg: #e7f4ff;
+
+  /* Theme for chip selector. */
+  --chipselect-bg: #ffeaea;
 }
 
 .dummy {

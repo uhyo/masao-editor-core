@@ -15,6 +15,8 @@ import {
 
 import * as editLogics from '../../logics/edit';
 
+import * as styles from './css/mini-map.css';
+
 //色の対応
 const colors: Record<string, string> = {
     masao: "#ff0000",
@@ -127,7 +129,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 },
             },
         } = this;
-        return <div>
+        return (<div className={styles.wrapper}>
             <MousePad
                 onMouseDown={this.handleMouseDown}
                 onMouseMove={this.handleMouseMove}
@@ -135,7 +137,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 >
                 <canvas ref="canvas" width={size.x*2} height={size.y*2}/>
             </MousePad>
-        </div>;
+        </div>);
     }
     handleMouseDown(ev: MousePadEvent){
         const {

@@ -1,6 +1,8 @@
 .wrapper {
-  margin: 4px;
+  margin: 0;
   padding: 0;
+
+  display: inline-block;
 }
 
 .canvas-wrapper {

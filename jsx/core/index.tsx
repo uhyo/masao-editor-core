@@ -394,16 +394,16 @@ const MapScreen = (props: IPropMapScreen)=>{
                 <EditMode edit={edit} params={params} history={history} />
             </div>
         </Toolbar>
+        {are}
         <div className={mapsClass}>
-            <div>
+            <div className={styles.minimapWrapper}>
                 <MiniMap params={params} edit={edit} stage={stage}/>
             </div>
-            <div>
-                {are}
-                <div className={styles.main}>
-                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
-                    <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
-                </div>
+            <div className={styles.chipselectWrapper}>
+                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
+            </div>
+            <div className={styles.mainmapWrapper}>
+                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
             </div>
         </div>
         <KeyEvent />
