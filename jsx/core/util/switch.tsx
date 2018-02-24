@@ -16,7 +16,14 @@ export default class Switch extends React.Component<IPropSwitch, {}>{
     }
     render(){
         const c = this.props.value === true ? styles.switchYes : styles.switchNormal;
-        return <div className={c} tabIndex={0} onClick={this.handleClick} onKeyDown={this.handleKey}>{this.props.label}</div>;
+        return (<div
+            role='switch'
+            aria-checked={this.props.value === true ? 'true' : 'false'}
+            className={c}
+            tabIndex={0}
+            onClick={this.handleClick}
+            onKeyDown={this.handleKey}
+        >{this.props.label}</div>);
     }
     handleClick<T>(e: React.MouseEvent<T>){
         const {

@@ -28,7 +28,16 @@ export default class Button extends React.Component<IPropButton, {}>{
                 onClick();
             }
         };
-        return <div className={cl} tabIndex={disabled ? undefined : 0} onClick={disabled ? undefined : handler} onKeyDown={this.handleKey}>{child}</div>;
+        return (<div
+            role='button'
+            aria-disabled={disabled}
+            className={cl}
+            tabIndex={disabled ? undefined : 0}
+            onClick={disabled ? undefined : handler}
+            onKeyDown={this.handleKey}
+        >
+            {child}
+        </div>);
     }
     handleKey<T>(e: React.KeyboardEvent<T>){
         const {

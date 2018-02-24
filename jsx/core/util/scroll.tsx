@@ -14,6 +14,9 @@ import {
 import MousePad, {
     MousePadEvent,
 } from './mousepad';
+import {
+    WithRandomIds,
+} from './with-ids';
 
 export interface IPropScroll{
     /**
@@ -72,6 +75,30 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
      */
     private hsc_parent: HTMLElement | null = null;
     /**
+     * Wrapper of horizontal scroll bar
+     */
+    private horWrapper: HTMLElement | null = null;
+    /**
+     * Wrapper of vertical scroll bar
+     */
+    private verWrapper: HTMLElement | null = null;
+    /**
+     * Area of horizontal scroll bar
+     */
+    private horArea: HTMLElement | null = null;
+    /**
+     * Area of vertical scroll bar
+     */
+    private verArea: HTMLElement | null = null;
+    /**
+     * Handle of horizontal scroll bar
+     */
+    private horTip: HTMLElement | null = null;
+    /**
+     * Handle of vertical scroll bar
+     */
+    private verTip: HTMLElement | null = null;
+    /**
      * Hand Scrollのつかんだ位置 x
      */
     private hsc_x: number = -1;
@@ -116,49 +143,90 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             top: `${(100*y/vh).toFixed(3)}%`,
         };
 
-        const hor =
-            disableX ? null :
-            <div ref="horWrapper" className={styles.horWrap} onWheel={this.handleWheel}>
-                <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
-                <div ref="hor" className={styles.hor}>
-                    <div ref="horTip" className={styles.horTip} style={horStyle} />
-                </div>
-                <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
-            </div>;
+        return (
+            <WithRandomIds
+                names={['main']}
+            >{
+                ({main})=> {
+                    const hor =
+                        disableX ? null :
+                        <div
+                            role='scrollbar'
+                            aria-controls={main}
+                            aria-orientation='horizontal'
+                            aria-valuemax={width}
+                            aria-valuemin={0}
+                            aria-valuenow={x}
+                            ref={e=> this.horWrapper = e}
+                            className={styles.horWrap}
+                            onWheel={this.handleWheel}
+                        >
+                            <div className={styles.leftButton} onClick={this.handlePushButton} data-dir="left"/>
+                            <div
+                                ref={e=> this.horArea=e}
+                                className={styles.hor}
+                            >
+                                <div
+                                    ref={e=> this.horTip = e}
+                                    className={styles.horTip}
+                                    style={horStyle}
+                                />
+                            </div>
+                            <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
+                        </div>;
 
-        const ver =
-            disableY ? null :
-            <div ref="verWrapper" className={styles.verWrap} onWheel={this.handleWheel}>
-                <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
-                <div ref="ver" className={styles.ver}>
-                    <div ref="verTip" className={styles.verTip} style={verStyle} />
-                </div>
-                <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
-            </div>;
+                        const ver =
+                        disableY ? null :
+                        <div
+                            role='scrollbar'
+                            aria-controls={main}
+                            aria-orientation='vertical'
+                            aria-valuemax={height}
+                            aria-valuemin={0}
+                            aria-valuenow={y}
+                            ref={e=> this.verWrapper = e}
+                            className={styles.verWrap}
+                            onWheel={this.handleWheel}
+                        >
+                            <div className={styles.downButton} onClick={this.handlePushButton} data-dir="up"/>
+                            <div
+                                ref={e=> this.verArea=e}
+                                className={styles.ver}
+                            >
+                                <div
+                                    ref={e=> this.verTip = e}
+                                    className={styles.verTip}
+                                    style={verStyle}
+                                />
+                            </div>
+                            <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
+                        </div>;
 
-        return <div className={styles.outerWrapper}>
-            <div className={styles.wrapper}>
-                <div className={styles.content}>{children}</div>
-                <MousePad
-                    onMouseDown={this.handleMouseDown}
-                    onMouseMove={this.handleMouseMove}
-                    onMouseUp={this.handleMouseUp}
-                    >
-                    {hor}
+                        return <div className={styles.outerWrapper}>
+                            <div className={styles.wrapper}>
+                                <div id={main} className={styles.content}>{children}</div>
+                                <MousePad
+                                    onMouseDown={this.handleMouseDown}
+                                    onMouseMove={this.handleMouseMove}
+                                    onMouseUp={this.handleMouseUp}
+                                >
+                                    {hor}
                     {ver}
-                </MousePad>
-            </div>
-        </div>;
+                        </MousePad>
+                    </div>
+                </div>;
+                }
+            }</WithRandomIds>);
     }
     handleMouseDown({target, elementX, elementY, preventDefault}: MousePadEvent){
 
-        if (target === this.refs['hor'] || target === this.refs['ver']){
+        if (target === this.horArea || target === this.verArea){
             // 瞬間移動
             this.doFreeScroll(target, elementX, elementY);
             this.registerFreeScroll(target);
             return;
         }
-        if (target === this.refs['horTip'] || target === this.refs['verTip']){
+        if (target === this.horTip || target === this.verTip){
             // つかんで移動
             this.registerHandScroll(target, elementX, elementY);
             return;
@@ -192,8 +260,8 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
     registerHandScroll(target: HTMLElement, elementX: number, elementY: number){
         this.hsc_target = target;
         this.hsc_parent =
-            target === this.refs['horTip'] ? this.refs['hor'] as HTMLElement :
-            target === this.refs['verTip'] ? this.refs['ver'] as HTMLElement :
+            target === this.horTip ? this.horArea as HTMLElement :
+            target === this.verTip ? this.verArea as HTMLElement :
             null;
         this.hsc_x = elementX;
         this.hsc_y = elementY;
@@ -236,12 +304,12 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             height: target_height,
         } = getAbsolutePosition(target);
 
-        if (target === this.refs['hor']){
+        if (target === this.horArea){
             // 瞬間移動（横）
             const pos = Math.round(elementX/target_width * (width + screenX) - screenX/2);
             this.setScroll(pos, null);
             return;
-        }else if (target === this.refs['ver']){
+        }else if (target === this.verArea){
             // 瞬間移動（縦）
             const pos = Math.round(elementY/target_height * (height + screenY) - screenY/2);
             this.setScroll(null, pos);
@@ -271,10 +339,10 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         const px = pageX - parent_x;
         const py = pageY - parent_y;
 
-        if (target === this.refs['horTip']){
+        if (target === this.horTip){
             const pos = Math.round((px - handX)/parent_width * (width + screenX));
             this.setScroll(pos, null);
-        }else if (target === this.refs['verTip']){
+        }else if (target === this.verTip){
             const pos = Math.round((py - handY)/parent_height * (height + screenY));
             this.setScroll(null, pos);
         }
@@ -283,7 +351,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         const {
             currentTarget,
         } = e;
-        if (currentTarget === this.refs.horWrapper){
+        if (currentTarget === this.horWrapper){
             e.preventDefault();
             const {
                 x,
@@ -291,7 +359,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             } = getDelta(e);
             const sc = this.props.x + (y ? y : x);
             this.setScroll(sc, null);
-        }else if (currentTarget === this.refs.verWrapper){
+        }else if (currentTarget === this.verWrapper){
             e.preventDefault();
             const {
                 x,

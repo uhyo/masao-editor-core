@@ -26,12 +26,25 @@ export default class Select extends React.Component<IPropSelect, {}>{
             contents,
             disabled,
         } = this.props;
-        return <div className={styles.wrapper} tabIndex={disabled ? undefined : 0} onKeyDown={this.handleKey}>{
+        return (<div
+            role='radiogroup'
+            className={styles.wrapper}
+            tabIndex={disabled ? undefined : 0}
+            onKeyDown={this.handleKey}
+        >{
             contents.map(({key, label}, i)=>{
                 const c = key === value ? styles.buttonCurrent : styles.button;
-                return <div key={i} className={c} onClick={this.handleClick(key)}>{label}</div>;
+                return (<div
+                    key={i}
+                    role='radio'
+                    aria-checked={key === value ? 'true' : 'false'}
+                    className={c}
+                    onClick={this.handleClick(key)}
+                >
+                    {label}
+                </div>);
             })
-        }</div>;
+        }</div>);
     }
     handleClick<E>(key: string){
         return (e: React.MouseEvent<E>)=>{
