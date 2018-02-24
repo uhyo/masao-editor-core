@@ -99,6 +99,10 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
      */
     private verTip: HTMLElement | null = null;
     /**
+     * Ref to main content wrapper.
+     */
+    private mainWrapper: HTMLElement | null = null;
+    /**
      * Hand Scrollのつかんだ位置 x
      */
     private hsc_x: number = -1;
@@ -204,7 +208,14 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
 
                         return <div className={styles.outerWrapper}>
                             <div className={styles.wrapper}>
-                                <div id={main} className={styles.content}>{children}</div>
+                                <div
+                                    ref={e=> this.mainWrapper = e}
+                                    id={main}
+                                    className={styles.content}
+                                    onWheel={this.handleWheel}
+                                >
+                                    {children}
+                                </div>
                                 <MousePad
                                     onMouseDown={this.handleMouseDown}
                                     onMouseMove={this.handleMouseMove}
@@ -352,6 +363,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             currentTarget,
         } = e;
         if (currentTarget === this.horWrapper){
+            // 横スクロールバー
             e.preventDefault();
             const {
                 x,
@@ -360,6 +372,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             const sc = this.props.x + (y ? y : x);
             this.setScroll(sc, null);
         }else if (currentTarget === this.verWrapper){
+            // 縦スクロールバー
             e.preventDefault();
             const {
                 x,
@@ -367,6 +380,16 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             } = getDelta(e);
             const sc = this.props.y + (y ? y : x);
             this.setScroll(null, sc);
+        }else if (currentTarget === this.mainWrapper) {
+            // メイン画面上でのホイール操作
+            e.preventDefault();
+            const {
+                x,
+                y,
+            } = getDelta(e);
+            const scx = this.props.x + x;
+            const scy = this.props.y + y;
+            this.setScroll(scx, scy);
         }
             
     }

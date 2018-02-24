@@ -8,9 +8,7 @@ import MousePad, {
 } from '../util/mousepad';
 
 import Timers from '../../../scripts/timers';
-import {
-    getDelta,
-} from '../../../scripts/wheel';
+
 import BackLayer from './backlayer';
 import MapUpdator from './updator';
 
@@ -105,7 +103,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleResize = this.handleResize.bind(this);
-        this.handleWheel = this.handleWheel.bind(this);
     }
 
     componentDidMount(){
@@ -570,7 +567,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     screenY={view_height}
                     onScroll={this.handleScroll}>
                     <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
-                        <div className={styles.canvasWrapper} onWheel={this.handleWheel}>
+                        <div className={styles.canvasWrapper}>
                             <canvas ref="canvas" width={width} height={height}/>
                             <MousePad
                                 onMouseDown={this.handleMouseDown}
@@ -658,10 +655,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     handleBlur(){
         editLogics.blur('main');
-    }
-    handleWheel<T>(e: React.WheelEvent<T>){
-        e.preventDefault();
-        editLogics.scrollBy(getDelta(e));
     }
 }
 
