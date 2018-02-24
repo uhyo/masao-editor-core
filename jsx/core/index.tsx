@@ -51,6 +51,9 @@ import JSEdit from './js-edit';
 
 import KeyEvent from './key-event';
 import Button from './util/button';
+import {
+    Toolbar,
+} from './util/toolbar';
 
 import './css/init.css';
 import * as styles from './css/index.css';
@@ -197,31 +200,55 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
 
         let screen = null;
         if(edit.screen==="map" || edit.screen==="layer"){
-            screen=<MapScreen pattern={this.props.filename_pattern} mapchip={this.props.filename_mapchip} chips={chips} map={map} params={params} edit={edit} project={project} history={history}/>;
+            screen = (<MapScreen
+                pattern={this.props.filename_pattern}
+                mapchip={this.props.filename_mapchip}
+                chips={chips}
+                map={map}
+                params={params}
+                edit={edit}
+                project={project}
+                history={history}
+            />);
         }else if(edit.screen==="params"){
-            screen=<ParamScreen params={params} edit={edit} project={project}/>;
+            screen = (<ParamScreen
+                params={params}
+                edit={edit}
+                project={project}
+            />);
         }else if(edit.screen==="project"){
-            screen=<ProjectScreen project={project} map={map} edit={edit}/>;
+            screen = (<ProjectScreen
+                project={project}
+                map={map}
+                edit={edit}
+            />);
         }else if(edit.screen==='js'){
-            screen=<JsScreen jsWarning={!!this.props.jsWarning} edit={edit} project={project} />;
+            screen = (<JsScreen
+                jsWarning={!!this.props.jsWarning}
+                edit={edit}
+                project={project}
+            />);
         }
         let external_buttons=null;
-        if(this.props.externalCommands != null){
+        if (this.props.externalCommands != null) {
             external_buttons = this.props.externalCommands.map((com)=>{
-                return <div key={com.label}>
+                return (<div key={com.label}>
                     <Button label={com.label} onClick={this.handleExternal(com.request)}/>
-                </div>;
+                </div>);
             });
         }
-        return <div>
-            <div className={styles.info}>
-                <div>
-                    <ScreenSelect edit={edit}/>
+        return (<>
+            <Toolbar>
+                <div className={styles.info}>
+                    <div>
+                        <div className={styles.toolboxLabel}>画面選択</div>
+                        <ScreenSelect edit={edit}/>
+                    </div>
+                    {external_buttons}
                 </div>
-                {external_buttons}
-            </div>
+            </Toolbar>
             {screen}
-        </div>;
+        </>);
     }
     handleExternal(req: (game: MasaoJSONFormat, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
@@ -346,7 +373,7 @@ const MapScreen = (props: IPropMapScreen)=>{
     } = props;
     let are=null;
     if(project.version==="2.8" && edit.screen==="layer"){
-        are = <p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>;
+        are = (<p>バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。</p>);
     }
 
     const {
@@ -357,12 +384,15 @@ const MapScreen = (props: IPropMapScreen)=>{
     // いまのステージ
     const stage = data[edit.stage-1];
 
+    // ステージが縦長か否かでミニマップの表示位置を変更
     const mapsClass = stage.size.x >= stage.size.y ? styles.mapsColumn : styles.mapsRow;
 
-    return <div>
-        <div className={styles.mapInfo}>
-            <EditMode edit={edit} params={params} history={history} />
-        </div>
+    return (<div>
+        <Toolbar>
+            <div className={styles.mapInfo}>
+                <EditMode edit={edit} params={params} history={history} />
+            </div>
+        </Toolbar>
         <div className={mapsClass}>
             <div>
                 <MiniMap params={params} edit={edit} stage={stage}/>
@@ -376,7 +406,7 @@ const MapScreen = (props: IPropMapScreen)=>{
             </div>
         </div>
         <KeyEvent />
-    </div>;
+    </div>);
 };
 
 interface IPropParamScreen{

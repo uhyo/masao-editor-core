@@ -1,10 +1,19 @@
+@value toolbar-line-color from '../theme/color.css';
+
 .wrapper {
+  display: flex;
+  flex-flow: row wrap;
+
+  & > div {
+    margin-right: 4px;
+  }
+  & > div:not(:first-child) {
+    border-left: 1px solid toolbar-line-color;
+    padding-left: 4px;
+  }
 }
 
 .row {
   display: flex;
   margin: 0 0 4px 0;
-}
-.row > div {
-  margin: 0 6px;
 }

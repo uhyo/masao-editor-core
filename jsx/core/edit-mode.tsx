@@ -11,6 +11,7 @@ import Button from './util/button';
 import Select from './util/select';
 import Switch from './util/switch';
 
+import * as indexStyle from './css/index.css';
 import * as style from './css/edit-mode.css';
 
 export interface IPropEditMode{
@@ -18,6 +19,9 @@ export interface IPropEditMode{
     params: ParamsState;
     history: HistoryState;
 }
+/**
+ * Tools for editing.
+ */
 export default class EditMode extends React.Component<IPropEditMode, {}>{
     render(){
         const {
@@ -104,29 +108,47 @@ export default class EditMode extends React.Component<IPropEditMode, {}>{
             historyLogics.forward(edit.stage);
         };
 
-        return <div className={style.wrapper}>
-            <div className={style.row}>
-                <div>
-                    <Select contents={contents} value={edit.mode} onChange={mode_change}/>
-                </div>
+        return (<div className={style.wrapper}>
+            <Toolbox label='編集モード'>
+                <Select contents={contents} value={edit.mode} onChange={mode_change}/>
+            </Toolbox>
+            <Toolbox label='表示オプション'>
                 <div>
                     <Switch label="グリッドを表示" value={edit.grid} onChange={grid_change}/>
                 </div>
                 <div>
                     {renderSwitch}
                 </div>
-                <div>
-                    <Select contents={contents2} value={String(edit.stage)} onChange={stage_change}/>
-                </div>
-            </div>
-            <div className={style.row}>
-                <div>
-                    <Button label="戻る" disabled={back_disabled} onClick={back} />
-                </div>
-                <div>
-                    <Button label="進む" disabled={forward_disabled} onClick={forward} />
-                </div>
-            </div>
-        </div>
+            </Toolbox>
+            <Toolbox label='ステージ選択'>
+                <Select contents={contents2} value={String(edit.stage)} onChange={stage_change}/>
+            </Toolbox>
+            <Toolbox label='編集履歴'>
+                <Button label="戻る" disabled={back_disabled} onClick={back} />
+                <Button label="進む" disabled={forward_disabled} onClick={forward} />
+            </Toolbox>
+        </div>);
     }
 }
+
+interface IPropToolbox {
+    label: string;
+    children: React.ReactNode;
+}
+/**
+ * One tool box.
+ */
+function Toolbox({
+    label,
+    children,
+}: IPropToolbox) {
+    return (<div>
+        <div className={indexStyle.toolboxLabel}>
+            {label}
+        </div>
+        <div className={style.row}>
+            {children}
+        </div>
+    </div>);
+}
+
