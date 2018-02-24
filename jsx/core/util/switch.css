@@ -1,5 +1,3 @@
-@value button-surface-color-on from '../theme/color.css';
-
 .switch-normal {
   composes: button from './button.css';
 }
@@ -7,5 +5,5 @@
 .switch-yes {
   composes: switch-normal;
 
-  background-color: button-surface-color-on !important;
+  background-color: var(--button-surface-color-on) !important;
 }

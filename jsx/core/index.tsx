@@ -56,6 +56,7 @@ import {
 } from './util/toolbar';
 
 import './css/init.css';
+import './theme/color.css';
 import * as styles from './css/index.css';
 
 export interface IDefnMasaoEditorCore{

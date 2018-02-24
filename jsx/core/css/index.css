@@ -1,8 +1,6 @@
-@value toolbar-line-color #cccccc;
-
 .info{
   display: flex;
-  border-bottom: 1px solid toolbar-line-color;
+  border-bottom: 1px solid var(--toolbar-line-color);
 
   & > div {
     margin-right: 8px;

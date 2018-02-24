@@ -1,7 +1,8 @@
-@value width: 16px;
 /* Scroll component の wrapper */
 .outerWrapper {
-  padding: 0 width width 0;
+  /* size of scroll tip */
+  --control-width: 16px;
+  padding: 0 var(--control-width) var(--control-width) 0;
 }
 
 .wrapper {
@@ -36,9 +37,9 @@
   composes: bar-wrap;
 
   width: 100%;
-  height: width;
+  height: var(--control-width);
   left: 0;
-  bottom: calc(-1 * width);
+  bottom: calc(-1 * var(--control-width));
 
   flex-flow: row nowrap;
 }
@@ -51,9 +52,9 @@
 .verWrap {
   composes: bar-wrap;
 
-  width: width;
+  width: var(--control-width);
   height: 100%;
-  right: calc(-1 * width);
+  right: calc(-1 * var(--control-width));
   top: 0;
 
   flex-flow: column nowrap;
@@ -64,20 +65,20 @@
 
 .horTip {
   composes: tip;
-  height: width;
+  height: var(--control-width);
 }
 
 .verTip {
   composes: tip;
-  width: width;
+  width: var(--control-width);
 }
 
 /* push button */
 .push-button {
-  flex: width 0 0;
+  flex: var(--control-width) 0 0;
   box-sizing: border-box;
-  width: width;
-  height: width;
+  width: var(--control-width);
+  height: var(--control-width);
 
   background-color: #d4d4d4;
   border: 1px outset #eeeeee;

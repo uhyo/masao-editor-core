@@ -1,10 +1,8 @@
-@value button-surface-color-off, button-surface-color-on, button-surface-color-hov, button-label-color-disabled from '../theme/color.css';
-
 .button {
   display: inline-block;
 
   padding: 6px;
-  background-color: button-surface-color-off;
+  background-color: var(--button-surface-color-off);
   transition: background-color 0.3s ease;
 
   cursor: pointer;
@@ -13,12 +11,12 @@
 }
 
 .button:not(.disabled):hover {
-  background-color: button-surface-color-hov;
+  background-color: var(--button-surface-color-hov);
 }
 
 .disabled {
   composes: button;
 
-  color: button-label-color-disabled;
+  color: var(--button-label-color-disabled);
   cursor: default;
 }

@@ -1,8 +1,6 @@
-@value toolbar-surface from '../theme/color.css';
-
 .wrapper {
   margin: 0;
   padding: 0;
 
-  background-color: toolbar-surface;
+  background-color: var(--toolbar-surface);
 }
