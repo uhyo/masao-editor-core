@@ -165,6 +165,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     }
     componentWillUnmount(){
         this.timers.clean();
+        // cancel requestAnimationFrame
+        if (this.drawRequest != null) {
+            cancelAnimationFrame(this.drawRequest);
+        }
     }
     componentDidUpdate(prevProps: IPropMapEdit){
         //書き換える
@@ -339,6 +343,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
         this.drawing=true;
         this.drawRequest=requestAnimationFrame(()=>{
+            this.drawRequest = null;
             if (process.env.NODE_ENV !== 'production'){
                 console.time("draw");
             }
