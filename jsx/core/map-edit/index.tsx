@@ -55,6 +55,11 @@ export interface IPropMapEdit{
     mapchip: string;
     chips: string;
 
+    /**
+     * Whether this component should fit the parent in y-axis.
+     */
+    'fit-y'?: boolean;
+
     stage: StageData;
     lastUpdate: LastUpdateData;
 
@@ -544,6 +549,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             stage: {
                 size,
             },
+            'fit-y': fity,
         } = this.props;
         const width = view_width*32;
         const height = view_height*32;
@@ -558,7 +564,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         // TODO
         return (<div
             ref="focusarea"
-            className={styles.wrapper}
+            className={fity ? styles.wrapperFitY : styles.wrapper}
             tabIndex={0}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
@@ -567,7 +573,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 width={scrollWidth}
                 height={scrollHeight}
                 fit-x
-                fit-y
+                fit-y={fity}
                 x={scroll_x} y={scroll_y}
                 screenX={view_width}
                 screenY={view_height}
@@ -579,7 +585,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     minHeight={32}
                     grid={{x: 32, y: 32}}
                     fit-x
-                    fit-y
+                    fit-y={fity}
                     onResize={this.handleResize}
                 >
                     <div className={styles.canvasWrapper}>

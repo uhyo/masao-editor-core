@@ -215,25 +215,35 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     }
     render(){
         const {
-            map,
-            params,
-            edit,
-            project,
-            history,
-        } = this.state;
+            props: {
+                filename_pattern,
+                filename_mapchip,
+                jsWarning,
+                externalCommands,
+                'fit-y': fity,
+            },
+            state: {
+                map,
+                params,
+                edit,
+                project,
+                history,
+            },
+        } = this;
         const chips: string = require('../../images/chips.png');
 
         let screen = null;
         if(edit.screen==="map" || edit.screen==="layer"){
             screen = (<MapScreen
-                pattern={this.props.filename_pattern}
-                mapchip={this.props.filename_mapchip}
+                pattern={filename_pattern}
+                mapchip={filename_mapchip}
                 chips={chips}
                 map={map}
                 params={params}
                 edit={edit}
                 project={project}
                 history={history}
+                fit-y={fity}
             />);
         }else if(edit.screen==="params"){
             screen = (<ParamScreen
@@ -249,14 +259,14 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             />);
         }else if(edit.screen==='js'){
             screen = (<JsScreen
-                jsWarning={!!this.props.jsWarning}
+                jsWarning={!!jsWarning}
                 edit={edit}
                 project={project}
             />);
         }
         let external_buttons=null;
-        if (this.props.externalCommands != null) {
-            external_buttons = this.props.externalCommands.map((com)=>{
+        if (externalCommands != null) {
+            external_buttons = externalCommands.map((com)=>{
                 return (<div key={com.label}>
                     <Button label={com.label} onClick={this.handleExternal(com.request)}/>
                 </div>);
@@ -272,7 +282,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                     {external_buttons}
                 </div>
             </Toolbar>
-            <div className={this.props['fit-y'] ? styles.screenWrapperFit : undefined}>
+            <div className={fity ? styles.screenWrapperFit : undefined}>
                 {screen}
             </div>
         </div>);
@@ -380,6 +390,8 @@ interface IPropMapScreen{
     mapchip: string;
     chips: string;
 
+    'fit-y'?: boolean;
+
     edit: EditState;
     params: ParamsState;
     map: MapState;
@@ -397,6 +409,7 @@ const MapScreen = (props: IPropMapScreen)=>{
         pattern,
         mapchip,
         chips,
+        'fit-y': fity,
     } = props;
     let are=null;
     if(project.version==="2.8" && edit.screen==="layer"){
@@ -427,10 +440,28 @@ const MapScreen = (props: IPropMapScreen)=>{
             </div>
             <div className={styles.cmWrapper}>
                 <div className={styles.chipselectWrapper}>
-                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
+                    <ChipSelect
+                        pattern={pattern}
+                        mapchip={mapchip}
+                        chips={chips}
+                        params={params}
+                        edit={edit}
+                        project={project}
+                        advanced={advanced}
+                    />
                 </div>
                 <div className={styles.mainmapWrapper}>
-                    <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
+                    <MapEdit
+                        pattern={pattern}
+                        mapchip={mapchip}
+                        chips={chips}
+                        stage={stage}
+                        lastUpdate={lastUpdate}
+                        params={params}
+                        edit={edit}
+                        project={project}
+                        fit-y={fity}
+                    />
                 </div>
             </div>
         </div>
