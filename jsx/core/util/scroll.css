@@ -2,6 +2,7 @@
 .outerWrapper {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   /* size of scroll tip */
   --control-width: 16px;
   padding: 0 var(--control-width) var(--control-width) 0;

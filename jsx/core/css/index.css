@@ -43,7 +43,7 @@
 }
 
 .maps-column .minimap-wrapper {
-  flex: 100% 0 1;
+  flex: auto 0 1;
   border-top: 1px solid var(--toolbar-line-color);
   border-bottom: 1px solid var(--toolbar-line-color);
 }

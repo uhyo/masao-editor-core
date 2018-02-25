@@ -144,8 +144,8 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                 disableX = false,
                 disableY = false,
                 controlSize = 16,
-                'fit-x': fitx = false,
-                'fit-y': fity = false,
+                // 'fit-x': fitx = false,
+                // 'fit-y': fity = false,
             },
         } = this;
 
@@ -165,12 +165,14 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         const wrapperStyle: Record<string, string> = {
             '--control-width': `${controlSize}px`,
         };
+        /*
         if (fitx) {
             wrapperStyle.width = 'calc(100% - var(--control-width))';
         }
         if (fity) {
             wrapperStyle.height = 'calc(100% - var(--control-width))';
         }
+         */
 
         return (
             <WithRandomIds
