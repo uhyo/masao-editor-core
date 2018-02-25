@@ -105,6 +105,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
      * Fucusable areaのcontainer
      */
     protected focusarea: HTMLElement | null = null;
+    /**
+     * メインcanvasのcontainer
+     */
+    protected canvas: HTMLCanvasElement | null = null;
+    /**
+     * グリッド用canvasのcontainer
+     */
+    protected grid_canvas: HTMLCanvasElement | null = null;
 
     constructor(props: IPropMapEdit){
         super(props);
@@ -117,10 +125,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     componentDidMount(){
         const {
             stage,
-            edit: {
-                view_width,
-                view_height,
-            },
         } = this.props;
 
         // flags
@@ -147,25 +151,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         // timers
         this.timers = new Timers();
 
-        // draw grids
-        const canvas2 = this.refs['canvas2'] as HTMLCanvasElement;
-        const ctx = canvas2.getContext('2d');
-        if (ctx == null){
-            return;
-        }
-        ctx.strokeStyle="rgba(0,0,0,.25)";
-        for(let x=1; x < view_width; x++){
-            ctx.beginPath();
-            ctx.moveTo(x*32, 0);
-            ctx.lineTo(x*32, view_height*32);
-            ctx.stroke();
-        }
-        for(let y=1; y < view_height; y++){
-            ctx.beginPath();
-            ctx.moveTo(0,y*32);
-            ctx.lineTo(view_width*32,y*32);
-            ctx.stroke();
-        }
+        this.drawGrid();
 
         this.resetMap(false);
     }
@@ -204,30 +190,30 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.draw();
         }
 
-        if(pe.screen !== e.screen){
-            this.draw();
-            return;
-        }
         if (prevProps.params !== this.props.params){
             this.draw();
             return;
         }
         if (propChanged(pe, e, [
-            'render_map',
-            'render_layer',
-            'scroll_x',
-            'scroll_y',
             'view_width',
             'view_height',
             'view_width_remainder',
             'view_height_remainder',
             'scroll_stick_right',
             'scroll_stick_bottom',
+        ])) {
+            this.draw();
+            this.drawGrid();
+        } else if (propChanged(pe, e, [
+            'screen',
+            'render_map',
+            'render_layer',
+            'scroll_x',
+            'scroll_y',
             'tool',
         ])){
             this.draw();
-        }
-        if (cursorChanged(pe.cursor, e.cursor)){
+        } else if (cursorChanged(pe.cursor, e.cursor)){
             this.draw();
         }
 
@@ -244,7 +230,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             return c1.type === 'main' || c2.type === 'main';
         }
     }
-    resetBacklayer(size: boolean){
+    protected resetBacklayer(size: boolean){
         if (size){
             const {
                 stage: {
@@ -281,7 +267,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         };
         expandMap();
     }
-    resetMap(size: boolean){
+    protected resetMap(size: boolean){
         const {
             stage: {
                 size: {
@@ -300,7 +286,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.updator_layer.resetMap(layer);
     }
     /* TODO */
-    updateBacklayer(lastUpdate: LastUpdateData){
+    protected updateBacklayer(lastUpdate: LastUpdateData){
         // map storeのlastUpdateを見てbacklayerをアップデートする
         if (lastUpdate == null){
             return;
@@ -344,7 +330,55 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         }
     }
-    draw(){
+    /**
+     * Draw a new grid to the canvas.
+     */
+    protected drawGrid() {
+        const canvas = this.grid_canvas;
+        if (canvas == null) {
+            return;
+        }
+        const ctx = canvas.getContext('2d');
+        if (ctx == null) {
+            return;
+        }
+        const {
+            edit: {
+                scroll_stick_right,
+                scroll_stick_bottom,
+                view_width,
+                view_height,
+                view_width_remainder,
+                view_height_remainder,
+            },
+        } = this.props;
+
+        // 吸い付きによる補正
+        const x_corr = scroll_stick_right ? -view_width_remainder : 0;
+        const y_corr = scroll_stick_bottom ? -view_height_remainder : 0;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = 'rgba(0, 0, 0, .25)';
+        // y-grids
+        for (let x = 1; x < view_width; x++) {
+            ctx.beginPath();
+            const dx = x * 32 + x_corr;
+            ctx.moveTo(dx, 0);
+            ctx.lineTo(dx, view_height*32);
+            ctx.stroke();
+        }
+
+        // x-grids
+        for (let y = 1; y < view_height; y++) {
+            ctx.beginPath();
+            const dy = y * 32 + y_corr;
+            ctx.moveTo(0, dy);
+            ctx.lineTo(view_width*32, dy);
+            ctx.stroke();
+        }
+    }
+    protected draw(){
         if(this.drawing===true){
             return;
         }
@@ -385,7 +419,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 tool,
                 cursor,
             } = edit;
-            const ctx = (this.refs['canvas'] as HTMLCanvasElement).getContext("2d");
+            const canvas = this.canvas;
+            const ctx = canvas && canvas.getContext("2d");
             if (ctx == null){
                 return;
             }
@@ -522,13 +557,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             }
         });
     }
-    drawChip(ctx: CanvasRenderingContext2D, c: number, x: number, y: number): void{
+    protected drawChip(ctx: CanvasRenderingContext2D, c: number, x: number, y: number): void{
         if(c == null){
             return;
         }
         chip.drawChip(ctx, this.images, this.props.params, c, x, y, true);
     }
-    drawLayer(ctx: CanvasRenderingContext2D , c: number, x: number, y: number): void{
+    protected drawLayer(ctx: CanvasRenderingContext2D , c: number, x: number, y: number): void{
         //レイヤ
         if(c === 0){ 
             return;
@@ -536,7 +571,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const sx = (c&15)*32, sy = Math.floor(c>>4)*32;
         ctx.drawImage(this.images.mapchip, sx, sy, 32, 32, x, y, 32, 32);
     }
-    drawChipOn(type: 'map' | 'layer', ctx: CanvasRenderingContext2D, x: number, y: number){
+    protected drawChipOn(type: 'map' | 'layer', ctx: CanvasRenderingContext2D, x: number, y: number){
         // 指定された座標に描画
         const {
             stage,
@@ -549,7 +584,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.drawLayer(ctx, c, x*32, y*32);
         }
     }
-    chipPollution(type: 'map' | 'layer', c: number): Rect{
+    protected chipPollution(type: 'map' | 'layer', c: number): Rect{
         if (type === 'layer'){
             // layerのチップは全部普通
             return {
@@ -574,7 +609,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         };
         return updateRect;
     }
-    render(){
+    public render(){
         const {
             edit: {
                 view_width,
@@ -630,7 +665,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     onResize={this.handleResize}
                 >
                     <div className={styles.canvasWrapper}>
-                        <canvas ref="canvas" width={width} height={height}/>
+                        <canvas
+                            ref={e=> this.canvas = e}
+                            width={width}
+                            height={height}
+                        />
                         <MousePad
                             onMouseDown={this.handleMouseDown}
                             onMouseMove={this.handleMouseMove}
@@ -638,12 +677,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                             elementXCorrection={scroll_stick_right ? view_width_remainder : 0}
                             elementYCorrection={scroll_stick_bottom ? view_height_remainder : 0}
                             >
-                            <canvas ref="canvas2"
-                                className={styles.overlapCanvas}
-                                style={c2style}
-                                width={width}
-                                height={height}
-                                onContextMenu={this.handleContextMenu}
+                                <canvas
+                                    ref={e=> this.grid_canvas = e}
+                                    className={styles.overlapCanvas}
+                                    style={c2style}
+                                    width={width}
+                                    height={height}
+                                    onContextMenu={this.handleContextMenu}
                                 />
                         </MousePad>
                     </div>
@@ -651,7 +691,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             </Scroll>
         </div>);
     }
-    handleResize(widthr: number, heightr: number){
+    protected handleResize(widthr: number, heightr: number){
         const width = Math.ceil(widthr/32);
         const height = Math.ceil(heightr/32);
         // 中途半端で隠されるピクセル数
@@ -666,16 +706,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             heightRemainder,
         });
     }
-    handleScroll(x: number, y: number){
+    protected handleScroll(x: number, y: number){
         editLogics.scroll({
             x,
             y,
         });
     }
-    handleMouseDown({target, elementX, elementY, button, preventDefault}: MousePadEvent){
+    protected handleMouseDown({target, elementX, elementY, button, preventDefault}: MousePadEvent){
         //マウスが下がった
 
-        const canvas2 = this.refs['canvas2'] as HTMLCanvasElement;
+        const canvas2 = this.grid_canvas;
         if (target !== canvas2){
             preventDefault();
             return;
@@ -707,25 +747,25 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         editLogics.mouseDown(mode, mx, my);
     }
-    handleMouseMove({elementX, elementY}: MousePadEvent){
+    protected handleMouseMove({elementX, elementY}: MousePadEvent){
         this.mouseMoves(this.props.edit.tool, elementX, elementY);
     }
-    handleMouseUp(){
+    protected handleMouseUp(){
         editLogics.mouseUp();
     }
-    mouseMoves(tool: ToolState | null, elementX: number, elementY: number){
+    protected mouseMoves(tool: ToolState | null, elementX: number, elementY: number){
         const mx = Math.floor(elementX/32);
         const my = Math.floor(elementY/32);
 
         editLogics.mouseMove(mx, my, tool);
     }
-    handleContextMenu<T>(e: React.MouseEvent<T>){
+    protected handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();
     }
-    handleFocus(){
+    protected handleFocus(){
         editLogics.focus('main');
     }
-    handleBlur(){
+    protected handleBlur(){
         editLogics.blur('main');
     }
 }
