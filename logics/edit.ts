@@ -115,11 +115,13 @@ export function scroll({x, y}: {x: number; y: number}): void{
         y = size.y - view_height;
         stickBottom = true;
     }
-    if (x < 0){
+    if (x <= 0){
         x = 0;
+        stickRight = false;
     }
-    if (y < 0){
+    if (y <= 0){
         y = 0;
+        stickBottom = false;
     }
 
     if (scroll_x !== x || scroll_y !== y ||
