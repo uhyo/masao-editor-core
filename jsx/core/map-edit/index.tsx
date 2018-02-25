@@ -548,9 +548,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const width = view_width*32;
         const height = view_height*32;
 
-        const style = {
-            // width: width+"px"
-        };
         const c2style = {
             opacity: grid ? 1 : 0
         };
@@ -559,44 +556,50 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const scrollHeight = Math.max(0, size.y - view_height);
 
         // TODO
-        return (<div className={styles.wrapper} style={style}>
-            <div ref="focusarea" tabIndex={0} onFocus={this.handleFocus} onBlur={this.handleBlur}>
-                <Scroll
-                    width={scrollWidth}
-                    height={scrollHeight}
+        return (<div
+            ref="focusarea"
+            className={styles.wrapper}
+            tabIndex={0}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+        >
+            <Scroll
+                width={scrollWidth}
+                height={scrollHeight}
+                fit-x
+                fit-y
+                x={scroll_x} y={scroll_y}
+                screenX={view_width}
+                screenY={view_height}
+                onScroll={this.handleScroll}>
+                <Resizable
+                    width={width}
+                    height={height}
+                    minWidth={32}
+                    minHeight={32}
+                    grid={{x: 32, y: 32}}
                     fit-x
-                    x={scroll_x} y={scroll_y}
-                    screenX={view_width}
-                    screenY={view_height}
-                    onScroll={this.handleScroll}>
-                    <Resizable
-                        width={width}
-                        height={height}
-                        minWidth={32}
-                        minHeight={32}
-                        grid={{x: 32, y: 32}}
-                        fit-x
-                        onResize={this.handleResize}
-                    >
-                        <div className={styles.canvasWrapper}>
-                            <canvas ref="canvas" width={width} height={height}/>
-                            <MousePad
-                                onMouseDown={this.handleMouseDown}
-                                onMouseMove={this.handleMouseMove}
-                                onMouseUp={this.handleMouseUp}
-                                >
-                                <canvas ref="canvas2"
-                                    className={styles.overlapCanvas}
-                                    style={c2style}
-                                    width={width}
-                                    height={height}
-                                    onContextMenu={this.handleContextMenu}
-                                    />
-                            </MousePad>
-                        </div>
-                    </Resizable>
-                </Scroll>
-            </div>
+                    fit-y
+                    onResize={this.handleResize}
+                >
+                    <div className={styles.canvasWrapper}>
+                        <canvas ref="canvas" width={width} height={height}/>
+                        <MousePad
+                            onMouseDown={this.handleMouseDown}
+                            onMouseMove={this.handleMouseMove}
+                            onMouseUp={this.handleMouseUp}
+                            >
+                            <canvas ref="canvas2"
+                                className={styles.overlapCanvas}
+                                style={c2style}
+                                width={width}
+                                height={height}
+                                onContextMenu={this.handleContextMenu}
+                                />
+                        </MousePad>
+                    </div>
+                </Resizable>
+            </Scroll>
         </div>);
     }
     handleResize(widthr: number, heightr: number){

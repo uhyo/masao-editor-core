@@ -1,3 +1,13 @@
+.wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+}
+.screen-wrapper-fit {
+  flex: auto 1 1;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
 .info{
   display: flex;
   border-bottom: 1px solid var(--toolbar-line-color);
@@ -18,12 +28,17 @@
   display: flex;
 }
 
-.maps-column {
+.maps {
+  flex: auto 1 1;
   display: flex;
-  flex-flow: row wrap;
+}
+
+.maps-column {
+  composes: maps;
+  flex-flow: column nowrap;
 }
 .maps-row {
-  display: flex;
+  composes: maps;
   flex-flow: row wrap;
 }
 
@@ -36,6 +51,15 @@
   border-left: 1px solid var(--toolbar-line-color);
   border-right: 1px solid var(--toolbar-line-color);
 
+}
+
+.cm-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.maps-column .cm-wrapper {
+  flex: auto 1 0;
 }
 
 .chipselect-wrapper {

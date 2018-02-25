@@ -67,11 +67,26 @@ export interface IDefnMasaoEditorCore{
     history: HistoryState;
 }
 export interface IPropMasaoEditorCore{
+    /**
+     * Whether show a warning when editing a JS.
+     */
     jsWarning?: boolean;
+    /**
+     * An id of back up.
+     */
     backupId?: string;
+    /**
+     * Filename of pattern image.
+     */
     filename_pattern: string;
+    /**
+     * Filename of mapchip image.
+     */
     filename_mapchip: string;
 
+    /**
+     * Default param data.
+     */
     defaultParams?: Record<string, string>;
 
     // TODO
@@ -80,6 +95,15 @@ export interface IPropMasaoEditorCore{
         label: string;
         request(game: MasaoJSONFormat, states: IDefnMasaoEditorCore): void;
     }>;
+
+    /**
+     * Additional classes.
+     */
+    className?: string;
+    /**
+     * Whether the editor should fit the y-axis of container.
+     */
+    'fit-y'?: boolean;
 }
 export interface IStateMasaoEditorCore{
 }
@@ -238,7 +262,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                 </div>);
             });
         }
-        return (<>
+        return (<div className={styles.wrapper + (this.props.className ? ' ' + this.props.className : '')}>
             <Toolbar>
                 <div className={styles.info}>
                     <div>
@@ -248,8 +272,10 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
                     {external_buttons}
                 </div>
             </Toolbar>
-            {screen}
-        </>);
+            <div className={this.props['fit-y'] ? styles.screenWrapperFit : undefined}>
+                {screen}
+            </div>
+        </div>);
     }
     handleExternal(req: (game: MasaoJSONFormat, obj: IDefnMasaoEditorCore)=>void){
         //paramにmapの内容を突っ込む
@@ -388,7 +414,7 @@ const MapScreen = (props: IPropMapScreen)=>{
     // ステージが縦長か否かでミニマップの表示位置を変更
     const mapsClass = stage.size.x >= stage.size.y ? styles.mapsColumn : styles.mapsRow;
 
-    return (<div>
+    return (<>
         <Toolbar>
             <div className={styles.mapInfo}>
                 <EditMode edit={edit} params={params} history={history} />
@@ -399,15 +425,17 @@ const MapScreen = (props: IPropMapScreen)=>{
             <div className={styles.minimapWrapper}>
                 <MiniMap params={params} edit={edit} stage={stage}/>
             </div>
-            <div className={styles.chipselectWrapper}>
-                <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
-            </div>
-            <div className={styles.mainmapWrapper}>
-                <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
+            <div className={styles.cmWrapper}>
+                <div className={styles.chipselectWrapper}>
+                    <ChipSelect pattern={pattern} mapchip={mapchip} chips={chips} params={params} edit={edit} project={project} advanced={advanced}/>
+                </div>
+                <div className={styles.mainmapWrapper}>
+                    <MapEdit pattern={pattern} mapchip={mapchip} chips={chips} stage={stage} lastUpdate={lastUpdate} params={params} edit={edit} project={project}/>
+                </div>
             </div>
         </div>
         <KeyEvent />
-    </div>);
+    </>);
 };
 
 interface IPropParamScreen{
