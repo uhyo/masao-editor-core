@@ -219,6 +219,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             'scroll_y',
             'view_width',
             'view_height',
+            'view_width_remainder',
+            'view_height_remainder',
+            'scroll_stick_right',
+            'scroll_stick_bottom',
             'tool',
         ])){
             this.draw();
@@ -368,8 +372,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 screen,
                 scroll_x,
                 scroll_y,
+                scroll_stick_bottom,
+                scroll_stick_right,
                 view_width,
                 view_height,
+                view_width_remainder,
+                view_height_remainder,
 
                 render_map,
                 render_layer,
@@ -382,6 +390,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                 return;
             }
 
+            // 描画対象領域の大きさ
             const width=view_width*32;
             const height=view_height*32;
 
@@ -408,13 +417,37 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             if (screen === 'layer' || render_layer === true){
                 ctx.save();
                 ctx.globalAlpha = screen === 'layer' ? 1 : 0.5;
-                backlayer_layer.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+                backlayer_layer.copyTo(
+                    ctx,
+                    scroll_x,
+                    scroll_y,
+                    view_width,
+                    view_height,
+                    0,
+                    0,
+                    view_width_remainder,
+                    view_height_remainder,
+                    scroll_stick_right,
+                    scroll_stick_bottom,
+                );
                 ctx.restore();
             }
             if (screen === 'map' || render_map === true){
                 ctx.save();
                 ctx.globalAlpha = screen === 'map' ? 1 : 0.5;
-                backlayer_map.copyTo(ctx, scroll_x, scroll_y, view_width, view_height, 0, 0);
+                backlayer_map.copyTo(
+                    ctx,
+                    scroll_x,
+                    scroll_y,
+                    view_width,
+                    view_height,
+                    0,
+                    0,
+                    view_width_remainder,
+                    view_height_remainder,
+                    scroll_stick_right,
+                    scroll_stick_bottom,
+                );
                 ctx.restore();
             }
 
@@ -546,8 +579,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             edit: {
                 view_width,
                 view_height,
+                view_width_remainder,
+                view_height_remainder,
                 scroll_x,
                 scroll_y,
+                scroll_stick_right,
+                scroll_stick_bottom,
                 grid,
             },
             stage: {
@@ -598,6 +635,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                             onMouseDown={this.handleMouseDown}
                             onMouseMove={this.handleMouseMove}
                             onMouseUp={this.handleMouseUp}
+                            elementXCorrection={scroll_stick_right ? view_width_remainder : 0}
+                            elementYCorrection={scroll_stick_bottom ? view_height_remainder : 0}
                             >
                             <canvas ref="canvas2"
                                 className={styles.overlapCanvas}
@@ -615,13 +654,17 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     handleResize(widthr: number, heightr: number){
         const width = Math.ceil(widthr/32);
         const height = Math.ceil(heightr/32);
+        // 中途半端で隠されるピクセル数
+        const widthRemainder = Math.floor(width*32 - widthr);
+        const heightRemainder = Math.floor(height*32 - heightr);
         // if calculated view is different, then update.
-        if (width !== this.props.edit.view_width || height !== this.props.edit.view_height) {
-            editLogics.changeView({
-                width,
-                height,
-            });
-        }
+        console.log(width, height, widthRemainder, heightRemainder);
+        editLogics.changeView({
+            width,
+            height,
+            widthRemainder,
+            heightRemainder,
+        });
     }
     handleScroll(x: number, y: number){
         editLogics.scroll({

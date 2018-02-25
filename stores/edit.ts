@@ -30,6 +30,14 @@ export interface EditState{
      */
     view_height: number;
     /**
+     * マップ編集画面の余りpx数x
+     */
+    view_width_remainder: number;
+    /**
+     * マップ編集画面の余りpx数y
+     */
+    view_height_remainder: number;
+    /**
      * マップの表示位置x
      */
     scroll_x: number;
@@ -37,6 +45,14 @@ export interface EditState{
      * マップの表示位置y
      */
     scroll_y: number;
+    /**
+     * マップ編集画面のスクロールが右端に吸い付くかどうか
+     */
+    scroll_stick_right: boolean;
+    /**
+     * マップ編集画面のスクロールが左端に吸い付くかどうか
+     */
+    scroll_stick_bottom: boolean;
     /**
      * ステージ番号
      */
@@ -117,8 +133,12 @@ export class EditStore extends Store<EditState>{
             screen: 'map',
             view_width: 16,
             view_height: 10,
+            view_width_remainder: 0,
+            view_height_remainder: 0,
             scroll_x: 0,
             scroll_y: 20,
+            scroll_stick_right: false,
+            scroll_stick_bottom: false,
             stage: 1,
             mode: 'pen',
             pen: 0,
@@ -155,10 +175,17 @@ export class EditStore extends Store<EditState>{
             mode,
         });
     }
-    onChangeView({width, height}: editActions.ChangeViewAction){
+    onChangeView({
+        width,
+        height,
+        widthRemainder,
+        heightRemainder,
+    }: editActions.ChangeViewAction){
         this.setState({
             view_width: width,
             view_height: height,
+            view_width_remainder: widthRemainder,
+            view_height_remainder: heightRemainder,
         });
     }
     onChangePen({pen,mode}: editActions.ChangePenAction){
@@ -194,11 +221,21 @@ export class EditStore extends Store<EditState>{
             tool,
         });
     }
-    onScroll({x,y}: editActions.ScrollAction){
-        if (x !== this.state.scroll_x || y !== this.state.scroll_y){
+    onScroll({
+        x,
+        y,
+        stickRight,
+        stickBottom,
+    }: editActions.ScrollAction){
+        if (x !== this.state.scroll_x || y !== this.state.scroll_y ||
+            stickRight !== this.state.scroll_stick_right ||
+            stickBottom !== this.state.scroll_stick_bottom
+        ){
             this.setState({
                 scroll_x: x,
                 scroll_y: y,
+                scroll_stick_right: stickRight,
+                scroll_stick_bottom: stickBottom,
             });
         }
     }

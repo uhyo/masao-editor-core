@@ -94,6 +94,8 @@ export const changeMode = createAction<ChangeModeAction>();
 export interface ChangeViewAction {
     width: number;
     height: number;
+    widthRemainder: number;
+    heightRemainder: number;
 }
 export const changeView = createAction<ChangeViewAction>();
 
@@ -152,6 +154,8 @@ export const setTool = createAction<SetToolAction>();
 export interface ScrollAction {
     x: number;
     y: number;
+    stickRight: boolean;
+    stickBottom: boolean;
 }
 export const scroll = createAction<ScrollAction>();
 

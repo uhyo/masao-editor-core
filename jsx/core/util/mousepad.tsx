@@ -7,24 +7,55 @@ import {
     getAbsolutePosition,
 } from '../../../scripts/util';
 
-// Mouse Eventを抽象化してくれる
+/**
+ * 抽象化されたマウスイベント
+ */
 export interface MousePadEvent{
+    /**
+     * Target of event.
+     */
     target: HTMLElement;
+    /**
+     * ページ内の位置
+     */
     pageX: number;
+    /**
+     * ページ内の位置
+     */
     pageY: number;
-    // 要素の位置からの相対
+    /**
+     * 要素の位置からの相対位置
+     */
     elementX: number;
+    /**
+     * 要素の位置からの相対位置
+     */
     elementY: number;
-    // ボタン
+    /**
+     * 押されたボタン
+     */
     button: number | null;
-    // キャンセル
+    /**
+     * イベントをキャンセルするメソッド
+     */
     preventDefault(): void;
 }
 export interface IPropMousepad{
+    /**
+     * elementXの補正値
+     */
+    elementXCorrection?: number;
+    /**
+     * elementYの補正値
+     */
+    elementYCorrection?: number;
     onMouseDown?(e: MousePadEvent): void;
     onMouseMove?(e: MousePadEvent): void;
     onMouseUp?(e: MousePadEvent): void;
 }
+/**
+ * タッチを含めたMouse Eventを抽象化して発生させる領域
+ */
 export default class MousePad extends React.Component<IPropMousepad, {}>{
     private currentIdentifier: number | null = null;
     private currentTarget: HTMLElement;
@@ -36,6 +67,8 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             onMouseDown,
             onMouseMove,
             onMouseUp,
+            elementXCorrection = 0,
+            elementYCorrection = 0,
         } = this.props;
 
         const abstractDragStartHandler = (target: HTMLElement, pageX: number, pageY: number, button: number | null)=>{
@@ -50,8 +83,8 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             this.currentElmY = y;
 
             // マウスイベント開始
-            const elementX = pageX - x;
-            const elementY = pageY - y;
+            const elementX = pageX - x + elementXCorrection;
+            const elementY = pageY - y + elementYCorrection;
 
             let prevented = false;
             if (onMouseDown){
@@ -71,8 +104,8 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             return prevented;
         };
         const abstractDragMoveHandler = (pageX: number, pageY: number, button: number | null)=>{
-            const elementX = pageX - this.currentElmX;
-            const elementY = pageY - this.currentElmY;
+            const elementX = pageX - this.currentElmX + elementXCorrection;
+            const elementY = pageY - this.currentElmY + elementYCorrection;
 
             if (onMouseMove != null){
                 onMouseMove({
@@ -87,8 +120,8 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             }
         };
         const abstractDragEndHandler = (pageX: number, pageY: number, button: number | null)=>{
-            const elementX = pageX - this.currentElmX;
-            const elementY = pageY - this.currentElmY;
+            const elementX = pageX - this.currentElmX + elementXCorrection;
+            const elementY = pageY - this.currentElmY + elementYCorrection;
 
             if (onMouseUp){
                 onMouseUp({

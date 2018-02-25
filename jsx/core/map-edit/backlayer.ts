@@ -414,17 +414,55 @@ export default class BackLayer{
      * @param {number} height 描画領域縦幅
      * @param {number} dx 描画対象位置
      * @param {number} dy 描画対象位置
+     * @param {number} widthRemainder 右端の非表示領域 (px)
+     * @param {number} heightRemainder 下端の非表示領域 (px)
+     * @param {boolean} stickRight 右端に吸い付くフラグ
+     * @param {boolean} stickBottom 下端に吸い付くフラグ
      */
-    copyTo(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, dx: number, dy: number){
+    copyTo(
+        ctx: CanvasRenderingContext2D,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        dx: number,
+        dy: number,
+        widthRemainder: number,
+        heightRemainder: number,
+        stickRight: boolean,
+        stickBottom: boolean,
+    ){
         const {
             canvas,
             size,
         } = this;
-        ctx.drawImage(canvas,
-                      x * size, y * size,
-                      width * size, height * size,
-                      dx * size, dy * size,
-                      width * size, height * size);
+
+        // source image x
+        let csx;
+        // source image y
+        let csy;
+        if (stickRight) {
+            csx = x * size + widthRemainder;
+        } else {
+            csx = x * size;
+        }
+        if (stickBottom) {
+            csy = y * size + heightRemainder;
+        } else {
+            csy = y * size;
+        }
+        // copied image width.
+        const cw = width * size - widthRemainder;
+        // copied image height.
+        const ch = height * size - heightRemainder;
+
+        ctx.drawImage(
+            canvas,
+            csx, csy,
+            cw, ch,
+            dx * size, dy * size,
+            cw, ch,
+        );
     }
 
 }

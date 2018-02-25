@@ -22,7 +22,7 @@ export function changeMapSize(width: number, height: number): void{
     const scroll_x2 = Math.max(0, Math.min(scroll_x, width - view_width));
     const scroll_y2 = Math.max(0, Math.min(scroll_y, height - view_height));
 
-    editActions.scroll({
+    scroll({
         x: scroll_x2,
         y: scroll_y2,
     });
@@ -61,16 +61,31 @@ export function resizeMapData(stage: number, resize: ResizeData): void{
 export interface ChangeViewArg{
     width: number;
     height: number;
+    widthRemainder: number;
+    heightRemainder: number;
 }
-export function changeView({width, height}: ChangeViewArg): void{
-    editActions.changeView({
-        width,
-        height,
-    });
-    scroll({
-        x: editStore.state.scroll_x,
-        y: editStore.state.scroll_y,
-    });
+export function changeView({
+    width,
+    height,
+    widthRemainder,
+    heightRemainder,
+}: ChangeViewArg): void{
+    if (
+        width !== editStore.state.view_width ||
+        height !== editStore.state.view_height ||
+        widthRemainder !== editStore.state.view_width_remainder ||
+        heightRemainder !== editStore.state.view_height_remainder) {
+        editActions.changeView({
+            width,
+            height,
+            widthRemainder,
+            heightRemainder,
+        });
+        scroll({
+            x: editStore.state.scroll_x,
+            y: editStore.state.scroll_y,
+        });
+    }
 }
 
 // スクロールした場合の調整
@@ -79,17 +94,26 @@ export function scroll({x, y}: {x: number; y: number}): void{
         stage,
         view_width,
         view_height,
+        scroll_x,
+        scroll_y,
+        scroll_stick_right,
+        scroll_stick_bottom,
         cursor,
     } = editStore.state;
     const {
         size,
     } = mapStore.state.data[stage-1];
 
-    if (x > size.x - view_width){
+    let stickRight = false;
+    let stickBottom = false;
+
+    if (x >= size.x - view_width){
         x = size.x - view_width;
+        stickRight = true;
     }
-    if (y > size.y - view_height){
+    if (y >= size.y - view_height){
         y = size.y - view_height;
+        stickBottom = true;
     }
     if (x < 0){
         x = 0;
@@ -98,10 +122,17 @@ export function scroll({x, y}: {x: number; y: number}): void{
         y = 0;
     }
 
-    editActions.scroll({
-        x,
-        y,
-    });
+    if (scroll_x !== x || scroll_y !== y ||
+        scroll_stick_right !== stickRight ||
+        scroll_stick_bottom !== stickBottom
+    ) {
+        editActions.scroll({
+            x,
+            y,
+            stickRight,
+            stickBottom,
+        });
+    }
 
     if (cursor && cursor.type === 'main'){
         // カーソルが出ていたら考慮
@@ -220,8 +251,6 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         screen,
         scroll_x,
         scroll_y,
-        view_width,
-        view_height,
     } = edit;
     const stage = mapStore.state.data[edit.stage-1];
 
@@ -267,24 +296,11 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         let sx = tool.mouse_sx - x + tool.scroll_sx;
         let sy = tool.mouse_sy - y + tool.scroll_sy;
 
-        if (sx < 0){
-            sx = 0;
-        }else if (sx > stage.size.x - view_width){
-            sx = stage.size.x - view_width;
-        }
+        scroll({
+            x: sx,
+            y: sy,
+        });
 
-        if (sy < 0){
-            sy = 0;
-        }else if (sy > stage.size.y - view_height){
-            sy = stage.size.y - view_height;
-        }
-
-        if (sx !== scroll_x || sy !== scroll_y){
-            editActions.scroll({
-                x: sx,
-                y: sy,
-            });
-        }
     }else if (tool.type === 'rect'){
         // 四角形の描画
         const {
