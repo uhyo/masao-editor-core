@@ -55,6 +55,18 @@ export interface IPropScroll{
      * disable y bar
      */
     disableY?: boolean;
+    /**
+     * Size (in pixel) of scroll control.
+     */
+    controlSize?: number;
+    /**
+     * Fit x-asis to parent.
+     */
+    'fit-x'?: boolean;
+    /**
+     * Fit y-axis to parent.
+     */
+    'fit-y'?: boolean;
 }
 
 export default class Scroll extends React.Component<IPropScroll, {}>{
@@ -131,6 +143,9 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                 screenY,
                 disableX = false,
                 disableY = false,
+                controlSize = 16,
+                'fit-x': fitx = false,
+                'fit-y': fity = false,
             },
         } = this;
 
@@ -147,6 +162,16 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
             top: `${(100*y/vh).toFixed(3)}%`,
         };
 
+        const wrapperStyle: Record<string, string> = {
+            '--control-width': `${controlSize}px`,
+        };
+        if (fitx) {
+            wrapperStyle.width = 'calc(100% - var(--control-width))';
+        }
+        if (fity) {
+            wrapperStyle.height = 'calc(100% - var(--control-width))';
+        }
+
         return (
             <WithRandomIds
                 names={['main']}
@@ -154,7 +179,7 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                 ({main})=> {
                     const hor =
                         disableX ? null :
-                        <div
+                        (<div
                             role='scrollbar'
                             aria-controls={main}
                             aria-orientation='horizontal'
@@ -177,11 +202,11 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                                 />
                             </div>
                             <div className={styles.rightButton} onClick={this.handlePushButton} data-dir="right"/>
-                        </div>;
+                        </div>);
 
                         const ver =
                         disableY ? null :
-                        <div
+                        (<div
                             role='scrollbar'
                             aria-controls={main}
                             aria-orientation='vertical'
@@ -204,9 +229,9 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                                 />
                             </div>
                             <div className={styles.upButton} onClick={this.handlePushButton} data-dir="down"/>
-                        </div>;
+                        </div>);
 
-                        return <div className={styles.outerWrapper}>
+                        return (<div className={styles.outerWrapper} style={wrapperStyle}>
                             <div className={styles.wrapper}>
                                 <div
                                     ref={e=> this.mainWrapper = e}
@@ -222,10 +247,10 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
                                     onMouseUp={this.handleMouseUp}
                                 >
                                     {hor}
-                    {ver}
-                        </MousePad>
-                    </div>
-                </div>;
+                                    {ver}
+                                </MousePad>
+                            </div>
+                        </div>);
                 }
             }</WithRandomIds>);
     }

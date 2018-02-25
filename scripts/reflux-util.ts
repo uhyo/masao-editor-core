@@ -63,20 +63,22 @@ export const _RefluxComponent = (Reflux as any).Component as RefluxComponentClas
 
 export class RefluxComponent<D, P, S> extends React.Component<P, S & D>{
     protected unlistens: Array<()=>void> = [];
-    constructor(props: P, protected definition: {[K in keyof D]: Store<D[K]>}){
+    constructor(props: P, protected definition: {[K in keyof D]: Store<D[K]>}, initialState: S){
         super(props);
+
+        this.state = {
+            ... (initialState as any),
+            ... (this.loadCurrentStore() as any),
+        };
     }
-    protected loadCurrentStore(){
+    protected loadCurrentStore(): D{
         const initialState: any = {};
         for (const key in this.definition){
             const store = this.definition[key];
             initialState[key] = store.state;
         }
 
-        this.state = initialState;
-    }
-    componentWillMount(){
-        this.loadCurrentStore();
+        return initialState;
     }
     componentDidMount(){
         // listen to stores
@@ -89,6 +91,8 @@ export class RefluxComponent<D, P, S> extends React.Component<P, S & D>{
             });
             this.unlistens.push(unlisten);
         }
+        // Re-install current state
+        this.setState(this.loadCurrentStore());
     }
     componentWillUnmount(){
         // unlisten

@@ -94,7 +94,7 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             edit: editStore,
             project: projectStore,
             history: historyStore,
-        });
+        }, {});
 
         // backupがあるか?
         const {

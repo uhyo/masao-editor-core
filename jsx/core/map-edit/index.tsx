@@ -559,14 +559,25 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         const scrollHeight = Math.max(0, size.y - view_height);
 
         // TODO
-        return <div className={styles.wrapper} style={style}>
+        return (<div className={styles.wrapper} style={style}>
             <div ref="focusarea" tabIndex={0} onFocus={this.handleFocus} onBlur={this.handleBlur}>
-                <Scroll width={scrollWidth} height={scrollHeight}
+                <Scroll
+                    width={scrollWidth}
+                    height={scrollHeight}
+                    fit-x
                     x={scroll_x} y={scroll_y}
                     screenX={view_width}
                     screenY={view_height}
                     onScroll={this.handleScroll}>
-                    <Resizable width={width} height={height} minWidth={32} minHeight={32} grid={{x: 32, y: 32}} onResize={this.handleResize}>
+                    <Resizable
+                        width={width}
+                        height={height}
+                        minWidth={32}
+                        minHeight={32}
+                        grid={{x: 32, y: 32}}
+                        fit-x
+                        onResize={this.handleResize}
+                    >
                         <div className={styles.canvasWrapper}>
                             <canvas ref="canvas" width={width} height={height}/>
                             <MousePad
@@ -586,15 +597,18 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     </Resizable>
                 </Scroll>
             </div>
-        </div>;
+        </div>);
     }
     handleResize(widthr: number, heightr: number){
-        const width = Math.floor(widthr/32);
-        const height = Math.floor(heightr/32);
-        editLogics.changeView({
-            width,
-            height,
-        });
+        const width = Math.ceil(widthr/32);
+        const height = Math.ceil(heightr/32);
+        // if calculated view is different, then update.
+        if (width !== this.props.edit.view_width || height !== this.props.edit.view_height) {
+            editLogics.changeView({
+                width,
+                height,
+            });
+        }
     }
     handleScroll(x: number, y: number){
         editLogics.scroll({
