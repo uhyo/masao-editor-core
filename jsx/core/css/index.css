@@ -54,12 +54,9 @@
 }
 
 .cm-wrapper {
+  flex: auto 1 0;
   display: flex;
   flex-flow: row wrap;
-}
-
-.maps-column .cm-wrapper {
-  flex: auto 1 0;
 }
 
 .chipselect-wrapper {
