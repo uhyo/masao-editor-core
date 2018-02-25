@@ -4,6 +4,7 @@
   height: 100%;
   box-sizing: border-box;
   padding: 0 6px 6px 0;
+  overflow: hidden;
 }
 .container {
 	width: 100%;

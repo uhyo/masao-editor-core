@@ -5,15 +5,16 @@ import Promise from '../../scripts/promise';
 import * as chip from '../../scripts/chip';
 import * as util from '../../scripts/util';
 import loadImage from '../../scripts/load-image';
-import {
-    getDelta,
-} from '../../scripts/wheel';
 
 import Resizable from './util/resizable';
 import Scroll from './util/scroll';
 import MousePad, {
     MousePadEvent,
 } from './util/mousepad';
+import {
+    ObserveResize,
+    ObserveResizeEvent,
+} from './util/observe-resize';
 
 import * as editActions from '../../actions/edit';
 import * as editLogics from '../../logics/edit';
@@ -42,9 +43,9 @@ export interface IPropChipSelect{
 export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
     constructor(props: IPropChipSelect){
         super(props);
+        this.handleWrapperResize = this.handleWrapperResize.bind(this);
         this.handleResize = this.handleResize.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
-        this.handleWheel = this.handleWheel.bind(this);
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -55,6 +56,15 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         chips: HTMLImageElement;
     };
     private backlayer: HTMLCanvasElement;
+    /**
+     * Ref to focusable area.
+     */
+    protected focusarea: HTMLElement | null = null;
+    /**
+     * Observed Height of chipselect area.
+     */
+    protected areaHeight: number = 0;
+
     componentDidMount(){
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
@@ -133,7 +143,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             const canvas = this.backlayer;
             canvas.width = maincanvas.width;
             canvas.height = maincanvas.height;
-            console.log('CANV', canvas.width, canvas.height);
 
             const ctx = canvas.getContext('2d');
             if (ctx == null){
@@ -244,7 +253,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             }
         }
         const w = chipselect_width * 32;
-        const allh = Math.ceil(this.chipNumber() / chipselect_width);
+        // 中途半端な表示領域のために1段余裕をもたせる
+        const allh = Math.ceil(this.chipNumber() / chipselect_width) + 1;
         const h = chipselect_height * 32;
 
         const scrollHeight = Math.max(0, allh - chipselect_height);
@@ -252,19 +262,54 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         const chipselectedStyle = {
             width: `${w}px`,
         };
-        return <div className={styles.wrapper}>
-            <div ref="focusarea" tabIndex={0} onFocus={this.handleFocus} onBlur={this.handleBlur}>
-                <Scroll x={0} y={chipselect_scroll} width={chipselect_width} height={scrollHeight} screenX={chipselect_width} screenY={chipselect_height} disableX disableY={scrollHeight === 0} onScroll={this.handleScroll}>
-                    <Resizable width={w} height={h} grid={{x: 32, y: 32}} onResize={this.handleResize}>
-                        <MousePad
-                            onMouseDown={this.handleMouseDown}
-                            onMouseMove={this.handleMouseMove}
+        return (<div className={styles.wrapper}>
+            <ObserveResize
+                className={styles.mainContainer}
+                onResize={this.handleWrapperResize}
+            >
+                <div
+                    className={styles.floatWrapper}
+                >
+                    <div
+                        ref={e=> this.focusarea = e}
+                        tabIndex={0}
+                        onFocus={this.handleFocus}
+                        onBlur={this.handleBlur}
+                        style={{height: `${this.areaHeight}px`}}
+                    >
+                        <Scroll
+                            x={0}
+                            y={chipselect_scroll}
+                            width={chipselect_width}
+                            height={scrollHeight}
+                            screenX={chipselect_width}
+                            screenY={chipselect_height}
+                            disableX
+                            disableY={scrollHeight === 0}
+                            fit-y
+                            onScroll={this.handleScroll}
+                        >
+                            <Resizable
+                                width={w}
+                                height={h}
+                                fit-y
+                                grid={{x: 32, y: 32}}
+                                onResize={this.handleResize}
                             >
-                            <canvas ref="canvas" width={w} height={h} onWheel={this.handleWheel} />
-                        </MousePad>
-                    </Resizable>
-                </Scroll>
-            </div>
+                                <MousePad
+                                    onMouseDown={this.handleMouseDown}
+                                    onMouseMove={this.handleMouseMove}
+                                    >
+                                        <canvas ref="canvas"
+                                            width={w}
+                                            height={h}
+                                        />
+                                </MousePad>
+                            </Resizable>
+                        </Scroll>
+                    </div>
+                </div>
+            </ObserveResize>
             <div style={chipselectedStyle}>
                 <div>
                     <p>選択中： <code>{pen}</code> {name}</p>
@@ -273,7 +318,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     <canvas ref="canvas2" width="96" height="64"/>
                 </div>
             </div>
-        </div>;
+        </div>);
     }
     // チップの数
     private chipNumber(){
@@ -291,14 +336,24 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             return chip.chipList.length;
         }
     }
-    handleResize(width: number, height: number){
+    /**
+     * chipselect部分のラッパのサイズを計測
+     */
+    protected handleWrapperResize({
+        height,
+    }: ObserveResizeEvent): void {
+        this.areaHeight = height;
+    }
+    protected handleResize(width: number, height: number){
         const {
             chipselect_width,
             chipselect_scroll,
         } = this.props.edit;
 
-        const newwidth = width/32;
-        const newheight = height/32;
+        console.log('wh', width, height);
+
+        const newwidth = Math.ceil(width/32);
+        const newheight = Math.ceil(height/32);
         editActions.changeChipselectSize({width: newwidth, height: newheight});
         // scroll量を調整する
         const curi = chipselect_width * chipselect_scroll;
@@ -308,14 +363,16 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
 
         editActions.changeChipselectScroll({y: newscroll});
     }
-    handleScroll(_: number, y: number){
+    protected handleScroll(_: number, y: number){
         editActions.changeChipselectScroll({y});
     }
-    handleMouseDown(ev: MousePadEvent){
+    protected handleMouseDown(ev: MousePadEvent){
         this.handleMouseMove(ev);
-        (this.refs.focusarea as HTMLElement).focus();
+        if (this.focusarea != null) {
+            this.focusarea.focus();
+        }
     }
-    handleMouseMove({elementX, elementY}: MousePadEvent){
+    protected handleMouseMove({elementX, elementY}: MousePadEvent){
         const {
             edit: {
                 chipselect_width,
@@ -340,34 +397,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             });
         }
     }
-    handleWheel<T>(e: React.WheelEvent<T>){
-        const {
-            chipselect_width,
-            chipselect_height,
-            chipselect_scroll,
-        } = this.props.edit;
-        const {
-            x,
-            y,
-        } = getDelta(e);
-        let delta;
-        if (y !== 0){
-            delta = y;
-        }else if (x !== 0){
-            delta = x;
-        }else{
-            return;
-        }
-        const allh = Math.ceil(this.chipNumber() / chipselect_width);
-        const newscroll = Math.min(Math.max(0,  chipselect_scroll + delta), allh - chipselect_height);
-        editActions.changeChipselectScroll({
-            y: newscroll,
-        });
-    }
-    handleFocus(){
+    protected handleFocus(){
         editLogics.focus('chipselect');
     }
-    handleBlur(){
+    protected handleBlur(){
         editLogics.blur('chipselect');
     }
 }
