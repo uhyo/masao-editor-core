@@ -119,7 +119,11 @@ export default class ResizableBox extends React.Component<IPropResizableBox, {}>
             width: fitx ? '100%' : width,
             height: fity ? '100%' : height,
         };
-        return (<div className={styles.wrapper}>
+        const wrapperStyle = {
+            paddingRight: fitx ? '0' : undefined,
+            paddingBottom: fity ? '0' : undefined,
+        };
+        return (<div className={styles.wrapper} style={wrapperStyle}>
             <Resizable
                 size={size}
                 minWidth={minWidth}

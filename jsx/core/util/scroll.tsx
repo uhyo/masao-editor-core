@@ -165,14 +165,12 @@ export default class Scroll extends React.Component<IPropScroll, {}>{
         const wrapperStyle: Record<string, string> = {
             '--control-width': `${controlSize}px`,
         };
-        /*
-        if (fitx) {
-            wrapperStyle.width = 'calc(100% - var(--control-width))';
+        if (disableX) {
+            wrapperStyle.paddingBottom = '0';
         }
-        if (fity) {
-            wrapperStyle.height = 'calc(100% - var(--control-width))';
+        if (disableY) {
+            wrapperStyle.paddingRight = '0';
         }
-         */
 
         return (
             <WithRandomIds

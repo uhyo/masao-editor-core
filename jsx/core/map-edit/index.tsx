@@ -101,6 +101,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
      * タイマー
      */
     private timers: Timers;
+    /**
+     * Fucusable areaのcontainer
+     */
+    protected focusarea: HTMLElement | null = null;
 
     constructor(props: IPropMapEdit){
         super(props);
@@ -563,7 +567,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
         // TODO
         return (<div
-            ref="focusarea"
+            ref={e=> this.focusarea = e}
             className={fity ? styles.wrapperFitY : styles.wrapper}
             tabIndex={0}
             onFocus={this.handleFocus}
@@ -633,7 +637,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             preventDefault();
             return;
         }
-        (this.refs.focusarea as HTMLElement).focus();
+        if (this.focusarea != null) {
+            this.focusarea.focus();
+        }
 
         const {
             edit,
