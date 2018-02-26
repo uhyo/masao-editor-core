@@ -427,10 +427,6 @@ export default class BackLayer{
         height: number,
         dx: number,
         dy: number,
-        widthRemainder: number,
-        heightRemainder: number,
-        stickRight: boolean,
-        stickBottom: boolean,
     ){
         const {
             canvas,
@@ -438,23 +434,13 @@ export default class BackLayer{
         } = this;
 
         // source image x
-        let csx;
+        const csx = x * size;
         // source image y
-        let csy;
-        if (stickRight) {
-            csx = x * size + widthRemainder;
-        } else {
-            csx = x * size;
-        }
-        if (stickBottom) {
-            csy = y * size + heightRemainder;
-        } else {
-            csy = y * size;
-        }
+        const csy = y * size;
         // copied image width.
-        const cw = width * size - widthRemainder;
+        const cw = width * size;
         // copied image height.
-        const ch = height * size - heightRemainder;
+        const ch = height * size;
 
         ctx.drawImage(
             canvas,

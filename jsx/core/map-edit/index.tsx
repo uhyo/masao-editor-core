@@ -447,6 +447,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             const fillWidth = Math.min(width - fillLeft, (stage.size.x - scroll_x)*32);
             const fillHeight = Math.min(height - fillTop, (stage.size.y - scroll_y)*32);
             ctx.fillRect(fillLeft, fillTop, fillWidth, fillHeight);
+
+            // 右端・下端では表示がずれる勝利
+            ctx.save();
+            // XXX DRY
+            const x_corr = scroll_stick_right ? -view_width_remainder : 0;
+            const y_corr = scroll_stick_bottom ? -view_height_remainder : 0;
+            ctx.translate(x_corr, y_corr);
+
             // バックバッファから
             if (screen === 'layer' || render_layer === true){
                 ctx.save();
@@ -459,10 +467,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     view_height,
                     0,
                     0,
-                    view_width_remainder,
-                    view_height_remainder,
-                    scroll_stick_right,
-                    scroll_stick_bottom,
                 );
                 ctx.restore();
             }
@@ -477,10 +481,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                     view_height,
                     0,
                     0,
-                    view_width_remainder,
-                    view_height_remainder,
-                    scroll_stick_right,
-                    scroll_stick_bottom,
                 );
                 ctx.restore();
             }
@@ -550,6 +550,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
 
                 ctx.restore();
             }
+            ctx.restore();
             this.drawing=false;
             if (process.env.NODE_ENV !== 'production'){
                 console.timeEnd("draw");
