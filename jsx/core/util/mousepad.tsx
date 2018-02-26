@@ -64,14 +64,15 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
     render(){
         const {
             children,
-            onMouseDown,
-            onMouseMove,
-            onMouseUp,
-            elementXCorrection = 0,
-            elementYCorrection = 0,
         } = this.props;
 
         const abstractDragStartHandler = (target: HTMLElement, pageX: number, pageY: number, button: number | null)=>{
+            const {
+                onMouseDown,
+                elementXCorrection = 0,
+                elementYCorrection = 0,
+            } = this.props;
+
             // 要素
             const {
                 x,
@@ -104,6 +105,12 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             return prevented;
         };
         const abstractDragMoveHandler = (pageX: number, pageY: number, button: number | null)=>{
+            const {
+                onMouseMove,
+                elementXCorrection = 0,
+                elementYCorrection = 0,
+            } = this.props;
+
             const elementX = pageX - this.currentElmX + elementXCorrection;
             const elementY = pageY - this.currentElmY + elementYCorrection;
 
@@ -120,6 +127,12 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             }
         };
         const abstractDragEndHandler = (pageX: number, pageY: number, button: number | null)=>{
+            const {
+                onMouseUp,
+                elementXCorrection = 0,
+                elementYCorrection = 0,
+            } = this.props;
+
             const elementX = pageX - this.currentElmX + elementXCorrection;
             const elementY = pageY - this.currentElmY + elementYCorrection;
 
