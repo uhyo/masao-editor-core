@@ -437,6 +437,47 @@ function isInArea(x: number, y: number, rect: Rect): boolean {
     return rect.left <= x && x < rect.right &&
         rect.top <= y && y < rect.bottom; 
 }
+/**
+ * 四隅を表す文字列
+ */
+export type EdgeType = 'top' | 'right' | 'bottom' | 'left';
+export function isEdge(viewx: number, viewy: number): EdgeType | null {
+    const {
+        scroll_x,
+        scroll_y,
+    } = editStore.state;
+    const sx = viewx + scroll_x;
+    const sy = viewy + scroll_y;
+    const av = availableArea();
+
+    // 四隅の判定
+    if (sx <= av.left) {
+        if (av.top <= sy && sy < av.bottom) {
+            return 'left';
+        } else {
+            return null;
+        }
+    } else if (sx >= av.right - 1) {
+        if (av.top <= sy && sy < av.bottom) {
+            return 'right';
+        } else {
+            return null;
+        }
+    } else if (sy <= av.top) {
+        if (av.left <= sx && sx < av.right) {
+            return 'top';
+        } else {
+            return null;
+        }
+    } else if (sy >= av.bottom - 1) {
+        if (av.left <= sx && sx < av.right) {
+            return 'bottom';
+        } else {
+            return null;
+        }
+    }
+    return null;
+}
 
 
 function mapUpdateAction(screen: Screen){

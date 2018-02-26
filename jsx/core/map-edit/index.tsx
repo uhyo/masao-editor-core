@@ -101,6 +101,10 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
      */
     private timers: Timers;
     /**
+     * マウスが周辺位置にいるかどうかのフラグ
+     */
+    protected mouse_edge: editLogics.EdgeType | null = null;
+    /**
      * Fucusable areaのcontainer
      */
     protected focusarea: HTMLElement | null = null;
@@ -745,15 +749,68 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             return;
         }
 
-        editLogics.mouseDown(mode, mx, my);
+        const tool = editLogics.mouseDown(mode, mx, my);
+        if (tool != null && tool.type !== 'hand') {
+            // マウスモードなのでマウスによるスクロールを有効化
+            this.mouse_edge = null;
+            let counter = 0;
+            const func = ()=> {
+                // マウスが恥にあればスクロール
+                counter++;
+                switch (this.mouse_edge) {
+                    case 'left': {
+                        editLogics.scrollBy({
+                            x: -1,
+                            y: 0,
+                        });
+                        break;
+                    }
+                    case 'top': {
+                        editLogics.scrollBy({
+                            x: 0,
+                            y: -1,
+                        });
+                        break;
+                    }
+                    case 'right': {
+                        editLogics.scrollBy({
+                            x: 1,
+                            y: 0,
+                        });
+                        break;
+                    }
+                    case 'bottom': {
+                        editLogics.scrollBy({
+                            x: 0,
+                            y: 1,
+                        });
+                        break;
+                    }
+                    case null: {
+                        counter = 0;
+                        break;
+                    }
+                }
+                // 連続で恥にいるときはスピードを挙げる
+                const wait =
+                    counter <= 5 ? 120 :
+                    counter <= 12 ? 50 : 
+                    17;
+                this.timers.addTimer('mouse-scroll', wait, func);
+            };
+            func();
+        }
     }
     protected handleMouseMove({elementX, elementY}: MousePadEvent){
         const mx = Math.floor(elementX/32);
         const my = Math.floor(elementY/32);
 
+        this.mouse_edge = editLogics.isEdge(mx, my);
+
         editLogics.mouseMove(mx, my, this.props.edit.tool);
     }
     protected handleMouseUp(){
+        this.timers.clearTimer('mouse-scroll');
         editLogics.mouseUp();
     }
     protected handleContextMenu<T>(e: React.MouseEvent<T>){
