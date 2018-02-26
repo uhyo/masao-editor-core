@@ -122,6 +122,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.handleResize = this.handleResize.bind(this);
     }
 
@@ -678,6 +679,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
                             onMouseDown={this.handleMouseDown}
                             onMouseMove={this.handleMouseMove}
                             onMouseUp={this.handleMouseUp}
+                            onClick={this.handleClick}
                             elementXCorrection={scroll_stick_right ? view_width_remainder : 0}
                             elementYCorrection={scroll_stick_bottom ? view_height_remainder : 0}
                             >
@@ -812,6 +814,15 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     protected handleMouseUp(){
         this.timers.clearTimer('mouse-scroll');
         editLogics.mouseUp();
+    }
+    protected handleClick({
+        elementX,
+        elementY,
+        button,
+    }: MousePadEvent) {
+        const mx = Math.floor(elementX/32);
+        const my = Math.floor(elementY/32);
+        editLogics.click(mx, my, button);
     }
     protected handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();

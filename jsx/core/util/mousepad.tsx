@@ -49,9 +49,22 @@ export interface IPropMousepad{
      * elementYの補正値
      */
     elementYCorrection?: number;
+    /**
+     * マウス操作開始イベント
+     */
     onMouseDown?(e: MousePadEvent): void;
+    /**
+     * マウス移動イベント
+     */
     onMouseMove?(e: MousePadEvent): void;
+    /**
+     * マウス操作終了イベント
+     */
     onMouseUp?(e: MousePadEvent): void;
+    /**
+     * クリックイベント（同じ位置で押して話した場合に発生
+     */
+    onClick?(e: MousePadEvent): void;
 }
 /**
  * タッチを含めたMouse Eventを抽象化して発生させる領域
@@ -61,6 +74,18 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
     private currentTarget: HTMLElement;
     private currentElmX: number;
     private currentElmY: number;
+    /**
+     * A flag whether current mouse/touch can be a click.
+     */
+    protected canBeClick: boolean = false;
+    /**
+     * Initial x position of mouse.
+     */
+    protected initialElementX: number;
+    /**
+     * Initial y position of mouse.
+     */
+    protected initialElementY: number;
     render(){
         const {
             children,
@@ -82,10 +107,14 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             this.currentTarget = target;
             this.currentElmX = x;
             this.currentElmY = y;
+            this.canBeClick = true;
 
             // マウスイベント開始
             const elementX = pageX - x + elementXCorrection;
             const elementY = pageY - y + elementYCorrection;
+
+            this.initialElementX = elementX;
+            this.initialElementY = elementY;
 
             let prevented = false;
             if (onMouseDown){
@@ -114,6 +143,11 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
             const elementX = pageX - this.currentElmX + elementXCorrection;
             const elementY = pageY - this.currentElmY + elementYCorrection;
 
+            // 最初の位置から一定以上離れたらクリックフラグ解消
+            if ((elementX - this.initialElementX) ** 2 + (elementY - this.initialElementY) ** 2 >= 25) {
+                this.canBeClick = false;
+            }
+
             if (onMouseMove != null){
                 onMouseMove({
                     target: this.currentTarget,
@@ -129,6 +163,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
         const abstractDragEndHandler = (pageX: number, pageY: number, button: number | null)=>{
             const {
                 onMouseUp,
+                onClick,
                 elementXCorrection = 0,
                 elementYCorrection = 0,
             } = this.props;
@@ -138,6 +173,17 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
 
             if (onMouseUp){
                 onMouseUp({
+                    target: this.currentTarget,
+                    pageX,
+                    pageY,
+                    elementX,
+                    elementY,
+                    button,
+                    preventDefault(){},
+                });
+            }
+            if (this.canBeClick && onClick) {
+                onClick({
                     target: this.currentTarget,
                     pageX,
                     pageY,

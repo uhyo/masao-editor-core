@@ -338,7 +338,7 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         }
         if (ry < sc_top) {
             ry = sc_top;
-        } else if (ry > sc_bottom) {
+        } else if (ry >= sc_bottom) {
             ry = sc_bottom - 1;
         }
 
@@ -403,6 +403,25 @@ export function mouseUp(): void{
             stage,
             stageData: mapStore.state.data[stage-1],
         });
+    }
+}
+
+/**
+ * マウスクリック
+ */
+export function click(x: number, y: number, button: number | null): void {
+    if (button === 1) {
+        // 中クリック: この位置からテストプレイ
+        const {
+            scroll_x,
+            scroll_y,
+        } = editStore.state;
+        const mx = x + scroll_x;
+        const my = y + scroll_y;
+
+        if (isInArea(mx, my, availableArea())) {
+            // TODO
+        }
     }
 }
 
