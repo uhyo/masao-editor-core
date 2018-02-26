@@ -26,7 +26,6 @@ import {
 
 import {
     Mode,
-    ToolState,
     CursorState,
 } from '../../../actions/edit';
 import { EditState } from '../../../stores/edit';
@@ -748,16 +747,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         editLogics.mouseDown(mode, mx, my);
     }
     protected handleMouseMove({elementX, elementY}: MousePadEvent){
-        this.mouseMoves(this.props.edit.tool, elementX, elementY);
-    }
-    protected handleMouseUp(){
-        editLogics.mouseUp();
-    }
-    protected mouseMoves(tool: ToolState | null, elementX: number, elementY: number){
         const mx = Math.floor(elementX/32);
         const my = Math.floor(elementY/32);
 
-        editLogics.mouseMove(mx, my, tool);
+        editLogics.mouseMove(mx, my, this.props.edit.tool);
+    }
+    protected handleMouseUp(){
+        editLogics.mouseUp();
     }
     protected handleContextMenu<T>(e: React.MouseEvent<T>){
         e.preventDefault();

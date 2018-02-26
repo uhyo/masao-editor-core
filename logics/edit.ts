@@ -253,18 +253,26 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         screen,
         scroll_x,
         scroll_y,
+        view_width,
+        view_height,
     } = edit;
     const stage = mapStore.state.data[edit.stage-1];
 
     const mapdata = screen === 'layer' ? stage.layer : stage.map;
     const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
 
+    // 有効領域（画面内かつステージ内）
+    const sc_left = Math.max(0, scroll_x);
+    const sc_top = Math.max(0, scroll_y);
+    const sc_right = Math.min(stage.size.x, scroll_x + view_width);
+    const sc_bottom = Math.min(stage.size.y, scroll_y + view_height);
+
     if (tool.type === 'pen'){
         const cx = x + scroll_x;
         const cy = y + scroll_y;
 
-        if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
-            // ステージ外
+        if (cx < sc_left || cy < sc_top || cx >= sc_right || cy >= sc_bottom){
+            // 有効範囲外
             return;
         }
 
@@ -280,7 +288,7 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         const cx = x + scroll_x;
         const cy = y + scroll_y;
 
-        if (cx < 0 || cy < 0 || cx >= stage.size.x || cy >= stage.size.y){
+        if (cx < sc_left || cy < sc_top || cx >= sc_right || cy >= sc_bottom){
             // ステージ外
             return;
         }
@@ -310,8 +318,20 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
             end_y
         } = tool;
 
-        const rx = x + scroll_x;
-        const ry = y + scroll_y;
+        let rx = x + scroll_x;
+        let ry = y + scroll_y;
+
+        // 画面内に収まるように補正
+        if (rx < sc_left) {
+            rx = sc_left;
+        } else if (rx >= sc_right) {
+            rx = sc_right - 1;
+        }
+        if (ry < sc_top) {
+            ry = sc_top;
+        } else if (ry > sc_bottom) {
+            ry = sc_bottom - 1;
+        }
 
         if (end_x !== rx || end_y !== ry){
             editActions.setTool({
