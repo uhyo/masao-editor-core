@@ -28,13 +28,16 @@ export function changeMapSize(width: number, height: number): void{
     });
 }
 
-export interface ResizeData{
+/**
+ * Rectangle defined by two points.
+ */
+export interface Rect{
     top: number;
     right: number;
     bottom: number;
     left: number;
 }
-export function resizeMapData(stage: number, resize: ResizeData): void{
+export function resizeMapData(stage: number, resize: Rect): void{
     // 新しいマップサイズを計算
     const data = mapStore.state.data[stage];
     const newwidth = data.size.x + resize.left + resize.right;
@@ -209,29 +212,36 @@ export function mouseDown(mode: editActions.Mode, x: number, y: number): editAct
     }else if (mode === 'rect'){
         const rx = x + scroll_x;
         const ry = y + scroll_y;
-        tool = {
-            type: 'rect',
-            start_x: rx,
-            start_y: ry,
-            end_x: rx,
-            end_y: ry,
-        };
+
+        // 有効範囲内か確認
+        if (isInArea(rx, ry, availableArea())) {
+            tool = {
+                type: 'rect',
+                start_x: rx,
+                start_y: ry,
+                end_x: rx,
+                end_y: ry,
+            };
+        }
     }else if (mode === 'fill'){
         const rx = x + scroll_x;
         const ry = y + scroll_y;
 
-        const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
+        // 有効範囲内か確認
+        if (isInArea(rx, ry, availableArea())) {
+            const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
 
-        mapUpdateFillAction(screen)({
-            stage,
-            x: rx,
-            y: ry,
-            chip: pen,
-        });
-        historyActions.addHistory({
-            stage,
-            stageData: mapStore.state.data[stage-1],
-        });
+            mapUpdateFillAction(screen)({
+                stage,
+                x: rx,
+                y: ry,
+                chip: pen,
+            });
+            historyActions.addHistory({
+                stage,
+                stageData: mapStore.state.data[stage-1],
+            });
+        }
     }
     editActions.setTool({
         tool,
@@ -253,19 +263,18 @@ export function mouseMove(x: number, y: number, tool: editActions.ToolState | nu
         screen,
         scroll_x,
         scroll_y,
-        view_width,
-        view_height,
     } = edit;
     const stage = mapStore.state.data[edit.stage-1];
 
     const mapdata = screen === 'layer' ? stage.layer : stage.map;
     const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
 
-    // 有効領域（画面内かつステージ内）
-    const sc_left = Math.max(0, scroll_x);
-    const sc_top = Math.max(0, scroll_y);
-    const sc_right = Math.min(stage.size.x, scroll_x + view_width);
-    const sc_bottom = Math.min(stage.size.y, scroll_y + view_height);
+    const {
+        left: sc_left,
+        top: sc_top,
+        right: sc_right,
+        bottom: sc_bottom,
+    } = availableArea();
 
     if (tool.type === 'pen'){
         const cx = x + scroll_x;
@@ -396,6 +405,39 @@ export function mouseUp(): void{
         });
     }
 }
+
+/**
+ * 現在のEditStateから画面の有効領域（画面内かつステージ内）を計算
+ */
+function availableArea(): Rect {
+    const {
+        scroll_x,
+        scroll_y,
+        view_width,
+        view_height,
+    } = editStore.state;
+    const stage = mapStore.state.data[editStore.state.stage-1];
+
+    const left = Math.max(0, scroll_x);
+    const top = Math.max(0, scroll_y);
+    const right = Math.min(stage.size.x, scroll_x + view_width);
+    const bottom = Math.min(stage.size.y, scroll_y + view_height);
+
+    return {
+        left,
+        top,
+        right,
+        bottom,
+    };
+}
+/**
+ * 点が領域内にあるか判定
+ */
+function isInArea(x: number, y: number, rect: Rect): boolean {
+    return rect.left <= x && x < rect.right &&
+        rect.top <= y && y < rect.bottom; 
+}
+
 
 function mapUpdateAction(screen: Screen){
     if (screen === 'layer'){
