@@ -38,6 +38,11 @@ export interface IStateMiniMap{
 }
 export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap>{
     private drawing: boolean;
+    /**
+     * ref to the canvas.
+     */
+    protected canvas: HTMLCanvasElement | null = null;
+
     constructor(props: IPropMiniMap){
         super(props);
 
@@ -61,9 +66,12 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
         }
         this.drawing=true;
         requestAnimationFrame(()=>{
-            const canvas=this.refs['canvas'] as HTMLCanvasElement;
+            const canvas = this.canvas;
+            if (canvas == null) {
+                return;
+            }
             const ctx = canvas.getContext('2d');
-            if (ctx == null){
+            if (ctx == null) {
                 return;
             }
             const {
@@ -135,7 +143,11 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
                 onMouseMove={this.handleMouseMove}
                 onMouseUp={this.handleMouseUp}
                 >
-                <canvas ref="canvas" width={size.x*2} height={size.y*2}/>
+                    <canvas
+                        ref={e=> this.canvas = e}
+                        width={size.x*2}
+                        height={size.y*2}
+                    />
             </MousePad>
         </div>);
     }
@@ -145,7 +157,7 @@ export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap
             button,
             preventDefault,
         } = ev;
-        const can = this.refs['canvas'] as HTMLCanvasElement;
+        const can = this.canvas;
 
         if (target !== can || (button !== 0 && button != null)){
             preventDefault();

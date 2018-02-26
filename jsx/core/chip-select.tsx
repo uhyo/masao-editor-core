@@ -61,6 +61,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
      */
     protected focusarea: HTMLElement | null = null;
     /**
+     * Ref to main canvas.
+     */
+    protected canvas: HTMLCanvasElement | null = null;
+    /**
+     * Ref t chip preview canvas.
+     */
+    protected previewCanvas: HTMLCanvasElement | null = null;
+    /**
      * Observed Height of chipselect area.
      */
     protected areaHeight: number = 0;
@@ -137,7 +145,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             cursor,
         } = edit;
 
-        const maincanvas = this.refs['canvas'] as HTMLCanvasElement;
+        const maincanvas = this.canvas;
+        if (maincanvas == null || maincanvas.width === 0 || maincanvas.height === 0) {
+            return;
+        }
         if(mode === 'redraw'){
             //チップセットを書き換える
             const canvas = this.backlayer;
@@ -210,7 +221,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
         }
 
         //下のやつも描画
-        const canvas=this.refs['canvas2'] as HTMLCanvasElement;
+        const canvas = this.previewCanvas;
+        if (canvas == null) {
+            return;
+        }
         const ctx=canvas.getContext('2d');
         if (ctx == null){
             return;
@@ -300,7 +314,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                                     onMouseDown={this.handleMouseDown}
                                     onMouseMove={this.handleMouseMove}
                                     >
-                                        <canvas ref="canvas"
+                                        <canvas
+                                            ref={e=> this.canvas = e}
                                             width={w}
                                             height={h}
                                         />
@@ -315,7 +330,11 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
                     <p>選択中： <code>{pen}</code> {name}</p>
                 </div>
                 <div>
-                    <canvas ref="canvas2" width="96" height="64"/>
+                    <canvas
+                        ref={e=> this.previewCanvas = e}
+                        width="96"
+                        height="64"
+                    />
                 </div>
             </div>
         </div>);
