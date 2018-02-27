@@ -15,9 +15,21 @@ import projectStore from '../stores/project';
 import paramsStore from '../stores/params';
 
 /**
+ * Option bag to `getCurrentGame`.
+ */
+export interface GetCurrentGameOption {
+    /**
+     * A temporal position of masao.
+     */
+    masaoPosition?: {
+        x: number;
+        y: number;
+    };
+}
+/**
  * Generate an object of current game.
  */
-export function getCurrentGame(): MasaoJSONFormat {
+export function getCurrentGame(options: GetCurrentGameOption = {}): MasaoJSONFormat {
     const map = mapStore.state;
     const project = projectStore.state;
     const params = paramsStore.state;
@@ -25,7 +37,7 @@ export function getCurrentGame(): MasaoJSONFormat {
     const {
         params: mp,
         advancedMap,
-    } = mapToParam(map);
+    } = mapToParam(map, options.masaoPosition);
 
     const version = project.version;
     const allParams = masao.param.sanitize({
@@ -49,7 +61,10 @@ type LayerObject = masao.format.LayerObject;
 /**
  * Convert the map to params.
  */
-function mapToParam(map: MapState): {
+function mapToParam(
+    map: MapState,
+    masaoPosition?: {x: number; y: number},
+): {
     params: Record<string, string>;
     advancedMap: AdvancedMap | undefined;
 }{
@@ -61,7 +76,7 @@ function mapToParam(map: MapState): {
             const layers: Array<LayerObject> = [
                 {
                     type: 'main',
-                    map: st.map,
+                    map: setMasaoPosition(st.map, masaoPosition),
                 },
                 {
                     type: 'mapchip',
@@ -92,8 +107,9 @@ function mapToParam(map: MapState): {
             }else if(stage===3){
                 stagechar="-f";
             }
+            const m = setMasaoPosition(map.data[stage].map, masaoPosition);
             for(let y=0; y < 30; y++){
-                const j = map.data[stage].map[y].map(chipToMapString).join("");
+                const j = m[y].map(chipToMapString).join("");
                 params[`map0-${y}${stagechar}`]=j.slice(0,60);
                 params[`map1-${y}${stagechar}`]=j.slice(60,120);
                 params[`map2-${y}${stagechar}`]=j.slice(120,180);
@@ -108,4 +124,29 @@ function mapToParam(map: MapState): {
             advancedMap: void 0,
         };
     }
+}
+
+/**
+ * Set masao position to specified point.
+ */
+function setMasaoPosition(
+    map: Array<Array<number | string>>, 
+    masaoPosition?: {x: number; y: number},
+): Array<Array<number | string>> {
+    if (masaoPosition == null) {
+        return map;
+    }
+    // 正男をサーチして新しいのを返す
+    return map.map((row, y)=> {
+        // 正男を消す
+        // TODO 正男の表現はこれだけ?
+        if (row.includes(0x41)) {
+            row = row.map(c=> c === 0x41 ? 0 : c);
+        }
+        if (y === masaoPosition.y) {
+            // ここだ!!!!!
+            row = row.map((c, x)=> x === masaoPosition.x ? 0x41 : c);
+        }
+        return row;
+    });
 }

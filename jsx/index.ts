@@ -12,6 +12,7 @@ import Switch from './core/util/switch';
 import {
     Command,
     commandNames,
+    ExternalCommand,
 } from '../logics/command';
 
 export const uis = {
@@ -27,6 +28,7 @@ export {
     ProjectState,
 
     Command,
+    ExternalCommand,
     commandNames,
 };
 

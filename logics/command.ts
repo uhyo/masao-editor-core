@@ -3,6 +3,9 @@ import editStore from '../stores/edit';
 import * as editActions from '../actions/edit';
 import * as editLogics from '../logics/edit';
 import * as historyLogics from './history';
+import {
+    MasaoJSONFormat,
+} from '../scripts/masao';
 
 // 定義されたコマンド
 export type Command =
@@ -40,6 +43,28 @@ export const commandNames: Record<Command, string> = {
     'cursor:vanish': 'カーソル消去',
     'cursor:button': 'カーソルボタン',
 };
+
+/**
+ * エディタの外部で処理すべきイベント
+ */
+export type ExternalCommand =
+    | ETestplayCommand
+;
+
+/**
+ * Command of test play.
+ */
+export interface ETestplayCommand {
+    type: 'testplay';
+    /**
+     * Game to test play.
+     */
+    game: MasaoJSONFormat;
+    /**
+     * Start stage.
+     */
+    stage: number;
+}
 
 /**
  * コマンドを実行

@@ -8,6 +8,10 @@ import editStore, {
     Screen,
 } from '../stores/edit';
 import mapStore from '../stores/map';
+import commandStore from '../stores/command';
+import {
+    getCurrentGame,
+} from './game';
 
 export type FocusPlace = editActions.FocusPlace;
 
@@ -415,12 +419,22 @@ export function click(x: number, y: number, button: number | null): void {
         const {
             scroll_x,
             scroll_y,
+            stage,
         } = editStore.state;
         const mx = x + scroll_x;
         const my = y + scroll_y;
 
         if (isInArea(mx, my, availableArea())) {
-            // TODO
+            commandStore.invokeCommand({
+                type: 'testplay',
+                game: getCurrentGame({
+                    masaoPosition: {
+                        x: mx,
+                        y: my,
+                    },
+                }),
+                stage,
+            });
         }
     }
 }

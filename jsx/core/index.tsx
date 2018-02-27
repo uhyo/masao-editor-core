@@ -1,4 +1,8 @@
 import * as React  from 'react';
+import {
+    autorun,
+    IReactionDisposer,
+} from 'mobx';
 
 import {
     RefluxComponent,
@@ -19,6 +23,7 @@ import {
 } from '../../logics/game';
 import {
     Command,
+    ExternalCommand,
 } from '../../logics/command';
 
 import mapStore, {
@@ -36,6 +41,7 @@ import editStore, {
 import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
+import commandStore from '../../stores/command';
 
 import MapEdit from './map-edit/index';
 import ChipSelect from './chip-select';
@@ -89,6 +95,10 @@ export interface IPropMasaoEditorCore{
 
     // TODO
     defaultGame?: MasaoJSONFormat;
+    /**
+     * @deprecated
+     * External commands is legacy!
+     */
     externalCommands?: Array<{
         label: string;
         request(game: MasaoJSONFormat, states: IDefnMasaoEditorCore): void;
@@ -102,6 +112,11 @@ export interface IPropMasaoEditorCore{
      * Whether the editor should fit the y-axis of container.
      */
     'fit-y'?: boolean;
+
+    /**
+     * Handler of external commands.
+     */
+    onCommand?: (command: ExternalCommand)=> void;
 }
 export interface IStateMasaoEditorCore{
 }
@@ -109,6 +124,10 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
     private autosaveTimer: any = null;
     private backupField = 'masao-editor-backup';
     private backupInterval = 60000;
+    /**
+     * Disposer of external command autorun.
+     */
+    protected autorunDisposer: IReactionDisposer | null = null;
     constructor(props: IPropMasaoEditorCore){
         super(props, {
             map: mapStore,
@@ -151,12 +170,19 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
             }, this.backupInterval);
             this.backup();
         }
+
+        // start an autorun for external command.
+        this.autorunDisposer = autorun(this.handleExternalCommand.bind(this));
+
         super.componentDidMount();
     }
     comoponentWillUnmount(){
         if (this.autosaveTimer != null){
             clearInterval(this.autosaveTimer);
             this.clearBackup();
+        }
+        if (this.autorunDisposer != null) {
+            this.autorunDisposer();
         }
         super.componentWillUnmount();
     }
@@ -351,6 +377,20 @@ export default class MasaoEditorCore extends RefluxComponent<IDefnMasaoEditorCor
         keyActions.setKeyBinding({
             binding,
         });
+    }
+    /**
+     * Handle an update of external command.
+     */
+    protected handleExternalCommand(): void {
+        const {
+            command,
+        } = commandStore;
+        const {
+            onCommand,
+        } = this.props;
+        if (command != null && onCommand) {
+            onCommand(command);
+        }
     }
 
     //export stores

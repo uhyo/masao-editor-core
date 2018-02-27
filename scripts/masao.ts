@@ -7,6 +7,7 @@ export {
     param,
     format,
 };
+export type MasaoJSONFormat = format.MasaoJSONFormat;
 
 export interface ParamType{
     name: string;

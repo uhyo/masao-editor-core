@@ -1,6 +1,5 @@
 {
   "compilerOptions":{
-    "lib": ["dom", "es2015"],
     "alwaysStrict": true,
     "declaration": true,
     "importHelpers": true,
@@ -17,7 +16,7 @@
     "removeComments": true,
     "rootDir": "./",
     "strictNullChecks": true,
-    "target":"es5"
+    "target":"es2016"
   },
   "include": [
     "./**/*.ts",

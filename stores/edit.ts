@@ -54,7 +54,7 @@ export interface EditState{
      */
     scroll_stick_bottom: boolean;
     /**
-     * ステージ番号
+     * ステージ番号. 1, 2, 3, 4
      */
     stage: number;
     /**
