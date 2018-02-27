@@ -37,7 +37,7 @@ export interface IStateMiniMap{
     mouse_down: boolean;
 }
 export default class MiniMap extends React.Component<IPropMiniMap, IStateMiniMap>{
-    private drawing: boolean;
+    private drawing: boolean = false;
     /**
      * ref to the canvas.
      */

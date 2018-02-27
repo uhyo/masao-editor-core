@@ -254,20 +254,21 @@ export default class BackLayer{
      */
     constructor(private width: number, private height: number, private size: number, private updator: MapUpdator, private drawCallback: DrawCallback){
         this.regions = new RenderedRegions(width, height, this.renderTargets.bind(this));
-        this.initCanvas();
+        this.canvas = this.initCanvas();
     }
     /**
      * canvasを初期化
      */
-    private initCanvas(){
+    private initCanvas(): HTMLCanvasElement {
         const {
             width,
             height,
             size,
         } = this;
-        const canvas = this.canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas');
         canvas.width = width * size;
         canvas.height = height * size;
+        return canvas;
     }
     /**
      * バッファ上に描画

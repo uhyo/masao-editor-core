@@ -12,7 +12,7 @@ import {
  * XXX is this really a "store"?
  */
 export class CommandStore {
-    public command: ExternalCommand | null;
+    public command: ExternalCommand | null = null;
     constructor() {
         extendShallowObservable(this, {
             command: null,

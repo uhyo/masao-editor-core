@@ -70,15 +70,15 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
     /**
      * 描画処理が走っているか
      */
-    private drawing: boolean;
+    private drawing: boolean = false;
     /**
      * 画像リソース
      */
-    private images: Images;
+    private images: Images | null = null;
     /**
      * requestAnimationFrameの返り値
      */
-    private drawRequest: any;
+    private drawRequest: any = null;
 
     /**
      * マップのupdator
@@ -124,16 +124,22 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleResize = this.handleResize.bind(this);
+
+        const {
+            stage,
+        } = props;
+        // double-buffering 
+        // TODO
+        this.updator_map = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'map'));
+        this.updator_layer = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'layer'));
+        this.backlayer_map = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
+        this.backlayer_layer = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
+
+        // timers
+        this.timers = new Timers();
     }
 
     componentDidMount(){
-        const {
-            stage,
-        } = this.props;
-
-        // flags
-        this.drawing=false;
-        this.drawRequest=null;
         // load files
         Promise.all([loadImage(this.props.pattern), loadImage(this.props.mapchip), loadImage(this.props.chips)])
         .then(([pattern, mapchip, chips])=>{
@@ -145,15 +151,6 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
             this.resetBacklayer(false);
             this.draw();
         });
-        // double-buffering 
-        // TODO
-        this.updator_map = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'map'));
-        this.updator_layer = new MapUpdator(stage.size.x, stage.size.y, this.chipPollution.bind(this, 'layer'));
-        this.backlayer_map = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_map, this.drawChipOn.bind(this, 'map'));
-        this.backlayer_layer = new BackLayer(stage.size.x, stage.size.y, 32, this.updator_layer, this.drawChipOn.bind(this, 'layer'));
-
-        // timers
-        this.timers = new Timers();
 
         this.drawGrid();
 
@@ -235,6 +232,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         }
     }
     protected resetBacklayer(size: boolean){
+        if (this.backlayer_map == null || this.backlayer_layer == null) {
+            return;
+        }
         if (size){
             const {
                 stage: {
@@ -563,14 +563,14 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}>{
         });
     }
     protected drawChip(ctx: CanvasRenderingContext2D, c: number, x: number, y: number): void{
-        if(c == null){
+        if(this.images == null){
             return;
         }
         chip.drawChip(ctx, this.images, this.props.params, c, x, y, true);
     }
     protected drawLayer(ctx: CanvasRenderingContext2D , c: number, x: number, y: number): void{
         //レイヤ
-        if(c === 0){ 
+        if(c === 0 || this.images == null){ 
             return;
         }
         const sx = (c&15)*32, sy = Math.floor(c>>4)*32;

@@ -10,6 +10,7 @@ export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
 import mapStore, {
     MapState,
+    Chip,
 } from '../stores/map';
 import projectStore from '../stores/project';
 import paramsStore from '../stores/params';
@@ -130,9 +131,9 @@ function mapToParam(
  * Set masao position to specified point.
  */
 function setMasaoPosition(
-    map: Array<Array<number | string>>, 
+    map: Array<Array<Chip>>, 
     masaoPosition?: {x: number; y: number},
-): Array<Array<number | string>> {
+): Array<Array<Chip>> {
     if (masaoPosition == null) {
         return map;
     }

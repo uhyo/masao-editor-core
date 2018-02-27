@@ -71,9 +71,9 @@ export interface IPropMousepad{
  */
 export default class MousePad extends React.Component<IPropMousepad, {}>{
     private currentIdentifier: number | null = null;
-    private currentTarget: HTMLElement;
-    private currentElmX: number;
-    private currentElmY: number;
+    private currentTarget: HTMLElement | null = null;
+    private currentElmX: number = 0;
+    private currentElmY: number = 0;
     /**
      * A flag whether current mouse/touch can be a click.
      */
@@ -81,11 +81,11 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
     /**
      * Initial x position of mouse.
      */
-    protected initialElementX: number;
+    protected initialElementX: number = 0;
     /**
      * Initial y position of mouse.
      */
-    protected initialElementY: number;
+    protected initialElementY: number = 0;
     render(){
         const {
             children,
@@ -139,6 +139,9 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
                 elementXCorrection = 0,
                 elementYCorrection = 0,
             } = this.props;
+            if (this.currentTarget == null) {
+                return;
+            }
 
             const elementX = pageX - this.currentElmX + elementXCorrection;
             const elementY = pageY - this.currentElmY + elementYCorrection;
@@ -167,6 +170,9 @@ export default class MousePad extends React.Component<IPropMousepad, {}>{
                 elementXCorrection = 0,
                 elementYCorrection = 0,
             } = this.props;
+            if (this.currentTarget == null) {
+                return;
+            }
 
             const elementX = pageX - this.currentElmX + elementXCorrection;
             const elementY = pageY - this.currentElmY + elementYCorrection;

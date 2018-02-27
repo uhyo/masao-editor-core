@@ -26,7 +26,7 @@ export interface DependencyTile{
  * マップの各タイルの依存関係を解決するクラス
  */
 export class TileDependency{
-    private map: Array<Array<DependencyTile>>;
+    private map!: Array<Array<DependencyTile>>;
     /**
      * @constructor
      * @param {number} width マップの横幅

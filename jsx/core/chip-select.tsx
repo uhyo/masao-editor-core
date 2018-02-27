@@ -49,12 +49,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
+
+        this.backlayer = document.createElement('canvas');
     }
     private images: {
         pattern: HTMLImageElement;
         mapchip: HTMLImageElement;
         chips: HTMLImageElement;
-    };
+    } | null = null;
     private backlayer: HTMLCanvasElement;
     /**
      * Ref to focusable area.
@@ -83,8 +85,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}>{
             };
             this.draw('redraw');
         });
-
-        this.backlayer = document.createElement('canvas');
     }
     componentDidUpdate(prevProps: IPropChipSelect){
         if(propChanged(prevProps, this.props, ['pattern', 'mapchip', 'chips'])){
