@@ -623,6 +623,9 @@ export function cursorJump(): void{
         setCursor('chipselect');
     }
 }
+/**
+ * Set a cursor to specified area.
+ */
 export function setCursor(type: FocusPlace): void{
     const {
         scroll_x,
@@ -646,6 +649,20 @@ export function setCursor(type: FocusPlace): void{
             },
         });
     }
+}
+/**
+ * Remove cursor.
+ * @returns {boolean} whether cursor was previously shown.
+ */
+export function removeCursor(): boolean {
+    const {
+        cursor,
+    } = editStore.state;
+    const ret = cursor != null;
+    editActions.setCursor({
+        cursor: null,
+    });
+    return ret;
 }
 /**
  * ある領域にフォーカスした

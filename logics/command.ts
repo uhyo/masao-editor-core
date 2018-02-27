@@ -49,6 +49,7 @@ export const commandNames: Record<Command, string> = {
  */
 export type ExternalCommand =
     | ETestplayCommand
+    | EEscapeCommand
 ;
 
 /**
@@ -64,6 +65,14 @@ export interface ETestplayCommand {
      * Start stage.
      */
     stage: number;
+}
+
+/**
+ * Command of escape key.
+ * XXX should this be handled inside the editor?
+ */
+export interface EEscapeCommand {
+    type: 'escape';
 }
 
 /**
@@ -181,10 +190,7 @@ export function run(command: Command, keydown: boolean): boolean{
                 break;
             }
             case 'cursor:vanish': {
-                editActions.setCursor({
-                    cursor: null,
-                });
-                break;
+                return editLogics.removeCursor();
             }
             case 'cursor:button': {
                 editLogics.cursorButton(true);
