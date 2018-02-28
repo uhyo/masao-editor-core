@@ -52,7 +52,6 @@
 }
 .hor {
   composes: bar;
-
 }
 
 /* vertical bar */

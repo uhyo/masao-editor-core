@@ -1,186 +1,183 @@
 //edit actions
-import {
-    Action,
-    createAction,
-} from '../scripts/reflux-util';
+import { Action, createAction } from '../scripts/reflux-util';
 
-export {
-    Action,
-};
+export { Action };
 
 export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
 
 export type FocusPlace = 'main' | 'chipselect';
 
 // ツールの使用中状態
-export interface PenTool{
-    type: 'pen';
+export interface PenTool {
+  type: 'pen';
 }
-export interface EraserTool{
-    type: 'eraser';
+export interface EraserTool {
+  type: 'eraser';
 }
-export interface HandTool{
-    type: 'hand';
+export interface HandTool {
+  type: 'hand';
 
-    /**
-     * マウスが押された場所x
-     */
-    mouse_sx: number;
-    /**
-     * マウスが押された場所y
-     */
-    mouse_sy: number;
-    /**
-     * マウスが押されたときのスクロール状態x
-     */
-    scroll_sx: number;
-    /**
-     * マウスが押されたときのスクロール状態y
-     */
-    scroll_sy: number;
+  /**
+   * マウスが押された場所x
+   */
+  mouse_sx: number;
+  /**
+   * マウスが押された場所y
+   */
+  mouse_sy: number;
+  /**
+   * マウスが押されたときのスクロール状態x
+   */
+  scroll_sx: number;
+  /**
+   * マウスが押されたときのスクロール状態y
+   */
+  scroll_sy: number;
 }
-export interface RectTool{
-    type: 'rect';
+export interface RectTool {
+  type: 'rect';
 
-    /**
-     * 開始地点x
-     */
-    start_x: number;
-    /**
-     * 開始地点y
-     */
-    start_y: number;
+  /**
+   * 開始地点x
+   */
+  start_x: number;
+  /**
+   * 開始地点y
+   */
+  start_y: number;
 
-    /**
-     * 終了地点x
-     */
-    end_x: number;
+  /**
+   * 終了地点x
+   */
+  end_x: number;
 
-    /**
-     * 終了地点y
-     */
-    end_y: number;
+  /**
+   * 終了地点y
+   */
+  end_y: number;
 }
 
 export type ToolState = PenTool | EraserTool | HandTool | RectTool;
 
-export interface MainCursor{
-    type: 'main';
-    x: number;
-    y: number;
+export interface MainCursor {
+  type: 'main';
+  x: number;
+  y: number;
 }
-export interface ChipselectCursor{
-    type: 'chipselect';
-    id: number;
+export interface ChipselectCursor {
+  type: 'chipselect';
+  id: number;
 }
 
 export type CursorState = MainCursor | ChipselectCursor;
 
 export interface ChangeScreenAction {
-    screen: 'map' | 'layer' | 'params' | 'project' | 'js';
+  screen: 'map' | 'layer' | 'params' | 'project' | 'js';
 }
 export const changeScreen = createAction<ChangeScreenAction>();
 
 export interface ChangeStageAction {
-    stage: number;
+  stage: number;
 }
 export const changeStage = createAction<ChangeStageAction>();
 
 export interface ChangeModeAction {
-    mode: Mode;
+  mode: Mode;
 }
 export const changeMode = createAction<ChangeModeAction>();
 
 export interface ChangeViewAction {
-    width: number;
-    height: number;
-    widthRemainder: number;
-    heightRemainder: number;
+  width: number;
+  height: number;
+  widthRemainder: number;
+  heightRemainder: number;
 }
 export const changeView = createAction<ChangeViewAction>();
 
 export interface ChangePenAction {
-    pen: number;
-    mode?: boolean;
+  pen: number;
+  mode?: boolean;
 }
 export const changePen = createAction<ChangePenAction>({
-    preEmit: (obj: ChangePenAction)=>{
-        if(obj==null){
-            return {pen: 0};
-        }else if(obj.pen==null){
-            return {pen: 0};
-        }
-        return;
-    },
+  preEmit: (obj: ChangePenAction) => {
+    if (obj == null) {
+      return { pen: 0 };
+    } else if (obj.pen == null) {
+      return { pen: 0 };
+    }
+    return;
+  },
 });
 export interface ChangePenLayerAction {
-    pen: number;
-    mode?: boolean;
+  pen: number;
+  mode?: boolean;
 }
 export const changePenLayer = createAction<ChangePenLayerAction>({
-    preEmit: (obj: ChangePenAction)=>{
-        if(obj==null){
-            return {
-                pen: 0,
-            };
-        }else if(obj.pen==null){
-            return {pen: 0};
-        }
-        return;
-    },
+  preEmit: (obj: ChangePenAction) => {
+    if (obj == null) {
+      return {
+        pen: 0,
+      };
+    } else if (obj.pen == null) {
+      return { pen: 0 };
+    }
+    return;
+  },
 });
 
 export interface ChangeParamTypeAction {
-    param_type: string;
+  param_type: string;
 }
 export const changeParamType = createAction<ChangeParamTypeAction>();
 
 export interface ChangeGridAction {
-    grid: boolean;
+  grid: boolean;
 }
 export const changeGrid = createAction<ChangeGridAction>();
 
 export interface ChangeRenderModeAction {
-    render_map?: boolean;
-    render_layer?: boolean;
+  render_map?: boolean;
+  render_layer?: boolean;
 }
 export const changeRenderMode = createAction<ChangeRenderModeAction>();
 
 export interface SetToolAction {
-    tool: ToolState | null;
+  tool: ToolState | null;
 }
 export const setTool = createAction<SetToolAction>();
 
 export interface ScrollAction {
-    x: number;
-    y: number;
-    stickRight: boolean;
-    stickBottom: boolean;
+  x: number;
+  y: number;
+  stickRight: boolean;
+  stickBottom: boolean;
 }
 export const scroll = createAction<ScrollAction>();
 
 export interface ChangeChipselectSizeAction {
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 export const changeChipselectSize = createAction<ChangeChipselectSizeAction>();
 
 export interface ChangeChipselectScrollAction {
-    y: number;
+  y: number;
 }
-export const changeChipselectScroll = createAction<ChangeChipselectScrollAction>();
+export const changeChipselectScroll = createAction<
+  ChangeChipselectScrollAction
+>();
 
 export interface SetCursorAction {
-    cursor: CursorState | null;
+  cursor: CursorState | null;
 }
 export const setCursor = createAction<SetCursorAction>();
 
 export interface SetFocusAction {
-    focus: FocusPlace | null;
+  focus: FocusPlace | null;
 }
 export const setFocus = createAction<SetFocusAction>();
 
 export interface JsConfirmAction {
-    confirm: boolean;
+  confirm: boolean;
 }
 export const jsConfirm = createAction<JsConfirmAction>();

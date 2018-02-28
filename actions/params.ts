@@ -1,11 +1,6 @@
-import {
-    Action,
-    createAction,
-} from '../scripts/reflux-util';
+import { Action, createAction } from '../scripts/reflux-util';
 
-export {
-    Action,
-};
+export { Action };
 
 /*
  * changeParam({
@@ -22,9 +17,9 @@ export {
  * });
  */
 
-export interface ChangeParamAction{
-    param: string;
-    value: string;
+export interface ChangeParamAction {
+  param: string;
+  value: string;
 }
 export const changeParam = createAction<ChangeParamAction>();
 export const changeParams = createAction<Record<string, string>>();

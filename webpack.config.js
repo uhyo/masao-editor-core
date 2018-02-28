@@ -1,30 +1,30 @@
-"use strict";
-const path=require('path');
-const webpack=require('webpack');
+'use strict';
+const path = require('path');
+const webpack = require('webpack');
 
-const plugins = 
-    process.env.NODE_ENV === 'production' ?
-    [
+const plugins =
+  process.env.NODE_ENV === 'production'
+    ? [
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+          'process.env.NODE_ENV': JSON.stringify('production'),
         }),
-    ] :
-    [];
+      ]
+    : [];
 
-module.exports={
-    devtool: 'source-map',
-    entry: {
-        js: './dist-es6/jsx/index.js',
-    },
-    output: {
-        path: path.join(__dirname, 'dist'),
-        filename: 'bundle.js',
-        library: 'MasaoEditorCore',
-        libraryTarget: 'umd',
-    },
-    module: {
-        loaders: [
-            /*
+module.exports = {
+  devtool: 'source-map',
+  entry: {
+    js: './dist-es6/jsx/index.js',
+  },
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'bundle.js',
+    library: 'MasaoEditorCore',
+    libraryTarget: 'umd',
+  },
+  module: {
+    loaders: [
+      /*
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
@@ -35,31 +35,35 @@ module.exports={
                 }
             },
            */
-            {
-                test: /\.js$/,
-                loader: 'source-map-loader',
-                enforce: 'pre',
-            },
-            /*
+      {
+        test: /\.js$/,
+        loader: 'source-map-loader',
+        enforce: 'pre',
+      },
+      /*
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules|\.d\.ts$/,
                 loader: 'awesome-typescript-loader',
             },
            */
-            {
-                test: /\.css$/,
-                loaders: ['style-loader', 'css-loader?modules&camelCase', 'postcss-loader'],
-            },
-            {
-                test: /\.json$/,
-                loaders: ['json-loader'],
-            },
-            {
-                test: /\.(?:png|gif)$/,
-                loaders: ['url-loader', 'img-loader'],
-            },
-            /*
+      {
+        test: /\.css$/,
+        loaders: [
+          'style-loader',
+          'css-loader?modules&camelCase',
+          'postcss-loader',
+        ],
+      },
+      {
+        test: /\.json$/,
+        loaders: ['json-loader'],
+      },
+      {
+        test: /\.(?:png|gif)$/,
+        loaders: ['url-loader', 'img-loader'],
+      },
+      /*
             {
                 test: /\.jsx?$/,
                 loader: 'transform/cacheable?envify',
@@ -69,46 +73,46 @@ module.exports={
                 loader: 'file?name=[name].[ext]',
             },
            */
-        ]
+    ],
+  },
+  plugins,
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    // modules: [path.resolve(__dirname, 'node_modules')],
+    modules: ['node_modules'],
+  },
+  externals: {
+    react: {
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'react',
+      root: 'React',
     },
-    plugins,
-    resolve: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        // modules: [path.resolve(__dirname, 'node_modules')],
-        modules: ['node_modules'],
+    tslib: {
+      commonjs: 'tslib',
+      commonjs2: 'tslib',
     },
-    externals: {
-        react: {
-            commonjs: 'react',
-            commonjs2: 'react',
-            amd: 'react',
-            root: 'React',
-        },
-        tslib: {
-            commonjs: 'tslib',
-            commonjs2: 'tslib',
-        },
-        masao: {
-            commonjs: 'masao',
-            commonjs2: 'masao',
-        },
-        'react-dom': {
-            commonjs: 'react-dom',
-            commonjs2: 'react-dom',
-        },
-        reflux: {
-            commonjs: 'reflux',
-            commonjs2: 'reflux',
-        },
+    masao: {
+      commonjs: 'masao',
+      commonjs2: 'masao',
     },
+    'react-dom': {
+      commonjs: 'react-dom',
+      commonjs2: 'react-dom',
+    },
+    reflux: {
+      commonjs: 'reflux',
+      commonjs2: 'reflux',
+    },
+  },
 
-    performance: {
-        //bye bye, FIXME...
-        hints: false,
-    },
-    
-    devServer: {
-        contentBase: './dist',
-        port: 8080,
-    }
+  performance: {
+    //bye bye, FIXME...
+    hints: false,
+  },
+
+  devServer: {
+    contentBase: './dist',
+    port: 8080,
+  },
 };

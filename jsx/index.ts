@@ -9,27 +9,22 @@ import Button from './core/util/button';
 import Select from './core/util/select';
 import Switch from './core/util/switch';
 
-import {
-    Command,
-    commandNames,
-    ExternalCommand,
-} from '../logics/command';
+import { Command, commandNames, ExternalCommand } from '../logics/command';
 
 export const uis = {
-    Button,
-    Select,
-    Switch,
+  Button,
+  Select,
+  Switch,
 };
 
 export {
-    MapState,
-    ParamsState,
-    EditState,
-    ProjectState,
-
-    Command,
-    ExternalCommand,
-    commandNames,
+  MapState,
+  ParamsState,
+  EditState,
+  ProjectState,
+  Command,
+  ExternalCommand,
+  commandNames,
 };
 
 export default MasaoEditorCore;

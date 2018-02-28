@@ -7,7 +7,14 @@
   "types": "./dist-types/jsx/index.d.ts",
   "scripts": {
     "prepare": "NODE_ENV=production gulp default",
+    "precommit": "lint-staged",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "lint-staged": {
+    "*.{js,json,ts,tsx}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
@@ -43,12 +50,15 @@
     "gulp-typescript": "^4.0.1",
     "gulp-uglify": "^3.0.0",
     "gulp-webserver": "^0.9.1",
+    "husky": "^0.14.3",
     "img-loader": "^2.0.1",
     "json-loader": "^0.5.4",
+    "lint-staged": "^7.0.0",
     "merge2": "^1.2.1",
     "postcss-css-variables": "^0.8.0",
     "postcss-loader": "^2.1.0",
     "postcss-nested": "^3.0.0",
+    "prettier": "^1.11.0",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.20.2",
     "typescript": "^2.7.2",
