@@ -24,29 +24,11 @@ module.exports = {
   },
   module: {
     loaders: [
-      /*
-            {
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                query: {
-                    presets: [path.join(__dirname, 'node_modules/babel-preset-react'), path.join(__dirname, 'node_modules/babel-preset-es2015')],
-                    //sourceMaps: true
-                }
-            },
-           */
       {
         test: /\.js$/,
         loader: 'source-map-loader',
         enforce: 'pre',
       },
-      /*
-            {
-                test: /\.tsx?$/,
-                exclude: /node_modules|\.d\.ts$/,
-                loader: 'awesome-typescript-loader',
-            },
-           */
       {
         test: /\.css$/,
         loaders: [
@@ -63,22 +45,11 @@ module.exports = {
         test: /\.(?:png|gif)$/,
         loaders: ['url-loader', 'img-loader'],
       },
-      /*
-            {
-                test: /\.jsx?$/,
-                loader: 'transform/cacheable?envify',
-            },
-            {
-                test: /\.html$/,
-                loader: 'file?name=[name].[ext]',
-            },
-           */
     ],
   },
   plugins,
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
-    // modules: [path.resolve(__dirname, 'node_modules')],
     modules: ['node_modules'],
   },
   externals: {
@@ -95,10 +66,6 @@ module.exports = {
     masao: {
       commonjs: 'masao',
       commonjs2: 'masao',
-    },
-    'react-dom': {
-      commonjs: 'react-dom',
-      commonjs2: 'react-dom',
     },
     reflux: {
       commonjs: 'reflux',

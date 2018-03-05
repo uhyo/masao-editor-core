@@ -1,6 +1,5 @@
 'use strict';
 //load image script
-import Promise from './promise';
 
 const loaded: Record<string, HTMLImageElement> = {};
 

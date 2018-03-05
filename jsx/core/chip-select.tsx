@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Promise from '../../scripts/promise';
-
 import * as chip from '../../scripts/chip';
 import * as util from '../../scripts/util';
 import loadImage from '../../scripts/load-image';

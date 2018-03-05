@@ -10,7 +10,6 @@ import Timers from '../../../scripts/timers';
 import BackLayer from './backlayer';
 import MapUpdator from './updator';
 
-import Promise from '../../../scripts/promise';
 import * as util from '../../../scripts/util';
 
 import * as chip from '../../../scripts/chip';
