@@ -17,11 +17,11 @@ var replace = require('gulp-replace');
 var concat = require('gulp-concat');
 const merge2 = require('merge2');
 
-gulp.task('jsx', ['tsc'], () => {
+gulp.task('bundle', ['tsc'], () => {
   return jsxCompiler(false);
 });
 
-gulp.task('watch-jsx', ['tsc'], () => {
+gulp.task('watch-bundle', ['tsc'], () => {
   return jsxCompiler(true);
 });
 
@@ -128,7 +128,16 @@ gulp.task('clean', function(cb) {
 
 gulp.task(
   'watch',
-  ['tcm', 'watch-tsc', 'watch-build-files', 'watch-jsx', 'html'],
+  ['tcm', 'watch-tsc', 'watch-build-files', 'watch-bundle', 'html'],
+  function() {
+    //w
+    gulp.watch('html/*.html', ['html']);
+    gulp.watch('jsx/**/*.css', ['tcm']);
+  },
+);
+gulp.task(
+  'watch-no-bundle',
+  ['tcm', 'watch-tsc', 'watch-build-files', 'html'],
   function() {
     //w
     gulp.watch('html/*.html', ['html']);
@@ -136,7 +145,7 @@ gulp.task(
   },
 );
 
-gulp.task('default', ['tcm', 'tsc', 'build-files', 'jsx', 'mc_canvas']);
+gulp.task('default', ['tcm', 'tsc', 'build-files', 'bundle', 'mc_canvas']);
 
 //jsx compiling
 function jsxCompiler(watch) {
