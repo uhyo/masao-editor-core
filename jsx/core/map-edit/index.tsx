@@ -196,8 +196,8 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
         this.draw();
       });
     }
-    let pe = prevProps.edit,
-      e = this.props.edit;
+    const pe = prevProps.edit;
+    const e = this.props.edit;
     if (pe.stage !== e.stage) {
       this.resetMap(true);
       this.resetBacklayer(true);

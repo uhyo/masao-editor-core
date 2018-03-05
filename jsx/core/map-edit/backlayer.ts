@@ -1,7 +1,5 @@
 'use strict';
 
-import * as rbush from 'rbush';
-
 import { sortedUniq } from '../../../scripts/util';
 import { Rect } from '../../../scripts/rect';
 import MapUpdator from './updator';
@@ -26,40 +24,35 @@ export interface Box {
 }
 class RenderedRegions {
   /**
-   * 既に描画済みの領域の右端
+   * 描画済み領域のビットフラグ
+   * 0: 未描画
+   * 1: 描画済み
    */
-  private leftFrontier: number = 0;
+  protected renderedArray: Uint8Array;
 
-  /**
-   * 1回のexpandで拡大するfrontierの長さ
-   */
-  private expandWidth: number = 10;
-
-  /**
-   * 描画済み領域
-   */
-  private tree: rbush.RBush<Rect>;
-  /**
-   * @constructor
-   * @param {number} width 管理する範囲の横幅
-   * @param {number} height 管理する範囲の縦幅
-   * @param {Function} renderCallback 実際の書き込み発生時のあれ
-   */
   constructor(
     private width: number,
     private height: number,
     private renderCallback: RenderCallback,
   ) {
-    // 左から順番に描画するやつ
-    this.tree = rbush(9);
+    this.renderedArray = this.makeNewArray(width, height);
+  }
+
+  /**
+   * 指定されたサイズの描画領域を表す新しい配列を作成
+   */
+  protected makeNewArray(width: number, height: number): Uint8Array {
+    // 1ます1ビットで表すのに必要なサイズ
+    const size = Math.ceil(width * height / 8);
+    return new Uint8Array(size);
   }
 
   /**
    * 描画情報をクリア
    */
-  clear() {
-    this.tree.clear();
-    this.leftFrontier = 0;
+  public clear() {
+    // 配列を0で埋める
+    this.renderedArray.fill(0);
   }
 
   /**
@@ -67,9 +60,10 @@ class RenderedRegions {
    * @param {number} width 新しい横幅
    * @param {number} height 新しい縦幅
    */
-  resize(width: number, height: number): void {
+  public resize(width: number, height: number): void {
     this.width = width;
     this.height = height;
+    this.renderedArray = this.makeNewArray(width, height);
   }
 
   /**
@@ -77,149 +71,84 @@ class RenderedRegions {
    * @param {Object[]} rects レンダリングする範囲
    * @param {boolean} [force=false] 描画済でももう一度描画
    */
-  requestRender(rects: Array<Box>, force: boolean = false) {
+  public requestRender(rects: Array<Box>, force: boolean = false) {
+    const { renderedArray } = this;
     // まだrenderされていないところを列挙する
     const targets = [];
     for (let { x, y, width, height } of rects) {
+      // 矩形が描画範囲外に出ないようにする
       const minX = Math.max(0, Math.min(x, this.width));
       const minY = Math.max(0, Math.min(y, this.height));
       const maxX = Math.min(this.width, Math.max(0, x + width));
       const maxY = Math.min(this.height, Math.max(0, y + height));
 
-      if (!force && maxX <= this.leftFrontier) {
-        continue;
-      }
-
-      const item = {
-        minX,
-        minY,
-        maxX,
-        maxY,
-      };
-
-      // colsはitemとintersectする矩形の集合
-      const cols = this.tree.search(item);
-
-      const startX = Math.max(
-        0,
-        force ? minX : Math.max(minX, this.leftFrontier),
-      );
-      const endX = Math.min(maxX, this.width);
-      for (let cx = startX; cx < endX; cx++) {
-        const startY = Math.max(0, minY);
-        const endY = Math.min(maxY, this.height);
-        for (let cy = startY; cy < endY; cy++) {
-          if (!force) {
-            for (let rect of cols) {
-              if (
-                rect.minY <= cy &&
-                cy < rect.maxY &&
-                rect.minX <= cx &&
-                cx < rect.maxX
-              ) {
-                if (rect.minY <= minY && maxY <= rect.maxY) {
-                  // 列を全部覆う
-                  cx = rect.maxX - 1;
-                  break;
-                } else {
-                  cy = rect.maxY - 1;
-                  continue;
-                }
-              }
-            }
+      for (let y = minY; y < maxY; y++) {
+        for (let x = minX; x < maxX; x++) {
+          const idx = this.width * y + x;
+          const byteidx = idx >> 3;
+          const flag = 1 << (idx & 0b111);
+          const val = renderedArray[byteidx] & flag;
+          if (val === 0 || force) {
+            // 未描画なので描画
+            renderedArray[byteidx] |= flag;
+            targets.push({
+              x,
+              y,
+            });
           }
-          // 当たり判定をくぐり抜けた
-          targets.push({
-            x: cx,
-            y: cy,
-          });
         }
       }
-      this.insertArea(item, cols);
     }
 
     if (targets[0] != null) {
       this.renderCallback(targets);
     }
   }
-
   /**
-   * 指定された矩形を描画済み領域に追加
-   * @param {Rect} item 矩形
-   * @param {Rect[]} [cols] itemとintersectする領域の集まり
-   *
-   * @private
+   * 指定した領域を描画済み領域から除去
    */
-  insertArea(item: Rect, cols?: Array<Rect>) {
+  public removeArea(item: Rect) {
     const { minX, minY, maxX, maxY } = item;
-    const { tree } = this;
-    if (cols == null) {
-      cols = tree.search(item);
-    }
-    for (let rect of cols) {
-      if (
-        minX <= rect.minX &&
-        minY <= rect.minY &&
-        rect.maxX <= maxX &&
-        rect.maxY <= maxY
-      ) {
-        tree.remove(rect);
-      }
-    }
-    tree.insert(item);
-  }
-  /**
-   * 指定した領域を描画済み領域から拡張
-   */
-  removeArea(item: Rect) {
-    const { minX, minY, maxX, maxY } = item;
-    const { tree } = this;
-
-    const cols = tree.search(item);
-    for (let rect of cols) {
-      // intersectするやつは範囲をけずる
-      tree.remove(rect);
-      let minX2, minY2, maxX2, maxY2;
-      let flag = 0;
-      if (maxX < rect.maxX) {
-        minX2 = maxX;
-        maxX2 = rect.maxX;
-      } else if (rect.minX < minX) {
-        minX2 = rect.minX;
-        maxX2 = minX;
+    const { renderedArray, width } = this;
+    for (let y = minY; y < maxY; y++) {
+      // 0で埋める
+      const startidx = y * width + minX;
+      const endidx = y * width + maxX;
+      const startbyteidx = startidx >> 3;
+      const endbyteidx = endidx >> 3;
+      // 中間は0で埋める
+      renderedArray.fill(0, startbyteidx + 1, endbyteidx);
+      // 始めと終わりを処理
+      if (startbyteidx === endbyteidx) {
+        // 同じbyte内で完結している場合の処理
+        // [76543210]
+        const startbitidx = startidx & 0b111;
+        const endbitidx = endidx & 0b111;
+        // start=2, end = 5 => mask = [00011100]
+        // mask1 = 1[00011111]
+        const mask1 = 0xff + (1 << endbitidx);
+        // mask2 = 1[00000011]
+        const mask2 = 0xff + (1 << startbitidx);
+        // mask = [00011100]
+        const mask = mask1 - mask2;
+        renderedArray[startbyteidx] &= 0xff ^ mask;
       } else {
-        minX2 = rect.minX;
-        maxX2 = rect.maxX;
-        flag++;
+        const startbitidx = startidx & 0b111;
+        const endbitidx = endidx & 0b111;
+        // start=2 => mask1 = 1[00000011]
+        const mask1 = 0xff + (1 << startbitidx);
+        renderedArray[startbyteidx] &= mask1;
+        // end=5 => mask2 = 1[11100000]
+        const mask2 = 0xff ^ (0xff + (1 << endbitidx));
+        renderedArray[endbyteidx] &= mask2;
       }
-      if (maxY < rect.maxY) {
-        minY2 = maxY;
-        maxY2 = rect.maxY;
-      } else if (rect.minY < minY) {
-        minY2 = rect.minY;
-        maxY2 = minY;
-      } else {
-        minY2 = rect.minY;
-        maxY2 = rect.maxY;
-        flag++;
-      }
-      if (flag < 2) {
-        tree.insert({
-          minX: minX2,
-          minY: minY2,
-          maxX: maxX2,
-          maxY: maxY2,
-        });
-      }
-    }
-    if (this.leftFrontier > minX) {
-      this.leftFrontier = minX;
     }
   }
   /**
    * 描画済み領域を拡張
    */
-  expand() {
+  public expand() {
+    /*
     // frontierを広げる
     if (this.leftFrontier >= this.width) {
       return false;
@@ -235,6 +164,8 @@ class RenderedRegions {
     ]);
     this.leftFrontier += exp;
     return this.leftFrontier < this.width;
+     */
+    return true;
   }
 }
 

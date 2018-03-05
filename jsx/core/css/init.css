@@ -1,5 +1,9 @@
 /* Google fonts */
 @import url('https://fonts.googleapis.com/css?family=Nunito:700');
 
+html {
+  line-height: 1;
+}
+
 .dummy {
 }
