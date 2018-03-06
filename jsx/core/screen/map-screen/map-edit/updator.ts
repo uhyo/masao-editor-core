@@ -1,8 +1,8 @@
 'use strict';
 
-import { Rect } from '../../../scripts/rect';
+import { Rect } from '../../../../../scripts/rect';
 
-import { sortedUniq } from '../../../scripts/util';
+import { sortedUniq } from '../../../../../scripts/util';
 
 export interface Point {
   x: number;

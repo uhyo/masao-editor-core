@@ -1,8 +1,13 @@
 import * as React from 'react';
 // key eventを感知
-import * as keyLogics from '../../logics/key';
+import * as keyLogics from '../../../../logics/key';
 
-export interface IPropKeyEvents {}
+export interface IPropKeyEvents {
+  /**
+   * Whether this is disabled.
+   */
+  disabled: boolean;
+}
 export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
   constructor(props: IPropKeyEvents) {
     super(props);
@@ -11,6 +16,9 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
     this.keyupHandler = this.keyupHandler.bind(this);
   }
   private keydownHandler(e: KeyboardEvent) {
+    if (this.props.disabled) {
+      return;
+    }
     const mv = keyLogics.runByKey(
       {
         key: e.key,
@@ -25,6 +33,9 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
     }
   }
   private keyupHandler(e: KeyboardEvent) {
+    if (this.props.disabled) {
+      return;
+    }
     const mv = keyLogics.runByKey(
       {
         key: e.key,

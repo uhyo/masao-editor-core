@@ -24,17 +24,12 @@ import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
 import commandStore from '../../stores/command';
 
-import MapEdit from './map-edit/index';
-import ChipSelect from './chip-select';
-import EditMode from './edit-mode';
-import MiniMap from './mini-map';
 import ScreenSelect from './screen-select';
-import ParamEdit from './param-edit';
-import ProjectEdit from './project-edit';
-import JSWarning from './js-warning';
-import JSEdit from './js-edit';
+import { MapScreen } from './screen/map-screen';
+import { ParamScreen } from './screen/param-screen';
+import { ProjectScreen } from './screen/project-screen';
+import { JsScreen } from './screen/js-screen';
 
-import KeyEvent from './key-event';
 import Button from './util/button';
 import { Toolbar } from './util/toolbar';
 
@@ -91,6 +86,10 @@ export interface IPropMasaoEditorCore {
    * Whether the editor should fit the y-axis of container.
    */
   'fit-y'?: boolean;
+  /**
+   * Whether keyboard is disabled.
+   */
+  keyDisabled?: boolean;
 
   /**
    * Handler of external commands.
@@ -238,6 +237,7 @@ export default class MasaoEditorCore extends RefluxComponent<
         jsWarning,
         externalCommands,
         'fit-y': fity,
+        keyDisabled,
       },
       state: { map, params, edit, project, history },
     } = this;
@@ -256,6 +256,7 @@ export default class MasaoEditorCore extends RefluxComponent<
           project={project}
           history={history}
           fit-y={fity}
+          keyDisabled={!!keyDisabled}
         />
       );
     } else if (edit.screen === 'params') {
@@ -378,145 +379,3 @@ export default class MasaoEditorCore extends RefluxComponent<
   static paramStore: ParamsStore = paramStore;
   static editStore: EditStore = editStore;
 }
-
-//各screen
-interface IPropMapScreen {
-  // 画像
-  pattern: string;
-  mapchip: string;
-  chips: string;
-
-  'fit-y'?: boolean;
-
-  edit: EditState;
-  params: ParamsState;
-  map: MapState;
-  project: ProjectState;
-  history: HistoryState;
-}
-const MapScreen = (props: IPropMapScreen) => {
-  const {
-    map,
-    params,
-    edit,
-    project,
-    history,
-
-    pattern,
-    mapchip,
-    chips,
-    'fit-y': fity,
-  } = props;
-  let are = null;
-  if (project.version === '2.8' && edit.screen === 'layer') {
-    are = (
-      <p>
-        バージョン設定が2.8になっています。このバージョンでは背景レイヤーは使用できません。
-      </p>
-    );
-  }
-
-  const { lastUpdate, data, advanced } = map;
-  // いまのステージ
-  const stage = data[edit.stage - 1];
-
-  // ステージが縦長か否かでミニマップの表示位置を変更
-  const mapsClass =
-    stage.size.x >= stage.size.y ? styles.mapsColumn : styles.mapsRow;
-
-  return (
-    <>
-      <Toolbar>
-        <div className={styles.mapInfo}>
-          <EditMode edit={edit} params={params} history={history} />
-        </div>
-      </Toolbar>
-      {are}
-      <div className={mapsClass}>
-        <div className={styles.minimapWrapper}>
-          <MiniMap params={params} edit={edit} stage={stage} />
-        </div>
-        <div className={styles.cmWrapper}>
-          <div className={styles.chipselectWrapper}>
-            <ChipSelect
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
-              params={params}
-              edit={edit}
-              project={project}
-              advanced={advanced}
-            />
-          </div>
-          <div className={styles.mainmapWrapper}>
-            <MapEdit
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
-              stage={stage}
-              lastUpdate={lastUpdate}
-              params={params}
-              edit={edit}
-              project={project}
-              fit-y={fity}
-            />
-          </div>
-        </div>
-      </div>
-      <KeyEvent />
-    </>
-  );
-};
-
-interface IPropParamScreen {
-  edit: EditState;
-  params: ParamsState;
-  project: ProjectState;
-}
-const ParamScreen = (props: IPropParamScreen) => {
-  const { edit, params, project } = props;
-  return (
-    <div>
-      <ParamEdit params={params} edit={edit} project={project} />
-    </div>
-  );
-};
-
-interface IPropProjectScreen {
-  project: ProjectState;
-  map: MapState;
-  edit: EditState;
-}
-const ProjectScreen = (props: IPropProjectScreen) => {
-  return (
-    <div>
-      <ProjectEdit {...props} />
-    </div>
-  );
-};
-
-interface IPropJsScreen {
-  jsWarning: boolean;
-  edit: EditState;
-  project: ProjectState;
-}
-const JsScreen = ({ jsWarning, edit, project }: IPropJsScreen) => {
-  if (jsWarning && !edit.js_confirm) {
-    const handleConfirm = () => {
-      editActions.jsConfirm({
-        confirm: true,
-      });
-    };
-    return (
-      <div>
-        <JSWarning onClick={handleConfirm} />
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <JSEdit project={project} />
-      </div>
-    );
-  }
-};

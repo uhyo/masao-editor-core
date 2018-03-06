@@ -1,24 +1,21 @@
 import * as React from 'react';
 
-import * as chip from '../../scripts/chip';
-import * as util from '../../scripts/util';
-import loadImage from '../../scripts/load-image';
+import * as chip from '../../../../scripts/chip';
+import * as util from '../../../../scripts/util';
+import loadImage from '../../../../scripts/load-image';
 
-import Resizable from './util/resizable';
-import Scroll from './util/scroll';
-import MousePad, { MousePadEvent } from './util/mousepad';
-import { ObserveResize, ObserveResizeEvent } from './util/observe-resize';
+import Resizable from '../../util/resizable';
+import Scroll from '../../util/scroll';
+import propChanged from '../../util/changed';
+import MousePad, { MousePadEvent } from '../../util/mousepad';
+import { ObserveResize, ObserveResizeEvent } from '../../util/observe-resize';
 
-import * as editActions from '../../actions/edit';
-import * as editLogics from '../../logics/edit';
+import * as editActions from '../../../../actions/edit';
+import * as editLogics from '../../../../logics/edit';
 
-import { EditState } from '../../stores/edit';
-import { ParamsState } from '../../stores/params';
-import { ProjectState } from '../../stores/project';
+import { EditState, ParamsState, ProjectState } from '../../../../stores';
 
-import * as styles from './css/chip-select.css';
-
-import propChanged from './util/changed';
+import * as styles from '../../css/chip-select.css';
 
 export interface IPropChipSelect {
   // 画像ファイル

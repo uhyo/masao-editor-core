@@ -1,7 +1,7 @@
 'use strict';
 
-import { sortedUniq } from '../../../scripts/util';
-import { Rect } from '../../../scripts/rect';
+import { sortedUniq } from '../../../../../scripts/util';
+import { Rect } from '../../../../../scripts/rect';
 import MapUpdator from './updator';
 /**
  * すでにRenderした範囲を管理する

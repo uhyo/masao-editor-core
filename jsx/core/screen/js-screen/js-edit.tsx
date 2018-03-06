@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import { ProjectState } from '../../stores/project';
-import * as projectActions from '../../actions/project';
+import { ProjectState } from '../../../../stores';
+import * as projectActions from '../../../../actions/project';
 
-import * as styles from './css/js-edit.css';
+import * as styles from '../../css/js-edit.css';
 
 export interface IPropJSEdit {
   project: ProjectState;

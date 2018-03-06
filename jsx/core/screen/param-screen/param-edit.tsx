@@ -1,16 +1,14 @@
 import * as React from 'react';
-import * as masao from '../../scripts/masao';
+import * as masao from '../../../../scripts/masao';
 
-import Select from './util/select';
-import Color from './util/color';
+import Select from '../../util/select';
+import Color from '../../util/color';
 
-import * as paramActions from '../../actions/params';
-import * as editActions from '../../actions/edit';
-import { EditState } from '../../stores/edit';
-import { ParamsState } from '../../stores/params';
-import { ProjectState } from '../../stores/project';
+import * as paramActions from '../../../../actions/params';
+import * as editActions from '../../../../actions/edit';
+import { EditState, ParamsState, ProjectState } from '../../../../stores';
 
-import * as styles from './css/param-edit.css';
+import * as styles from '../../css/param-edit.css';
 
 export interface IPropParamEdit {
   edit: EditState;

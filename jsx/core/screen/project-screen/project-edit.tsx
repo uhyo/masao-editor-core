@@ -1,18 +1,21 @@
 import * as React from 'react';
 
-import * as projectActions from '../../actions/project';
-import * as editLogics from '../../logics/edit';
-import { setAdvanced } from '../../logics/advanced';
-import { ProjectState } from '../../stores/project';
-import { MapState, StageData } from '../../stores/map';
-import { EditState } from '../../stores/edit';
+import * as projectActions from '../../../../actions/project';
+import * as editLogics from '../../../../logics/edit';
+import { setAdvanced } from '../../../../logics/advanced';
+import {
+  ProjectState,
+  MapState,
+  StageData,
+  EditState,
+} from '../../../../stores';
 
-import Select from './util/select';
-import ToggleButton from './util/toggle-button';
+import Select from '../../util/select';
+import ToggleButton from '../../util/toggle-button';
 
-import propChanged from './util/changed';
+import propChanged from '../../util/changed';
 
-import * as styles from './css/project-edit.css';
+import * as styles from '../../css/project-edit.css';
 
 export interface IPropProjectEdit {
   project: ProjectState;

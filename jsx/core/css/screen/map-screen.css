@@ -1,0 +1,43 @@
+.map-info {
+  display: flex;
+}
+
+.maps {
+  flex: auto 1 1;
+  display: flex;
+}
+
+.maps-column {
+  composes: maps;
+  flex-flow: column nowrap;
+}
+.maps-row {
+  composes: maps;
+  flex-flow: row wrap;
+}
+
+.maps-column .minimap-wrapper {
+  flex: auto 0 1;
+  border-top: 1px solid var(--toolbar-line-color);
+  border-bottom: 1px solid var(--toolbar-line-color);
+}
+.maps-row .minimap-wrapper {
+  border-left: 1px solid var(--toolbar-line-color);
+  border-right: 1px solid var(--toolbar-line-color);
+}
+
+.cm-wrapper {
+  flex: auto 1 0;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.chipselect-wrapper {
+  background-color: var(--chipselect-bg);
+}
+
+.mainmap-wrapper {
+  flex: auto 1 0;
+
+  background-color: var(--mainmap-bg);
+}

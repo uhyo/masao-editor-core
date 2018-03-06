@@ -1,17 +1,15 @@
 import * as React from 'react';
 
-import * as util from '../../scripts/util';
-import * as chip from '../../scripts/chip';
+import * as util from '../../../../scripts/util';
+import * as chip from '../../../../scripts/chip';
 
-import MousePad, { MousePadEvent } from './util/mousepad';
+import MousePad, { MousePadEvent } from '../../util/mousepad';
 
-import { EditState } from '../../stores/edit';
-import { ParamsState } from '../../stores/params';
-import { StageData } from '../../stores/map';
+import { EditState, ParamsState, StageData } from '../../../../stores';
 
-import * as editLogics from '../../logics/edit';
+import * as editLogics from '../../../../logics/edit';
 
-import * as styles from './css/mini-map.css';
+import * as styles from '../../css/mini-map.css';
 
 //色の対応
 const colors: Record<string, string> = {

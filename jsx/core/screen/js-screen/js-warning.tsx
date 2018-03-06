@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import * as styles from './css/js-warning.css';
+import * as styles from '../../css/js-warning.css';
 
 //Warning about external JS
 export interface IPropJSWarning {

@@ -1,33 +1,34 @@
 'use strict';
 import * as React from 'react';
 
-import Resizable from '../util/resizable';
-import Scroll from '../util/scroll';
-import MousePad, { MousePadEvent } from '../util/mousepad';
+import Resizable from '../../../util/resizable';
+import Scroll from '../../../util/scroll';
+import MousePad, { MousePadEvent } from '../../../util/mousepad';
+import propChanged from '../../../util/changed';
 
-import Timers from '../../../scripts/timers';
+import Timers from '../../../../../scripts/timers';
 
 import BackLayer from './backlayer';
 import MapUpdator from './updator';
 
-import * as util from '../../../scripts/util';
+import * as util from '../../../../../scripts/util';
 
-import * as chip from '../../../scripts/chip';
-import loadImage from '../../../scripts/load-image';
+import * as chip from '../../../../../scripts/chip';
+import loadImage from '../../../../../scripts/load-image';
+import { Rect } from '../../../../../scripts/rect';
 
 import * as styles from './index.css';
 
-import { Rect } from '../../../scripts/rect';
+import { Mode, CursorState } from '../../../../../actions/edit';
+import {
+  EditState,
+  StageData,
+  LastUpdateData,
+  ParamsState,
+  ProjectState,
+} from '../../../../../stores';
 
-import { Mode, CursorState } from '../../../actions/edit';
-import { EditState } from '../../../stores/edit';
-import { StageData, LastUpdateData } from '../../../stores/map';
-import { ParamsState } from '../../../stores/params';
-import { ProjectState } from '../../../stores/project';
-
-import * as editLogics from '../../../logics/edit';
-
-import propChanged from '../util/changed';
+import * as editLogics from '../../../../../logics/edit';
 
 /**
  * 画像リソースたち

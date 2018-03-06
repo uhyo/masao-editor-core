@@ -1,18 +1,16 @@
 import * as React from 'react';
 
-import * as editActions from '../../actions/edit';
-import { EditState } from '../../stores/edit';
-import { ParamsState } from '../../stores/params';
-import { HistoryState } from '../../stores/history';
+import * as editActions from '../../../../actions/edit';
+import { EditState, ParamsState, HistoryState } from '../../../../stores';
 
-import * as historyLogics from '../../logics/history';
+import * as historyLogics from '../../../../logics/history';
 
-import Button from './util/button';
-import Select from './util/select';
-import Switch from './util/switch';
+import Button from '../../util/button';
+import Select from '../../util/select';
+import Switch from '../../util/switch';
 
-import * as indexStyle from './css/index.css';
-import * as style from './css/edit-mode.css';
+import * as indexStyle from '../../css/index.css';
+import * as style from '../../css/edit-mode.css';
 
 export interface IPropEditMode {
   edit: EditState;
