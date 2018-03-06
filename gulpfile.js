@@ -123,7 +123,7 @@ gulp.task('webserver', function() {
 });
 
 gulp.task('clean', function(cb) {
-  del(['dist'], cb);
+  del(['dist', 'dist-es6', 'dist-types'], cb);
 });
 
 gulp.task(

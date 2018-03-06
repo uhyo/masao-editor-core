@@ -1,14 +1,27 @@
 .wrapper {
-  margin: 5px;
+  flex: auto 1 1;
+  padding: 5px;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .menu {
+  flex: auto 0 0;
   margin: 5px;
 }
 
 .main {
-  max-height: 600px;
+  flex: auto 1 1;
+  position: relative;
+  left: 0;
+  top: 0;
   overflow-y: scroll;
+}
+
+.main > div {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .param > label {

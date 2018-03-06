@@ -57,8 +57,11 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
       <div className={styles.wrapper}>
         {typeMenu}
         <div ref="main" className={styles.main}>
-          {(param_type === '' ? keys : masao.paramTypes[param_type].params).map(
-            key => {
+          <div>
+            {(param_type === ''
+              ? keys
+              : masao.paramTypes[param_type].params
+            ).map(key => {
               let description: string;
               let field;
               let obj: masao.param.Data;
@@ -211,8 +214,8 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   </label>
                 </div>
               );
-            },
-          )}
+            })}
+          </div>
         </div>
       </div>
     );

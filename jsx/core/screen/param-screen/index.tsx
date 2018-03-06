@@ -13,9 +13,5 @@ export interface IPropParamScreen {
  */
 export const ParamScreen = (props: IPropParamScreen) => {
   const { edit, params, project } = props;
-  return (
-    <div>
-      <ParamEdit params={params} edit={edit} project={project} />
-    </div>
-  );
+  return <ParamEdit params={params} edit={edit} project={project} />;
 };
