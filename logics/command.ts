@@ -89,8 +89,9 @@ export interface EEscapeCommand {
  * @returns 有効なコマンドが実行されたか
  */
 export function run(command: Command, keydown: boolean): boolean {
-  const { focus, cursor } = editStore.state;
-  if (focus == null && command !== 'cursor:jump') {
+  const { focus, screen, cursor } = editStore.state;
+  if (screen !== 'map' && screen !== 'layer') {
+    // 今のところマップ画面のみ
     return false;
   }
   if (focus != null && cursor == null) {
