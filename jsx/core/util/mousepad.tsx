@@ -104,7 +104,6 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
-      console.log('abstractDragStartHandler', button);
       const {
         onMouseDown,
         elementXCorrection = 0,
@@ -148,7 +147,6 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
-      console.log('abstractDragMoveHandler', button);
       const {
         onMouseMove,
         elementXCorrection = 0,
@@ -187,7 +185,6 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
-      console.log('abstractDragEndHandler', button);
       const {
         onMouseUp,
         onClick,
@@ -356,6 +353,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
             // pending touch have not emitted a event yet.
             abstractDragStartHandler(currentTouch.target, pageX, pageY, null);
             abstractDragEndHandler(pageX, pageY, null);
+            clearTimeout(currentTouch.timer);
             break;
           }
         }
@@ -363,7 +361,6 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
         // a two-fingered touch state remains two-fingered if fingers are removed.
         let pageX: number | null = null;
         let pageY: number | null = null;
-        console.log('c', [...currentTouch.touches], changedTouches);
         for (const t of Array.from(changedTouches)) {
           const idx = currentTouch.touches.findIndex(
             ({ identifier }) => identifier === t.identifier,
@@ -408,8 +405,8 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       const { target, changedTouches } = e;
       const { currentTouch } = this;
 
+      e.preventDefault();
       if (currentTouch == null) {
-        e.preventDefault();
         // タッチが無い
         const t = changedTouches[0];
         if (t == null) {
