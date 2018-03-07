@@ -68,7 +68,18 @@ export interface IPropMousepad {
  * タッチを含めたMouse Eventを抽象化して発生させる領域
  */
 export default class MousePad extends React.Component<IPropMousepad, {}> {
-  private currentIdentifier: number | null = null;
+  /**
+   * Button number of two-fingered touch.
+   */
+  protected readonly twoButton = 1;
+  /**
+   * Time to wait before makeing it a one touch.
+   */
+  protected readonly pendingWait = 150;
+  /**
+   * Current state of touch.
+   */
+  private currentTouch: TouchState | null = null;
   private currentTarget: HTMLElement | null = null;
   private currentElmX: number = 0;
   private currentElmY: number = 0;
@@ -93,6 +104,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
+      console.log('abstractDragStartHandler', button);
       const {
         onMouseDown,
         elementXCorrection = 0,
@@ -136,6 +148,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
+      console.log('abstractDragMoveHandler', button);
       const {
         onMouseMove,
         elementXCorrection = 0,
@@ -174,6 +187,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       pageY: number,
       button: number | null,
     ) => {
+      console.log('abstractDragEndHandler', button);
       const {
         onMouseUp,
         onClick,
@@ -243,67 +257,219 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
 
     const touchMoveHandler = (e: TouchEvent) => {
       const { changedTouches } = e;
+      const { currentTouch } = this;
+      if (currentTouch == null) {
+        return;
+      }
 
-      for (let i = 0, l = changedTouches.length; i < l; i++) {
-        const t = changedTouches[i];
-        if (t.identifier !== this.currentIdentifier) {
-          continue;
+      if (currentTouch.type === 'one') {
+        for (const t of Array.from(changedTouches)) {
+          if (t.identifier === currentTouch.identifier) {
+            // This touch is tracked
+            const { pageX, pageY } = t;
+
+            abstractDragMoveHandler(pageX, pageY, null);
+            break;
+          }
         }
-        const { pageX, pageY } = t;
-
-        abstractDragMoveHandler(pageX, pageY, null);
-
-        break;
+      } else if (currentTouch.type === 'two') {
+        // two-or-more-fingers touch.
+        const { touches } = currentTouch;
+        for (const t of Array.from(changedTouches)) {
+          for (let i = 0; i < touches.length; i++) {
+            const { identifier, originX, originY } = touches[i];
+            if (t.identifier === identifier) {
+              const { pageX, pageY } = t;
+              if (i === 0) {
+                // primary fingerはmouseeventを発生させる
+                // originX, Yによる補正
+                abstractDragMoveHandler(
+                  pageX - originX + currentTouch.originX,
+                  pageY - originY + currentTouch.originY,
+                  this.twoButton,
+                );
+              } else {
+                // 他はoriginを修正
+                touches[i].originX = pageX;
+                touches[i].originY = pageY;
+              }
+            }
+          }
+        }
       }
     };
     const touchEndHandler = (e: TouchEvent) => {
       const { changedTouches } = e;
-
-      for (let i = 0, l = changedTouches.length; i < l; i++) {
-        const t = changedTouches[i];
-        if (t.identifier !== this.currentIdentifier) {
-          continue;
-        }
-        this.currentIdentifier = null;
-        const { pageX, pageY } = t;
-
-        abstractDragEndHandler(pageX, pageY, null);
-        document.removeEventListener('touchmove', touchMoveHandler, false);
-        document.removeEventListener('touchend', touchEndHandler, false);
-        document.removeEventListener('touchcancel', touchEndHandler, false);
-
-        break;
+      const { currentTouch } = this;
+      if (currentTouch == null) {
+        return;
       }
+
+      if (currentTouch.type === 'one') {
+        for (const t of Array.from(changedTouches)) {
+          if (t.identifier === currentTouch.identifier) {
+            // touch is removed!
+            this.currentTouch = null;
+            const { pageX, pageY } = t;
+            abstractDragEndHandler(pageX, pageY, null);
+            break;
+          }
+        }
+      } else if (currentTouch.type === 'pending') {
+        for (const t of Array.from(changedTouches)) {
+          if (t.identifier === currentTouch.identifier) {
+            // a touch is removed!
+            this.currentTouch = null;
+            const { pageX, pageY } = t;
+            // pending touch have not emitted a event yet.
+            abstractDragStartHandler(currentTouch.target, pageX, pageY, null);
+            abstractDragEndHandler(pageX, pageY, null);
+            break;
+          }
+        }
+      } else if (currentTouch.type === 'two') {
+        // a two-fingered touch state remains two-fingered if fingers are removed.
+        let pageX: number | null = null;
+        let pageY: number | null = null;
+        console.log('c', [...currentTouch.touches], changedTouches);
+        for (const t of Array.from(changedTouches)) {
+          const idx = currentTouch.touches.findIndex(
+            ({ identifier }) => identifier === t.identifier,
+          );
+          if (idx >= 0) {
+            // remove this touch.
+            const [{ originX, originY }] = currentTouch.touches.splice(idx, 1);
+            if (idx === 0 && pageX == null) {
+              // this removes the first touch!
+              pageX = t.pageX;
+              pageY = t.pageY;
+              // これまでの移動を蓄積
+              currentTouch.originX += pageX - originX;
+              currentTouch.originY += pageY - originY;
+            }
+          }
+        }
+        // If all touches are removed, close it.
+        if (currentTouch.touches.length === 0) {
+          this.currentTouch = null;
+          // drag endの情報
+          if (pageX == null || pageY == null) {
+            console.warn('???');
+            return;
+          }
+          abstractDragEndHandler(pageX, pageY, this.twoButton);
+        }
+      }
+      if (this.currentTouch == null) {
+        removeTouchEvents();
+      }
+    };
+    /**
+     * A function to remove touch events.
+     */
+    const removeTouchEvents = () => {
+      document.removeEventListener('touchmove', touchMoveHandler, false);
+      document.removeEventListener('touchend', touchEndHandler, false);
+      document.removeEventListener('touchcancel', touchEndHandler, false);
     };
     const touchStartHandler = (e: React.TouchEvent<HTMLDivElement>) => {
       const { target, changedTouches } = e;
+      const { currentTouch } = this;
 
-      if (this.currentIdentifier != null) {
-        // すでにタッチがある場合は無視
-        return;
-      }
-      e.preventDefault();
-
-      for (let i = 0, l = changedTouches.length; i < l; i++) {
-        const t = changedTouches[i];
-
+      if (currentTouch == null) {
+        e.preventDefault();
+        // タッチが無い
+        const t = changedTouches[0];
+        if (t == null) {
+          return;
+        }
         const { pageX, pageY } = t;
 
-        const prevented = abstractDragStartHandler(
-          target as HTMLElement,
-          pageX,
-          pageY,
-          null,
-        );
+        // First, this touch is pending.
+        // issue a timer to turn this pending touch into a one touch.
+        const timer = setTimeout(() => {
+          // Turn this into a touch.
+          this.currentTouch = {
+            type: 'one',
+            target: target as HTMLElement,
+            identifier: t.identifier,
+            originX: pageX,
+            originY: pageY,
+          };
+          const prevented = abstractDragStartHandler(
+            target as HTMLElement,
+            pageX,
+            pageY,
+            null,
+          );
+          // if prevented, cancel.
+          if (prevented) {
+            this.currentTouch = null;
+            removeTouchEvents();
+          }
+        }, this.pendingWait);
+        this.currentTouch = {
+          type: 'pending',
+          target: target as HTMLElement,
+          identifier: t.identifier,
+          originX: pageX,
+          originY: pageY,
+          timer,
+        };
 
-        if (prevented === false) {
-          this.currentIdentifier = t.identifier;
-
-          document.addEventListener('touchmove', touchMoveHandler, false);
-          document.addEventListener('touchend', touchEndHandler, false);
-          document.addEventListener('touchcancel', touchEndHandler, false);
+        document.addEventListener('touchmove', touchMoveHandler, false);
+        document.addEventListener('touchend', touchEndHandler, false);
+        document.addEventListener('touchcancel', touchEndHandler, false);
+      } else if (currentTouch.type === 'pending') {
+        // TwoTouchStateを作成
+        const { target, timer, identifier, originX, originY } = currentTouch;
+        const touches = [
+          {
+            identifier,
+            originX,
+            originY,
+          },
+        ];
+        for (const t of Array.from(changedTouches)) {
+          if (t.identifier !== identifier) {
+            // 新しいタッチを見つけた
+            touches.push({
+              identifier: t.identifier,
+              originX: t.pageX,
+              originY: t.pageY,
+            });
+          }
         }
-        break;
+        if (touches.length > 1) {
+          // 一応ほんとうに新しいタッチがあったかチェック
+          e.preventDefault();
+          clearTimeout(timer);
+          // 2つタッチで起動
+          this.currentTouch = {
+            type: 'two',
+            touches,
+            originX,
+            originY,
+          };
+
+          abstractDragStartHandler(target, originX, originY, this.twoButton);
+        }
+      } else if (currentTouch.type === 'two') {
+        // 予備のタッチを追加
+        for (const t of Array.from(changedTouches)) {
+          if (
+            -1 ===
+            currentTouch.touches.findIndex(
+              ({ identifier }) => identifier === t.identifier,
+            )
+          ) {
+            currentTouch.touches.push({
+              identifier: t.identifier,
+              originX: t.pageX,
+              originY: t.pageY,
+            });
+          }
+        }
       }
     };
 
@@ -317,4 +483,81 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
       </div>
     );
   }
+}
+
+/**
+ * Initial representation of state of touch.
+ */
+type TouchState = OneTouchState | PendingOneTouchState | TwoTouchState;
+
+/**
+ * There is one active touch.
+ */
+interface OneTouchState {
+  type: 'one';
+  /*
+   * Target of touch.
+   */
+  target: HTMLElement;
+  /*
+   * Touch idenfitier.
+   */
+  identifier: number;
+  /**
+   * origin of this touch.
+   */
+  originX: number;
+  /**
+   * origin of this touch.
+   */
+  originY: number;
+}
+/**
+ * There is one but pending touch.
+ */
+interface PendingOneTouchState {
+  type: 'pending';
+  /*
+   * Target of touch.
+   */
+  target: HTMLElement;
+  /**
+   * Touch identifier.
+   */
+  identifier: number;
+  /**
+   * timer id to changing in to one touch.
+   */
+  timer: any;
+  /**
+   * origin of this touch.
+   */
+  originX: number;
+  /**
+   * origin of this touch.
+   */
+  originY: number;
+}
+
+/**
+ * There are two (or more) touches.
+ */
+interface TwoTouchState {
+  type: 'two';
+  /**
+   * tracked touches.
+   */
+  touches: Array<{
+    identifier: number;
+    originX: number;
+    originY: number;
+  }>;
+  /**
+   * origin of this touch as a whole.
+   */
+  originX: number;
+  /**
+   * origin of this touch as a whole.
+   */
+  originY: number;
 }
