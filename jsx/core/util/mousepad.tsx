@@ -272,6 +272,38 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
             break;
           }
         }
+      } else if (currentTouch.type === 'pending') {
+        // pendingの状態で移動した場合はさっさとoneに移行
+        const { target, identifier, originX, originY, timer } = currentTouch;
+        for (const t of Array.from(changedTouches)) {
+          if (t.identifier === identifier) {
+            const { pageX, pageY } = t;
+            // 位置の移動を検出
+            if ((pageX - originX) ** 2 + (pageY - originY) ** 2 >= 25) {
+              // 移動したとみなす
+              this.currentTouch = {
+                type: 'one',
+                target,
+                identifier,
+                originX,
+                originY,
+              };
+              clearTimeout(timer);
+              const prevented = abstractDragStartHandler(
+                target as HTMLElement,
+                originX,
+                originY,
+                null,
+              );
+              if (prevented) {
+                this.currentTouch = null;
+                removeTouchEvents();
+              } else {
+                abstractDragMoveHandler(pageX, pageY, null);
+              }
+            }
+          }
+        }
       } else if (currentTouch.type === 'two') {
         // two-or-more-fingers touch.
         const { touches } = currentTouch;
