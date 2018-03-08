@@ -16,9 +16,6 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
     this.keyupHandler = this.keyupHandler.bind(this);
   }
   private keydownHandler(e: KeyboardEvent) {
-    if (this.props.disabled) {
-      return;
-    }
     const mv = keyLogics.runByKey(
       {
         key: e.key,
@@ -27,15 +24,13 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
         alt: e.altKey,
       },
       true,
+      this.props.disabled,
     );
     if (mv) {
       e.preventDefault();
     }
   }
   private keyupHandler(e: KeyboardEvent) {
-    if (this.props.disabled) {
-      return;
-    }
     const mv = keyLogics.runByKey(
       {
         key: e.key,
@@ -44,6 +39,7 @@ export default class KeyEvents extends React.Component<IPropKeyEvents, {}> {
         alt: e.altKey,
       },
       false,
+      this.props.disabled,
     );
     if (mv) {
       e.preventDefault();

@@ -1,6 +1,4 @@
-'use strict';
 //chipの情報
-
 import { Rect, containerRect } from './rect';
 
 import {
@@ -447,6 +445,11 @@ const chipTable: Record<string, Chip> = keyToNum({
   '{': {
     pattern: 140,
     name: '亀（追尾）',
+    category: 'enemy',
+  },
+  '}': {
+    pattern: 143,
+    name: '重力無視の追跡ピカチー等',
     category: 'enemy',
   },
   '[': {

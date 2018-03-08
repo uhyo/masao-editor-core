@@ -19,7 +19,14 @@ export function keyString({ key, shift, ctrl, alt }: KeyButton): string {
   );
 }
 
-export function runByKey(key: KeyButton, keydown: boolean): boolean {
+/**
+ * Run a command by key.
+ */
+export function runByKey(
+  key: KeyButton,
+  keydown: boolean,
+  appDisabled: boolean,
+): boolean {
   const k = keyString(key);
   if (keydown) {
     console.log(k);
@@ -28,7 +35,7 @@ export function runByKey(key: KeyButton, keydown: boolean): boolean {
   const com = keyStore.state.binding[k];
   // XXX Escapeキーに対する特殊処理
   if (k === 'escape') {
-    if (com != null) {
+    if (!appDisabled && com != null) {
       const ret = run(com, keydown);
       if (ret) {
         return true;
@@ -40,7 +47,7 @@ export function runByKey(key: KeyButton, keydown: boolean): boolean {
     });
     return true;
   }
-  if (com != null) {
+  if (!appDisabled && com != null) {
     return run(com, keydown);
   } else {
     return false;
