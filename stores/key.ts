@@ -38,6 +38,14 @@ const defaultBinding: Record<string, Command> = {
   // 'tab': 'cursor:jump',
   escape: 'cursor:vanish',
   z: 'cursor:button',
+
+  // Files
+  'Ctrl:m': 'file:new',
+  'Ctrl:o': 'external:open',
+  'Ctrl:s': 'external:save',
+  'Ctrl:j': 'external:json',
+  'Ctrl:h': 'external:html',
+  'Ctrl:p': 'external:testplay',
 };
 
 export interface KeyState {

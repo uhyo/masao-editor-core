@@ -1,7 +1,9 @@
 // command
 import editStore from '../stores/edit';
+import commandStore from '../stores/command';
 import * as editActions from '../actions/edit';
-import * as editLogics from '../logics/edit';
+import * as editLogics from './edit';
+import { getCurrentGame } from './game';
 import * as historyLogics from './history';
 import { MasaoJSONFormat } from '../scripts/masao';
 
@@ -29,7 +31,14 @@ export type Command =
   | 'cursor:button'
   // history command
   | 'back'
-  | 'forward';
+  | 'forward'
+  // external command
+  | 'file:new'
+  | 'external:save'
+  | 'external:json'
+  | 'external:html'
+  | 'external:open'
+  | 'external:testplay';
 
 export const commandNames: Record<Command, string> = {
   'mode:pen': 'ペンツール',
@@ -54,12 +63,23 @@ export const commandNames: Record<Command, string> = {
   'cursor:jump': 'カーソルフォーカス移動',
   'cursor:vanish': 'カーソル消去',
   'cursor:button': 'カーソルボタン',
+
+  'file:new': '新規ファイル',
+  'external:open': 'ファイルを開く',
+  'external:save': '保存',
+  'external:json': 'JSON出力',
+  'external:html': 'HTML出力',
+  'external:testplay': 'テストプレイ',
 };
 
 /**
  * エディタの外部で処理すべきイベント
  */
-export type ExternalCommand = ETestplayCommand | EEscapeCommand;
+export type ExternalCommand =
+  | ETestplayCommand
+  | EEscapeCommand
+  | ESaveCommand
+  | EOpenCommand;
 
 /**
  * Command of test play.
@@ -82,6 +102,24 @@ export interface ETestplayCommand {
  */
 export interface EEscapeCommand {
   type: 'escape';
+}
+
+/**
+ * Command of save.
+ */
+export interface ESaveCommand {
+  type: 'save';
+  /**
+   * Kind of data.
+   */
+  kind: 'default' | 'json' | 'html';
+}
+
+/**
+ * Command of open file.
+ */
+export interface EOpenCommand {
+  type: 'open';
 }
 
 /**
@@ -209,6 +247,44 @@ export function run(command: Command, keydown: boolean): boolean {
       }
       case 'forward': {
         historyLogics.forward(editStore.state.stage);
+        break;
+      }
+      case 'external:save': {
+        commandStore.invokeCommand({
+          type: 'save',
+          kind: 'default',
+        });
+        break;
+      }
+      case 'external:json': {
+        commandStore.invokeCommand({
+          type: 'save',
+          kind: 'json',
+        });
+        break;
+      }
+      case 'external:html': {
+        commandStore.invokeCommand({
+          type: 'save',
+          kind: 'html',
+        });
+        break;
+      }
+      case 'external:open': {
+        commandStore.invokeCommand({
+          type: 'open',
+        });
+        break;
+      }
+      case 'external:testplay': {
+        // テストプレイを要求
+        const game = getCurrentGame();
+        const { stage } = editStore.state;
+        commandStore.invokeCommand({
+          type: 'testplay',
+          game,
+          stage,
+        });
         break;
       }
       default: {
