@@ -270,13 +270,22 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
           }
         }
       } else if (currentTouch.type === 'pending') {
-        // pendingの状態で移動した場合はさっさとoneに移行
-        const { target, identifier, originX, originY, timer } = currentTouch;
+        // pendingの状態で移動した場合はログを取る
+        const {
+          target,
+          identifier,
+          originX,
+          originY,
+          timer,
+          moves,
+        } = currentTouch;
         for (const t of Array.from(changedTouches)) {
           if (t.identifier === identifier) {
             const { pageX, pageY } = t;
-            // 位置の移動を検出
-            if ((pageX - originX) ** 2 + (pageY - originY) ** 2 >= 25) {
+            moves.push({ pageX, pageY });
+
+            // 移動距離が大きい場合はもう移行する
+            if ((pageX - originX) ** 2 + (pageY - originY) ** 2 >= 48 ** 2) {
               // 移動したとみなす
               this.currentTouch = {
                 type: 'one',
@@ -296,7 +305,9 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
                 this.currentTouch = null;
                 removeTouchEvents();
               } else {
-                abstractDragMoveHandler(pageX, pageY, null);
+                for (const { pageX, pageY } of moves) {
+                  abstractDragMoveHandler(pageX, pageY, null);
+                }
               }
             }
           }
@@ -444,6 +455,7 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
           originX: pageX,
           originY: pageY,
           timer,
+          moves: [],
         };
 
         document.addEventListener('touchmove', touchMoveHandler, false);
@@ -451,7 +463,14 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
         document.addEventListener('touchcancel', touchEndHandler, false);
       } else if (currentTouch.type === 'pending') {
         // TwoTouchStateを作成
-        const { target, timer, identifier, originX, originY } = currentTouch;
+        const {
+          target,
+          timer,
+          identifier,
+          originX,
+          originY,
+          moves,
+        } = currentTouch;
         const touches = [
           {
             identifier,
@@ -482,6 +501,10 @@ export default class MousePad extends React.Component<IPropMousepad, {}> {
           };
 
           abstractDragStartHandler(target, originX, originY, this.twoButton);
+          // いままでのタッチを反映
+          for (const { pageX, pageY } of moves) {
+            abstractDragMoveHandler(pageX, pageY, this.twoButton);
+          }
         }
       } else if (currentTouch.type === 'two') {
         // 予備のタッチを追加
@@ -566,6 +589,10 @@ interface PendingOneTouchState {
    * origin of this touch.
    */
   originY: number;
+  /**
+   * List of pending movements.
+   */
+  moves: Array<{ pageX: number; pageY: number }>;
 }
 
 /**
