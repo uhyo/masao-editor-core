@@ -71,6 +71,10 @@ module.exports = {
       commonjs: 'reflux',
       commonjs2: 'reflux',
     },
+    mobx: {
+      commonjs: 'reflux',
+      commonjs2: 'reflux',
+    },
   },
 
   performance: {
