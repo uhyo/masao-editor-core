@@ -23,6 +23,7 @@ import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
 import commandStore from '../../stores/command';
+import updateStore from '../../stores/update';
 
 import ScreenSelect from './screen-select';
 import { MapScreen } from './screen/map-screen';
@@ -95,6 +96,10 @@ export interface IPropMasaoEditorCore {
    * Handler of external commands.
    */
   onCommand?: (command: ExternalCommand) => void;
+  /**
+   * Handler of any updates to the stage.
+   */
+  onUpdateFlag?: (updated: boolean) => void;
 }
 export interface IStateMasaoEditorCore {}
 export default class MasaoEditorCore extends RefluxComponent<
@@ -108,7 +113,7 @@ export default class MasaoEditorCore extends RefluxComponent<
   /**
    * Disposer of external command autorun.
    */
-  protected autorunDisposer: IReactionDisposer | null = null;
+  protected autorunDisposers: IReactionDisposer[] = [];
   constructor(props: IPropMasaoEditorCore) {
     super(
       props,
@@ -153,7 +158,10 @@ export default class MasaoEditorCore extends RefluxComponent<
     }
 
     // start an autorun for external command.
-    this.autorunDisposer = autorun(this.handleExternalCommand.bind(this));
+    this.autorunDisposers = [
+      autorun(this.handleExternalCommand.bind(this)),
+      autorun(this.handleUpdateFlag.bind(this)),
+    ];
 
     super.componentDidMount();
   }
@@ -162,8 +170,8 @@ export default class MasaoEditorCore extends RefluxComponent<
       clearInterval(this.autosaveTimer);
       this.clearBackup();
     }
-    if (this.autorunDisposer != null) {
-      this.autorunDisposer();
+    for (const f of this.autorunDisposers) {
+      f();
     }
     super.componentWillUnmount();
   }
@@ -371,6 +379,16 @@ export default class MasaoEditorCore extends RefluxComponent<
     const { onCommand } = this.props;
     if (command != null && onCommand) {
       onCommand(command);
+    }
+  }
+  /**
+   * Handle update signal from the update store.
+   */
+  protected handleUpdateFlag(): void {
+    const { updated } = updateStore;
+    const { onUpdateFlag } = this.props;
+    if (onUpdateFlag != null) {
+      onUpdateFlag(updated);
     }
   }
 
