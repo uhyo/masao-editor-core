@@ -7,13 +7,13 @@ export class UpdateStore {
   /**
    * Whether it is updated.
    */
-  public updated: boolean = false;
+  public updated!: boolean;
   constructor() {
     extendObservable(this, {
       updated: false,
     });
-    this.update = action.bound(this.update);
-    this.reset = action.bound(this.reset);
+    this.update = action(this.update.bind(this));
+    this.reset = action(this.reset.bind(this));
   }
   /**
    * update the state.

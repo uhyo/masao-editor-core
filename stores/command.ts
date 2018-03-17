@@ -1,4 +1,4 @@
-import { action, extendShallowObservable } from 'mobx';
+import { action, extendObservable } from 'mobx';
 
 import { ExternalCommand } from '../logics/command';
 
@@ -7,12 +7,19 @@ import { ExternalCommand } from '../logics/command';
  * XXX is this really a "store"?
  */
 export class CommandStore {
-  public command: ExternalCommand | null = null;
+  public command!: ExternalCommand | null;
   constructor() {
-    extendShallowObservable(this, {
-      command: null,
-    });
-    this.invokeCommand = action.bound(this.invokeCommand);
+    extendObservable(
+      this,
+      {
+        command: null,
+      },
+      undefined,
+      {
+        deep: false,
+      },
+    );
+    this.invokeCommand = action(this.invokeCommand.bind(this));
   }
   /**
    * Invoke an external command.
