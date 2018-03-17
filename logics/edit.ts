@@ -7,6 +7,7 @@ import * as historyActions from '../actions/history';
 import editStore, { Screen } from '../stores/edit';
 import mapStore from '../stores/map';
 import commandStore from '../stores/command';
+import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
 
 export type FocusPlace = editActions.FocusPlace;
@@ -50,6 +51,7 @@ export function resizeMapData(stage: number, resize: Rect): void {
     stage,
     stageData: mapStore.state.data[stage - 1],
   });
+  updateStore.update();
   if (stage === editStore.state.stage) {
     changeMapSize(newwidth, newheight);
   }
@@ -281,6 +283,7 @@ export function mouseMove(
     }
 
     if (mapdata[cy] && mapdata[cy][cx] !== pen) {
+      updateStore.update();
       mapUpdateAction(screen)({
         stage: edit.stage,
         x: cx,
@@ -298,6 +301,7 @@ export function mouseMove(
     }
 
     if (mapdata[cy] && mapdata[cy][cx] !== 0) {
+      updateStore.update();
       mapUpdateAction(screen)({
         stage: edit.stage,
         x: cx,
@@ -362,6 +366,7 @@ export function mouseUp(): void {
 
     const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
 
+    updateStore.update();
     mapUpdateRectAction(screen)({
       stage,
       left,

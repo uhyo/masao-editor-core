@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import * as projectActions from '../../../../actions/project';
+import * as projectLogics from '../../../../logics/project';
 import * as editLogics from '../../../../logics/edit';
 import { setAdvanced } from '../../../../logics/advanced';
 import {
@@ -41,7 +41,7 @@ export default class ProjectEdit extends React.Component<IPropProjectEdit, {}> {
         },
       ],
       onVersionChange = (version: '2.8' | 'fx16' | 'kani2') => {
-        projectActions.changeVersion({ version });
+        projectLogics.changeVersion(version);
       };
 
     const advancedContents = [

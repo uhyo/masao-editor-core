@@ -5,6 +5,7 @@ import * as historyActions from '../actions/history';
 import editStore from '../stores/edit';
 import historyStore from '../stores/history';
 import mapStore, { StageData } from '../stores/map';
+import updateStore from '../stores/update';
 
 import { changeMapSize } from './edit';
 
@@ -21,6 +22,7 @@ export function back(stage: number): void {
   });
 
   stageChange(stage, oldStage, newStage);
+  updateStore.update();
 }
 
 export function forward(stage: number): void {
@@ -35,6 +37,7 @@ export function forward(stage: number): void {
   });
 
   stageChange(stage, oldStage, newStage);
+  updateStore.update();
 }
 
 function stageChange(

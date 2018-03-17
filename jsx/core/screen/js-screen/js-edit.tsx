@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ProjectState } from '../../../../stores';
-import * as projectActions from '../../../../actions/project';
+import * as projectLogics from '../../../../logics/project';
 
 import * as styles from '../../css/js-edit.css';
 
@@ -13,9 +13,7 @@ export default class JSEdit extends React.Component<IPropJSEdit, {}> {
     const handleChange = () => {
       const textarea = this.refs.textarea as HTMLTextAreaElement;
 
-      projectActions.changeScript({
-        script: textarea.value,
-      });
+      projectLogics.changeScript(textarea.value);
     };
     return (
       <div className={styles.wrapper}>

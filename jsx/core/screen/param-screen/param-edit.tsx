@@ -4,8 +4,8 @@ import * as masao from '../../../../scripts/masao';
 import Select from '../../util/select';
 import Color from '../../util/color';
 
-import * as paramActions from '../../../../actions/params';
 import * as editActions from '../../../../actions/edit';
+import * as paramsLogic from '../../../../logics/params';
 import { EditState, ParamsState, ProjectState } from '../../../../stores';
 
 import * as styles from '../../css/param-edit.css';
@@ -85,7 +85,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   green: number;
                   blue: number;
                 }) => {
-                  paramActions.changeParams({
+                  paramsLogic.changeParams({
                     [key_red]: String(red),
                     [key_green]: String(green),
                     [key_blue]: String(blue),
@@ -119,10 +119,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                     e: React.SyntheticEvent<HTMLSelectElement>,
                   ) => {
                     const value = e.currentTarget.value;
-                    paramActions.changeParam({
-                      param: key,
-                      value,
-                    });
+                    paramsLogic.changeParam(key, value);
                   };
                   field = (
                     <select value={params[key]} onChange={fieldChange}>
@@ -139,10 +136,10 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   const checkChange = (
                     e: React.SyntheticEvent<HTMLInputElement>,
                   ) => {
-                    paramActions.changeParam({
-                      param: key,
-                      value: e.currentTarget.checked ? '1' : '2',
-                    });
+                    paramsLogic.changeParam(
+                      key,
+                      e.currentTarget.checked ? '1' : '2',
+                    );
                   };
                   field = (
                     <input
@@ -155,10 +152,10 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   const checkChange = (
                     e: React.SyntheticEvent<HTMLInputElement>,
                   ) => {
-                    paramActions.changeParam({
-                      param: key,
-                      value: e.currentTarget.checked ? '2' : '1',
-                    });
+                    paramsLogic.changeParam(
+                      key,
+                      e.currentTarget.checked ? '2' : '1',
+                    );
                   };
                   field = (
                     <input
@@ -171,10 +168,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   const numChange = (
                     e: React.SyntheticEvent<HTMLInputElement>,
                   ) => {
-                    paramActions.changeParam({
-                      param: key,
-                      value: e.currentTarget.value,
-                    });
+                    paramsLogic.changeParam(key, e.currentTarget.value);
                   };
                   field = (
                     <input
@@ -190,10 +184,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                   const valChange = (
                     e: React.SyntheticEvent<HTMLInputElement>,
                   ) => {
-                    paramActions.changeParam({
-                      param: key,
-                      value: e.currentTarget.value,
-                    });
+                    paramsLogic.changeParam(key, e.currentTarget.value);
                   };
                   field = (
                     <input
