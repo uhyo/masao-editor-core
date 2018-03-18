@@ -91,6 +91,10 @@ export interface IPropMasaoEditorCore {
    * Whether keyboard is disabled.
    */
   keyDisabled?: boolean;
+  /**
+   * External status of updates flag.
+   */
+  updateFlag?: boolean;
 
   /**
    * Handler of external commands.
@@ -147,6 +151,13 @@ export default class MasaoEditorCore extends RefluxComponent<
     if (g != null) {
       this.loadGame(g);
     }
+    if (props.updateFlag != null) {
+      if (props.updateFlag) {
+        updateStore.update();
+      } else {
+        updateStore.reset();
+      }
+    }
   }
   componentDidMount() {
     const { backupId } = this.props;
@@ -191,6 +202,16 @@ export default class MasaoEditorCore extends RefluxComponent<
       projectActions.changeVersion({
         version: masao.acceptVersion(newProps.defaultGame.version),
       });
+    }
+  }
+  public componentDidUpdate() {
+    const { updateFlag } = this.props;
+    if (updateFlag != null) {
+      if (updateFlag) {
+        updateStore.update();
+      } else {
+        updateStore.reset();
+      }
     }
   }
   private loadGame(game: masao.format.MasaoJSONFormat) {
@@ -311,7 +332,7 @@ export default class MasaoEditorCore extends RefluxComponent<
       </div>
     );
   }
-  handleExternal(
+  protected handleExternal(
     req: (game: MasaoJSONFormat, obj: IDefnMasaoEditorCore) => void,
   ) {
     //paramにmapの内容を突っ込む
