@@ -378,7 +378,6 @@ export default class MasaoEditorCore extends RefluxComponent<
   // get infooooooom API
   public getCurrentGame(): MasaoJSONFormat {
     const obj = getCurrentGame();
-    console.log('MADE', obj);
     return obj;
   }
   public getCurrentStage(): number {
