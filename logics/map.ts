@@ -19,36 +19,39 @@ export function loadAdvancedMap(
 ): void {
   const l = data.length;
   for (let i = 0; i < l; i++) {
-    // 暫定的に4まで対応
+    // TODO 暫定的に4まで対応
     if (i >= 4) {
       break;
     }
     const { size, map, layer } = data[i];
     // TODO
-    const map2 =
-      map != null
-        ? map.map(row =>
-            row.map(c => {
-              if ('number' === typeof c && 0 <= c) {
-                return c | 0;
-              } else {
-                return 0;
-              }
-            }),
-          )
-        : zerofill2(size.x, size.y);
-    const layer2 =
-      layer != null
-        ? layer.map(row =>
-            row.map(c => {
-              if ('number' === typeof c && 0 <= c && c < 256) {
-                return c | 0;
-              } else {
-                return 0;
-              }
-            }),
-          )
-        : zerofill2(size.x, size.y);
+    const map2 = [];
+    for (let y = 0; y < size.y; y++) {
+      const row = new Array(size.x);
+      row.fill(0);
+      if (map != null && map[y] != null) {
+        for (const [x, c] of map[y].entries()) {
+          if ('number' === typeof c && 0 <= c) {
+            row[x] = c | 0;
+          }
+        }
+      }
+      map2.push(row);
+    }
+
+    const layer2 = [];
+    for (let y = 0; y < size.y; y++) {
+      const row = new Array(size.x);
+      row.fill(0);
+      if (layer != null && layer[y] != null) {
+        for (const [x, c] of layer[y].entries()) {
+          if ('number' === typeof c && 0 <= c && c < 256) {
+            row[x] = c | 0;
+          }
+        }
+      }
+      layer2.push(row);
+    }
     mapActions.loadMap({
       size,
       map: map2,
