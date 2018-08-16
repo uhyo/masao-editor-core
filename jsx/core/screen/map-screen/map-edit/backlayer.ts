@@ -43,7 +43,7 @@ class RenderedRegions {
    */
   protected makeNewArray(width: number, height: number): Uint8Array {
     // 1ます1ビットで表すのに必要なサイズ
-    const size = Math.ceil(width * height / 8);
+    const size = Math.ceil((width * height) / 8);
     return new Uint8Array(size);
   }
 
@@ -178,8 +178,9 @@ export type DrawCallback = (
 ) => void;
 /**
  * ダブルバッファリングを表すクラス
+ * C: チップコードの型
  */
-export default class BackLayer {
+export default class BackLayer<C> {
   private regions: RenderedRegions;
   private canvas: HTMLCanvasElement;
   /**
@@ -194,7 +195,7 @@ export default class BackLayer {
     private width: number,
     private height: number,
     private size: number,
-    private updator: MapUpdator,
+    private updator: MapUpdator<C>,
     private drawCallback: DrawCallback,
   ) {
     this.regions = new RenderedRegions(

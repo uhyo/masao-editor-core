@@ -63,8 +63,8 @@
     "webpack-dev-server": "^2.11.2"
   },
   "dependencies": {
-    "@types/node": "^9.6.27",
-    "@types/react": "^16.4.10",
+    "@types/node": "^9.6.28",
+    "@types/react": "^16.4.11",
     "@types/reflux": "^0.4.2",
     "masao": "^0.1.8",
     "mobx": "^4.3.1",

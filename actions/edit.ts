@@ -1,9 +1,12 @@
 //edit actions
 import { Action, createAction } from '../scripts/reflux-util';
+import { ChipCode } from '../scripts/chip';
 
 export { Action };
 
 export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
+
+export type Screen = 'map' | 'layer' | 'params' | 'project' | 'js';
 
 export type FocusPlace = 'main' | 'chipselect';
 
@@ -72,7 +75,7 @@ export interface ChipselectCursor {
 export type CursorState = MainCursor | ChipselectCursor;
 
 export interface ChangeScreenAction {
-  screen: 'map' | 'layer' | 'params' | 'project' | 'js';
+  screen: Screen;
 }
 export const changeScreen = createAction<ChangeScreenAction>();
 
@@ -95,7 +98,7 @@ export interface ChangeViewAction {
 export const changeView = createAction<ChangeViewAction>();
 
 export interface ChangePenAction {
-  pen: number;
+  pen: ChipCode;
   mode?: boolean;
 }
 export const changePen = createAction<ChangePenAction>({

@@ -66,6 +66,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   protected areaHeight: number = 0;
 
   componentDidMount() {
+    // Load all required resources.
     Promise.all([
       loadImage(this.props.pattern),
       loadImage(this.props.mapchip),
@@ -81,6 +82,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   }
   componentDidUpdate(prevProps: IPropChipSelect) {
     if (propChanged(prevProps, this.props, ['pattern', 'mapchip', 'chips'])) {
+      // If resource is changed, reload them.
       Promise.all([
         loadImage(this.props.pattern),
         loadImage(this.props.mapchip),
@@ -141,7 +143,12 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     if (this.images == null) {
       return;
     }
-    const { params, edit, project: { version }, advanced } = this.props;
+    const {
+      params,
+      edit,
+      project: { version },
+      advanced,
+    } = this.props;
     const {
       screen,
       chipselect_width,
@@ -372,7 +379,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   }
   // チップの数
   private chipNumber() {
-    const { edit: { screen }, advanced } = this.props;
+    const {
+      edit: { screen },
+      advanced,
+    } = this.props;
     if (screen === 'layer') {
       return 256;
     } else if (advanced) {

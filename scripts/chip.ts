@@ -12,6 +12,11 @@ import { dossunsun_pattern, unknown_pattern } from './chip-data/patterns';
 import { athleticTable } from './chip-data/athletics';
 import { enemyTable } from './chip-data/enemies';
 
+/**
+ * Code of chip.
+ */
+export type ChipCode = number | string;
+
 /* categoryの種類
  * masao: 正男
  * block: ブロック
@@ -518,7 +523,7 @@ export function drawChip(
   ctx: CanvasRenderingContext2D,
   images: ImagesObject,
   params: Record<string, string>,
-  chip: number,
+  chip: ChipCode,
   x: number,
   y: number,
   full: boolean,
@@ -572,7 +577,7 @@ export function drawChip(
           //270
           ctx.save();
           ctx.translate(xx + width / 2, yy + height / 2);
-          ctx.rotate(Math.PI * 3 / 4);
+          ctx.rotate((Math.PI * 3) / 4);
           ctx.translate(-xx - width / 2, -yy - height / 2);
         }
         ctx.drawImage(
@@ -607,7 +612,7 @@ export function drawChip(
           //270
           ctx.save();
           ctx.translate(x + 16, y + 16);
-          ctx.rotate(Math.PI * 3 / 4);
+          ctx.rotate((Math.PI * 3) / 4);
           ctx.translate(-x - 16, -y - 16);
         }
         ctx.drawImage(images.pattern, sx, sy, 32, 32, x, y, 32, 32);
@@ -704,7 +709,14 @@ export function chipRenderRect(
 }
 
 //チップオブジェクト
-export function chipFor(params: Record<string, string>, chip: number): Chip {
+export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
+  if ('string' === typeof chip) {
+    // TODO currently, return unknown for string chip.
+    return {
+      pattern: unknown_pattern,
+      name: '不明',
+    };
+  }
   let pa = athleticTypeParam[chip];
   if (pa != null && params[pa] !== '1') {
     //変わったアスレチックだ

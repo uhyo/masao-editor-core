@@ -30,6 +30,8 @@ import {
 
 import * as editLogics from '../../../../../logics/edit';
 
+type ChipCode = chip.ChipCode;
+
 /**
  * 画像リソースたち
  */
@@ -73,19 +75,19 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
   /**
    * マップのupdator
    */
-  private updator_map: MapUpdator;
+  private updator_map: MapUpdator<ChipCode>;
   /**
    * 背景レイヤーのupdator
    */
-  private updator_layer: MapUpdator;
+  private updator_layer: MapUpdator<number>;
   /**
    * マップのbacklayer
    */
-  private backlayer_map: BackLayer;
+  private backlayer_map: BackLayer<ChipCode>;
   /**
    * 背景レイヤーのbacklayer
    */
-  private backlayer_layer: BackLayer;
+  private backlayer_layer: BackLayer<number>;
   /**
    * タイマー
    */
@@ -262,7 +264,11 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
       return;
     }
     if (size) {
-      const { stage: { size: { x, y } } } = this.props;
+      const {
+        stage: {
+          size: { x, y },
+        },
+      } = this.props;
       this.backlayer_map.resize(x, y);
       this.backlayer_layer.resize(x, y);
     } else {
@@ -291,7 +297,13 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
     expandMap();
   }
   protected resetMap(size: boolean) {
-    const { stage: { size: { x, y }, map, layer } } = this.props;
+    const {
+      stage: {
+        size: { x, y },
+        map,
+        layer,
+      },
+    } = this.props;
     if (size) {
       this.updator_map.resize(x, y);
       this.updator_layer.resize(x, y);
@@ -305,7 +317,9 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
     if (lastUpdate == null) {
       return;
     }
-    const { stage: { map, layer } } = this.props;
+    const {
+      stage: { map, layer },
+    } = this.props;
     switch (lastUpdate.type) {
       case 'all': {
         // 刷新されちゃった
@@ -564,7 +578,7 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
   }
   protected drawChip(
     ctx: CanvasRenderingContext2D,
-    c: number,
+    c: ChipCode,
     x: number,
     y: number,
   ): void {

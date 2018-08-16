@@ -1,16 +1,19 @@
 // logic
+import { Action } from '../scripts/reflux-util';
 import * as chip from '../scripts/chip';
 
 import * as editActions from '../actions/edit';
 import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
-import editStore, { Screen } from '../stores/edit';
+import editStore from '../stores/edit';
 import mapStore from '../stores/map';
 import commandStore from '../stores/command';
 import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
 
 export type FocusPlace = editActions.FocusPlace;
+type Screen = editActions.Screen;
+type ChipCode = chip.ChipCode;
 
 // マップサイズが変更になった場合にeditをうまく調整する
 export function changeMapSize(width: number, height: number): void {
@@ -23,6 +26,14 @@ export function changeMapSize(width: number, height: number): void {
     y: scroll_y2,
   });
 }
+
+/**
+ * Type of chip per screen.
+ * TODO
+ */
+type ChipCodeForScreen<T extends editActions.Screen> = T extends 'layer'
+  ? number
+  : ChipCode;
 
 /**
  * Rectangle defined by two points.
@@ -483,23 +494,32 @@ export function isEdge(viewx: number, viewy: number): EdgeType | null {
   return null;
 }
 
-function mapUpdateAction(screen: Screen) {
+function mapUpdateAction<S extends Screen>(
+  screen: S,
+): Action<mapActions.UpdateMapAction<ChipCodeForScreen<S>>> {
   if (screen === 'layer') {
-    return mapActions.updateLayer;
+    return mapActions.updateLayer as any;
   } else {
     return mapActions.updateMap;
   }
 }
-function mapUpdateRectAction(screen: Screen) {
+function mapUpdateRectAction<S extends Screen>(
+  screen: S,
+): Action<mapActions.UpdateMapRectAction<ChipCodeForScreen<S>>> {
   if (screen === 'layer') {
-    return mapActions.updateLayerRect;
+    return mapActions.updateLayerRect as any;
   } else {
     return mapActions.updateMapRect;
   }
 }
-function mapUpdateFillAction(screen: Screen) {
+/**
+ * Update map to fill dedicated area.
+ */
+function mapUpdateFillAction<S extends Screen>(
+  screen: S,
+): Action<mapActions.UpdateMapFillAction<ChipCodeForScreen<S>>> {
   if (screen === 'layer') {
-    return mapActions.updateLayerFill;
+    return mapActions.updateLayerFill as any;
   } else {
     return mapActions.updateMapFill;
   }

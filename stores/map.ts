@@ -1,10 +1,8 @@
 //map store
 import { Store } from '../scripts/reflux-util';
+import { ChipCode } from '../scripts/chip';
 
 import * as mapActions from '../actions/map';
-
-// チップデータ （メイン用）
-export type Chip = mapActions.Chip;
 
 export interface MapState {
   // advancedステージデータを使用するか
@@ -19,7 +17,7 @@ export interface StageData {
     x: number;
     y: number;
   };
-  map: Array<Array<Chip>>;
+  map: Array<Array<ChipCode>>;
   layer: Array<Array<number>>;
 }
 
@@ -106,7 +104,12 @@ export class MapStore extends Store<MapState> {
       });
     }
   }
-  public onUpdateMap({ stage, x, y, chip }: mapActions.UpdateMapAction) {
+  public onUpdateMap({
+    stage,
+    x,
+    y,
+    chip,
+  }: mapActions.UpdateMapAction<ChipCode>) {
     const { data } = this.state;
     const st = this.state.data[stage - 1].map;
     if (st) {
@@ -153,7 +156,12 @@ export class MapStore extends Store<MapState> {
       }
     }
   }
-  public onUpdateLayer({ stage, x, y, chip }: mapActions.UpdateMapAction) {
+  public onUpdateLayer({
+    stage,
+    x,
+    y,
+    chip,
+  }: mapActions.UpdateMapAction<number>) {
     const { data } = this.state;
     const st = data[stage - 1].layer;
     if (st) {
@@ -207,7 +215,7 @@ export class MapStore extends Store<MapState> {
     right,
     bottom,
     chip,
-  }: mapActions.UpdateMapRectAction<Chip>): void {
+  }: mapActions.UpdateMapRectAction<ChipCode>): void {
     const { data } = this.state;
     const st = this.state.data[stage - 1].map;
     if (st) {
@@ -309,7 +317,7 @@ export class MapStore extends Store<MapState> {
     x,
     y,
     chip,
-  }: mapActions.UpdateMapFillAction<Chip>) {
+  }: mapActions.UpdateMapFillAction<ChipCode>) {
     const { size, map } = this.state.data[stage - 1];
     if (chip === map[y][x]) {
       return;
@@ -406,11 +414,11 @@ export class MapStore extends Store<MapState> {
         x: st.size.x + left + right,
         y: st.size.y + top + bottom,
       };
-      const map: Array<Array<Chip>> = [];
+      const map: Array<Array<ChipCode>> = [];
       const layer: Array<Array<number>> = [];
       for (let y = 0; y < size.y; y++) {
         const y2 = y - top;
-        const rowm: Array<Chip> = new Array(size.x);
+        const rowm: Array<ChipCode> = new Array(size.x);
         const rowl: Array<number> = new Array(size.x);
         if (y2 < 0 || st.size.y <= y2) {
           // データが存在しない領域

@@ -1,7 +1,6 @@
 'use strict';
 
 import { Rect } from '../../../../../scripts/rect';
-
 import { sortedUniq } from '../../../../../scripts/util';
 
 export interface Point {
@@ -156,16 +155,17 @@ export class TileDependency {
 
 /**
  * マップの変更をdependencyに入力するクラス
+ * C: チップの値の型
  */
-export default class MapUpdator {
-  private pollutionCache: Record<string, Rect>;
+export default class MapUpdator<C> {
+  private pollutionCache: Map<C, Rect>;
   private deps: TileDependency;
   constructor(
     private width: number,
     private height: number,
-    private pollutionCallback: (chip: number) => Rect,
+    private pollutionCallback: (chip: C) => Rect,
   ) {
-    this.pollutionCache = {};
+    this.pollutionCache = new Map();
 
     this.deps = new TileDependency(width, height);
   }
@@ -184,7 +184,7 @@ export default class MapUpdator {
    * @param {number} y 変更開始Y座標
    * @param {number} width 変更領域X大きさ
    * @param {number} height 変更領域y大きさ
-   * @param {number[][]} map マップ
+   * @param {C[][]} map マップ
    *
    */
   update(
@@ -192,7 +192,7 @@ export default class MapUpdator {
     y: number,
     width: number,
     height: number,
-    map: Array<Array<number>>,
+    map: Array<Array<C>>,
   ): Array<Point> {
     const { pollutionCallback, pollutionCache, deps } = this;
     // update範囲
@@ -202,10 +202,10 @@ export default class MapUpdator {
       for (let j = 0; j < height; j++) {
         const chip = map[y + j][x + i];
         // chipのpollution範囲を計算
-        let pollution = pollutionCache[chip];
+        let pollution = pollutionCache.get(chip);
         if (pollution == null) {
           pollution = pollutionCallback(chip);
-          pollutionCache[chip] = pollution;
+          pollutionCache.set(chip, pollution);
         }
 
         upoints.push({
@@ -253,9 +253,8 @@ export default class MapUpdator {
 
   /**
    * マップが全部変わったのを登録
-   * @param {number[][]} map マップ
    */
-  resetMap(map: Array<Array<number>>): void {
+  resetMap(map: Array<Array<C>>): void {
     const { width, height, deps } = this;
 
     deps.initMap();

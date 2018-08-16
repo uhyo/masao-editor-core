@@ -1,10 +1,10 @@
 // Game objectに関するlogic
 import * as masao from '../scripts/masao';
-import { chipToMapString, chipToLayerString } from '../scripts/chip';
+import { chipToMapString, chipToLayerString, ChipCode } from '../scripts/chip';
 
 export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
-import mapStore, { MapState, Chip } from '../stores/map';
+import mapStore, { MapState } from '../stores/map';
 import projectStore from '../stores/project';
 import paramsStore from '../stores/params';
 
@@ -102,7 +102,7 @@ function mapToParam(
       }
       const m = setMasaoPosition(map.data[stage].map, masaoPosition);
       for (let y = 0; y < 30; y++) {
-        const j = m[y].map(chipToMapString).join('');
+        const j = m[y].map(chipcodeToMapString).join('');
         params[`map0-${y}${stagechar}`] = j.slice(0, 60);
         params[`map1-${y}${stagechar}`] = j.slice(60, 120);
         params[`map2-${y}${stagechar}`] = j.slice(120, 180);
@@ -120,12 +120,23 @@ function mapToParam(
 }
 
 /**
+ * Convert chip to legacy map string, converting custom chip to zero.
+ */
+function chipcodeToMapString(chip: ChipCode): string {
+  if ('number' === typeof chip) {
+    return chipToMapString(chip);
+  } else {
+    return chipToMapString(0);
+  }
+}
+
+/**
  * Set masao position to specified point.
  */
 function setMasaoPosition(
-  map: Array<Array<Chip>>,
+  map: Array<Array<ChipCode>>,
   masaoPosition?: { x: number; y: number },
-): Array<Array<Chip>> {
+): Array<Array<ChipCode>> {
   if (masaoPosition == null) {
     return map;
   }

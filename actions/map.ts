@@ -1,24 +1,17 @@
 import { Action, createAction } from '../scripts/reflux-util';
+import { ChipCode } from '../scripts/chip';
 
 export { Action };
-export type Chip = number;
 
-export interface UpdateMapAction {
+export interface UpdateMapAction<C> {
   // 1 -- 4
   stage: number;
   x: number;
   y: number;
-  chip: Chip;
+  chip: C;
 }
-export interface UpdateLayerAction {
-  // 1 -- 4
-  stage: number;
-  x: number;
-  y: number;
-  chip: number;
-}
-export const updateMap = createAction<UpdateMapAction>();
-export const updateLayer = createAction<UpdateLayerAction>();
+export const updateMap = createAction<UpdateMapAction<ChipCode>>();
+export const updateLayer = createAction<UpdateMapAction<number>>();
 
 /**
  * 矩形でマップを更新するアクション
@@ -33,7 +26,7 @@ export interface UpdateMapRectAction<C> {
   bottom: number;
   chip: C;
 }
-export const updateMapRect = createAction<UpdateMapRectAction<Chip>>();
+export const updateMapRect = createAction<UpdateMapRectAction<ChipCode>>();
 export const updateLayerRect = createAction<UpdateMapRectAction<number>>();
 
 /**
@@ -45,7 +38,7 @@ export interface UpdateMapFillAction<C> {
   y: number;
   chip: C;
 }
-export const updateMapFill = createAction<UpdateMapFillAction<Chip>>();
+export const updateMapFill = createAction<UpdateMapFillAction<ChipCode>>();
 export const updateLayerFill = createAction<UpdateMapFillAction<number>>();
 
 export interface SetAdvancedAction {
@@ -73,7 +66,7 @@ export interface LoadMapAction {
     x: number;
     y: number;
   };
-  map: Array<Array<number>>;
+  map: Array<Array<ChipCode>>;
   layer: Array<Array<number>>;
 }
 export const loadMap = createAction<LoadMapAction>();

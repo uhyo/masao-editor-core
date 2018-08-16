@@ -1,9 +1,15 @@
 import * as editActions from '../actions/edit';
 import { setAdvanced, SetAdvancedAction } from '../actions/map';
-import { Mode, ToolState, CursorState, FocusPlace } from '../actions/edit';
+import {
+  Mode,
+  Screen,
+  ToolState,
+  CursorState,
+  FocusPlace,
+} from '../actions/edit';
 import { Store } from '../scripts/reflux-util';
+import { ChipCode } from '../scripts/chip';
 
-export type Screen = 'map' | 'layer' | 'params' | 'project' | 'js';
 // ツールの使用中状態
 
 export interface EditState {
@@ -54,7 +60,7 @@ export interface EditState {
   /**
    * ペン（メインマップ）
    */
-  pen: number; // TODO
+  pen: ChipCode; // TODO
   /**
    * ペン（背景レイヤー）
    */
@@ -187,7 +193,7 @@ export class EditStore extends Store<EditState> {
       mode: mode === true ? 'pen' : this.state.mode,
     });
   }
-  onChangePenLayer({ pen, mode }: editActions.ChangePenAction) {
+  onChangePenLayer({ pen, mode }: editActions.ChangePenLayerAction) {
     this.setState({
       pen_layer: pen,
       mode: mode === true ? 'pen' : this.state.mode,
