@@ -4,7 +4,7 @@ import * as historyActions from '../actions/history';
 
 import mapStore from '../stores/map';
 
-import { mapStringToChip, layerStringToChip } from '../scripts/chip';
+import { mapStringToChip, layerStringToChip, ChipCode } from '../scripts/chip';
 
 // マップを全部読みなおした
 export function loadAdvancedMap(
@@ -24,14 +24,18 @@ export function loadAdvancedMap(
       break;
     }
     const { size, map, layer } = data[i];
-    // TODO
-    const map2 = [];
+    // メインレイヤーのデータを読み込み
+    const map2: ChipCode[][] = [];
     for (let y = 0; y < size.y; y++) {
-      const row = new Array(size.x);
+      const row: ChipCode[] = new Array(size.x);
       row.fill(0);
       if (map != null && map[y] != null) {
         for (const [x, c] of map[y].entries()) {
-          if ('number' === typeof c && 0 <= c) {
+          if ('string' === typeof c) {
+            // カスタムパーツ
+            row[x] = c;
+          } else if (0 <= c) {
+            // 通常チップは0以上で整数に変換
             row[x] = c | 0;
           }
         }
@@ -39,9 +43,9 @@ export function loadAdvancedMap(
       map2.push(row);
     }
 
-    const layer2 = [];
+    const layer2: number[][] = [];
     for (let y = 0; y < size.y; y++) {
-      const row = new Array(size.x);
+      const row: number[] = new Array(size.x);
       row.fill(0);
       if (layer != null && layer[y] != null) {
         for (const [x, c] of layer[y].entries()) {
