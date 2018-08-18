@@ -17,6 +17,7 @@ import { Command, ExternalCommand } from '../../logics/command';
 import mapStore, { MapState, MapStore } from '../../stores/map';
 import paramStore, { ParamsState, ParamsStore } from '../../stores/params';
 import editStore, { EditState, EditStore } from '../../stores/edit';
+import customPartsStore, { CustomPartsState } from '../../stores/custom-parts';
 import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
@@ -40,6 +41,7 @@ export interface IDefnMasaoEditorCore {
   map: MapState;
   params: ParamsState;
   edit: EditState;
+  customParts: CustomPartsState;
   project: ProjectState;
   history: HistoryState;
 }
@@ -123,6 +125,7 @@ export default class MasaoEditorCore extends RefluxComponent<
         map: mapStore,
         params: paramStore,
         edit: editStore,
+        customParts: customPartsStore,
         project: projectStore,
         history: historyStore,
       },
@@ -225,7 +228,7 @@ export default class MasaoEditorCore extends RefluxComponent<
         'fit-y': fity,
         keyDisabled,
       },
-      state: { map, params, edit, project, history },
+      state: { map, params, edit, customParts, project, history },
     } = this;
     const chips: string = require('../../images/chips.png');
 
@@ -239,6 +242,7 @@ export default class MasaoEditorCore extends RefluxComponent<
           map={map}
           params={params}
           edit={edit}
+          customParts={customParts}
           project={project}
           history={history}
           fit-y={fity}
@@ -294,12 +298,13 @@ export default class MasaoEditorCore extends RefluxComponent<
   ) {
     //paramにmapの内容を突っ込む
     return () => {
-      const { map, project, edit, params, history } = this.state;
+      const { map, project, edit, customParts, params, history } = this.state;
 
       req(this.getCurrentGame(), {
         map,
         project,
         edit,
+        customParts,
         params,
         history,
       });

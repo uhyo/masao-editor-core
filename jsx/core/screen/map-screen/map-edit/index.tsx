@@ -24,6 +24,7 @@ import {
   EditState,
   StageData,
   LastUpdateData,
+  CustomPartsState,
   ParamsState,
   ProjectState,
 } from '../../../../../stores';
@@ -56,6 +57,7 @@ export interface IPropMapEdit {
 
   params: ParamsState;
   edit: EditState;
+  customParts: CustomPartsState;
   project: ProjectState;
 }
 export default class MapEdit extends React.Component<IPropMapEdit, {}> {
@@ -585,7 +587,16 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
     if (this.images == null) {
       return;
     }
-    chip.drawChip(ctx, this.images, this.props.params, c, x, y, true);
+    chip.drawChip(
+      ctx,
+      this.images,
+      this.props.params,
+      this.props.customParts.customParts,
+      c,
+      x,
+      y,
+      true,
+    );
   }
   protected drawLayer(
     ctx: CanvasRenderingContext2D,
@@ -627,9 +638,12 @@ export default class MapEdit extends React.Component<IPropMapEdit, {}> {
         maxY: 1,
       };
     }
-    const { params } = this.props;
+    const {
+      params,
+      customParts: { customParts },
+    } = this.props;
     // mapの場合は広い範囲に描画されるかも
-    const renderRect = chip.chipRenderRect(params, c);
+    const renderRect = chip.chipRenderRect(params, customParts, c);
 
     // タイル単位に変換
     const updateRect = {

@@ -13,7 +13,12 @@ import { ObserveResize, ObserveResizeEvent } from '../../util/observe-resize';
 import * as editActions from '../../../../actions/edit';
 import * as editLogics from '../../../../logics/edit';
 
-import { EditState, ParamsState, ProjectState } from '../../../../stores';
+import {
+  EditState,
+  CustomPartsState,
+  ParamsState,
+  ProjectState,
+} from '../../../../stores';
 
 import * as styles from '../../css/chip-select.css';
 
@@ -28,6 +33,7 @@ export interface IPropChipSelect {
 
   params: ParamsState;
   edit: EditState;
+  customParts: CustomPartsState;
   project: ProjectState;
 }
 export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
@@ -146,6 +152,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     const {
       params,
       edit,
+      customParts: { customParts },
       project: { version },
       advanced,
     } = this.props;
@@ -215,7 +222,16 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
             version !== '2.8' ||
             (c !== 123 && c !== 91 && c !== 93 && c !== 60 && c !== 62)
           ) {
-            chip.drawChip(ctx, this.images, params, c, x, y, false);
+            chip.drawChip(
+              ctx,
+              this.images,
+              params,
+              customParts,
+              c,
+              x,
+              y,
+              false,
+            );
           }
           i++;
           x += 32;
@@ -281,12 +297,22 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
         );
       }
     } else {
-      chip.drawChip(ctx, this.images, params, this.props.edit.pen, 32, 0, true);
+      chip.drawChip(
+        ctx,
+        this.images,
+        params,
+        customParts,
+        this.props.edit.pen,
+        32,
+        0,
+        true,
+      );
     }
   }
   render() {
     const {
       edit: { screen, chipselect_width, chipselect_height, chipselect_scroll },
+      customParts: { customParts },
     } = this.props;
     // var w= screen==="layer" ? 16 : 8;
     // const ks = advanced ? chip.advancedChipList : chip.chipList;
@@ -301,7 +327,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       }
     } else {
       pen = this.props.edit.pen;
-      let t = chip.chipFor(this.props.params, pen);
+      let t = chip.chipFor(this.props.params, customParts, pen);
       if (t != null) {
         name = t.name;
       }

@@ -4,6 +4,7 @@ import {
   EditState,
   HistoryState,
   MapState,
+  CustomPartsState,
   ParamsState,
   ProjectState,
 } from '../../../../stores';
@@ -31,6 +32,7 @@ export interface IPropMapScreen {
   keyDisabled: boolean;
 
   edit: EditState;
+  customParts: CustomPartsState;
   params: ParamsState;
   map: MapState;
   project: ProjectState;
@@ -44,6 +46,7 @@ export const MapScreen = (props: IPropMapScreen) => {
     map,
     params,
     edit,
+    customParts,
     project,
     history,
 
@@ -80,7 +83,12 @@ export const MapScreen = (props: IPropMapScreen) => {
       {are}
       <div className={mapsClass}>
         <div className={styles.minimapWrapper}>
-          <MiniMap params={params} edit={edit} stage={stage} />
+          <MiniMap
+            params={params}
+            edit={edit}
+            customParts={customParts}
+            stage={stage}
+          />
         </div>
         <div className={styles.cmWrapper}>
           <div className={styles.chipselectWrapper}>
@@ -90,6 +98,7 @@ export const MapScreen = (props: IPropMapScreen) => {
               chips={chips}
               params={params}
               edit={edit}
+              customParts={customParts}
               project={project}
               advanced={advanced}
             />
@@ -103,6 +112,7 @@ export const MapScreen = (props: IPropMapScreen) => {
               lastUpdate={lastUpdate}
               params={params}
               edit={edit}
+              customParts={customParts}
               project={project}
               fit-y={fity}
             />

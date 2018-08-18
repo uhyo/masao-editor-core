@@ -1,6 +1,7 @@
 // load new maps
 import { CustomPartsData } from '../defs/map';
 import * as mapActions from '../actions/map';
+import * as customPartsActions from '../actions/custom-parts';
 import * as historyActions from '../actions/history';
 
 import mapStore from '../stores/map';
@@ -65,7 +66,7 @@ export function loadAdvancedMap(
       stage: i + 1,
     });
     // TODO: how do we provide names?
-    mapActions.loadCustomParts({
+    customPartsActions.loadCustomParts({
       customParts,
     });
     historyActions.newHistory({

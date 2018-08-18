@@ -5,7 +5,12 @@ import * as chip from '../../../../scripts/chip';
 
 import MousePad, { MousePadEvent } from '../../util/mousepad';
 
-import { EditState, ParamsState, StageData } from '../../../../stores';
+import {
+  EditState,
+  CustomPartsState,
+  ParamsState,
+  StageData,
+} from '../../../../stores';
 
 import * as editLogics from '../../../../logics/edit';
 
@@ -25,6 +30,7 @@ const colors: Record<string, string> = {
 export interface IPropMiniMap {
   params: ParamsState;
   edit: EditState;
+  customParts: CustomPartsState;
   stage: StageData;
 }
 export interface IStateMiniMap {
@@ -71,7 +77,12 @@ export default class MiniMap extends React.Component<
       if (ctx == null) {
         return;
       }
-      const { params, edit, stage } = this.props;
+      const {
+        params,
+        edit,
+        customParts: { customParts },
+        stage,
+      } = this.props;
       const mapdata = stage.map;
       //bg
       const bgc = util.cssColor(util.stageBackColor(params, edit));
@@ -84,7 +95,7 @@ export default class MiniMap extends React.Component<
         for (let x = 0; x < stage.size.x; x++) {
           const c = a[x];
           // const t = chip.chipTable[c];
-          const t = chip.chipFor(params, c);
+          const t = chip.chipFor(params, customParts, c);
           if (t) {
             const { category } = t;
             const cl = category && colors[category];
@@ -132,7 +143,11 @@ export default class MiniMap extends React.Component<
     });
   }
   render() {
-    const { props: { stage: { size } } } = this;
+    const {
+      props: {
+        stage: { size },
+      },
+    } = this;
     return (
       <div className={styles.wrapper}>
         <MousePad

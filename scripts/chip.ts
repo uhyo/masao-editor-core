@@ -12,6 +12,8 @@ import { dossunsun_pattern, unknown_pattern } from './chip-data/patterns';
 import { athleticTable } from './chip-data/athletics';
 import { enemyTable } from './chip-data/enemies';
 
+import { CustomPartsData } from '../defs/map';
+import { getCustomChipName } from './custom-parts';
 /**
  * Code of chip.
  */
@@ -523,6 +525,7 @@ export function drawChip(
   ctx: CanvasRenderingContext2D,
   images: ImagesObject,
   params: Record<string, string>,
+  customParts: CustomPartsData,
   chip: ChipCode,
   x: number,
   y: number,
@@ -534,7 +537,7 @@ export function drawChip(
   if (chip === 0) {
     return;
   }
-  const t = chipFor(params, chip);
+  const t = chipFor(params, customParts, chip);
   if (t == null) {
     return;
   }
@@ -648,6 +651,7 @@ export function drawChip(
 // チップの描画範囲を返す（相対座標）
 export function chipRenderRect(
   params: Record<string, string>,
+  customParts: CustomPartsData,
   chip: number,
 ): Rect {
   const rect: Rect = {
@@ -659,7 +663,7 @@ export function chipRenderRect(
   if (chip === 0) {
     return rect;
   }
-  const t = chipFor(params, chip);
+  const t = chipFor(params, customParts, chip);
   if (t == null) {
     return rect;
   }
@@ -708,13 +712,19 @@ export function chipRenderRect(
   return containerRect(...rects);
 }
 
-//チップオブジェクト
-export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
+/**
+ * Get a chip object for given code.
+ */
+export function chipFor(
+  params: Record<string, string>,
+  customParts: CustomPartsData,
+  chip: ChipCode,
+): Chip {
   if ('string' === typeof chip) {
     // TODO currently, return unknown for string chip.
     return {
       pattern: unknown_pattern,
-      name: '不明',
+      name: getCustomChipName(customParts, chip) || '不明',
     };
   }
   let pa = athleticTypeParam[chip];

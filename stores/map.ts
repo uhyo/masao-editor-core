@@ -494,14 +494,6 @@ export class MapStore extends Store<MapState> {
       },
     });
   }
-  /**
-   * カスタムパーツ定義を読み込む
-   */
-  public onLoadCustomParts({ customParts }: mapActions.LoadCustomPartsAction) {
-    this.setState({
-      customParts,
-    });
-  }
 }
 
 // 塗りつぶし
