@@ -1,12 +1,18 @@
-// Game objectに関するlogic
-import * as masao from '../scripts/masao';
-import { chipToMapString, chipToLayerString, ChipCode } from '../scripts/chip';
+/*
+ * Generation of game object.
+ */
+import * as masao from '../../scripts/masao';
+import {
+  chipToMapString,
+  chipToLayerString,
+  ChipCode,
+} from '../../scripts/chip';
 
-export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
+type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
-import mapStore, { MapState } from '../stores/map';
-import projectStore from '../stores/project';
-import paramsStore from '../stores/params';
+import mapStore, { MapState } from '../../stores/map';
+import projectStore from '../../stores/project';
+import paramsStore from '../../stores/params';
 
 /**
  * Option bag to `getCurrentGame`.

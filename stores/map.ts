@@ -2,15 +2,30 @@
 import { Store } from '../scripts/reflux-util';
 import { ChipCode } from '../scripts/chip';
 
+import { CustomPartsData } from '../defs/map';
 import * as mapActions from '../actions/map';
 
 export interface MapState {
-  // advancedステージデータを使用するか
+  /**
+   * advancedステージデータを使用するか
+   */
   advanced: boolean;
-  // ステージ数
+  /**
+   * ステージ数
+   */
   stages: number;
+  /**
+   * 各ステージのデータ
+   */
   data: Array<StageData>;
+  /**
+   * マップに対する最終更新のデータ
+   */
   lastUpdate: LastUpdateData;
+  /**
+   * カスタムパーツの一覧
+   */
+  customParts: CustomPartsData;
 }
 export interface StageData {
   size: {
@@ -57,6 +72,7 @@ export class MapStore extends Store<MapState> {
         type: 'all',
         size: true,
       },
+      customParts: {},
     };
   }
   private initStage(): StageData {
@@ -476,6 +492,14 @@ export class MapStore extends Store<MapState> {
         type: 'all',
         size: true,
       },
+    });
+  }
+  /**
+   * カスタムパーツ定義を読み込む
+   */
+  public onLoadCustomParts({ customParts }: mapActions.LoadCustomPartsAction) {
+    this.setState({
+      customParts,
     });
   }
 }

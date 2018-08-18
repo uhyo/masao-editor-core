@@ -27,6 +27,7 @@ gulp.task('watch-bundle', ['tsc'], () => {
 
 const tsProject = gulp_ts.createProject('tsconfig.json');
 const tsTarget = [
+  './defs/**/*.ts',
   './actions/**/*.ts',
   './logics/**/*.ts',
   './scripts/**/*.ts',

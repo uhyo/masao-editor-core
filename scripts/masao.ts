@@ -2,6 +2,37 @@ import { param, format } from 'masao';
 
 export { param, format };
 export type MasaoJSONFormat = format.MasaoJSONFormat;
+export type AdvancedMap = format.AdvancedMap;
+
+/**
+ * Name of extension field in MasaoJSONFormat.
+ */
+const extField = '_meme_editor';
+
+/**
+ * MasaoJSOMFormat with editor-specific data.
+ */
+export interface MasaoJSONFormatExt extends MasaoJSONFormat {
+  [extField]?: MJSExtFields;
+}
+
+export interface MJSExtFields {
+  customParts?: Record<
+    string,
+    {
+      name: string;
+    }
+  >;
+}
+
+/**
+ * Get extension fields of given masao-json-format data.
+ */
+export function getExtFields(
+  game: MasaoJSONFormatExt,
+): MJSExtFields | undefined {
+  return game[extField];
+}
 
 export interface ParamType {
   name: string;

@@ -1,4 +1,5 @@
 // load new maps
+import { CustomPartsData } from '../defs/map';
 import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
 
@@ -16,6 +17,7 @@ export function loadAdvancedMap(
     map?: Array<Array<string | number>>;
     layer?: Array<Array<string | number>>;
   }>,
+  customParts: CustomPartsData,
 ): void {
   const l = data.length;
   for (let i = 0; i < l; i++) {
@@ -61,6 +63,10 @@ export function loadAdvancedMap(
       map: map2,
       layer: layer2,
       stage: i + 1,
+    });
+    // TODO: how do we provide names?
+    mapActions.loadCustomParts({
+      customParts,
     });
     historyActions.newHistory({
       stage: i + 1,

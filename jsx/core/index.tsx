@@ -7,13 +7,11 @@ import * as masao from '../../scripts/masao';
 
 export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
-import * as editActions from '../../actions/edit';
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
-import * as mapActions from '../../actions/map';
 import * as keyActions from '../../actions/key';
 import * as mapLogics from '../../logics/map';
-import { getCurrentGame } from '../../logics/game';
+import { getCurrentGame, loadGame } from '../../logics/game';
 import { Command, ExternalCommand } from '../../logics/command';
 
 import mapStore, { MapState, MapStore } from '../../stores/map';
@@ -215,48 +213,7 @@ export default class MasaoEditorCore extends RefluxComponent<
     }
   }
   private loadGame(game: masao.format.MasaoJSONFormat) {
-    const version = masao.acceptVersion(game.version);
-    const params = masao.param.addDefaults(game.params, version);
-    const script = game.script || '';
-
-    const advanced = game['advanced-map'] != null;
-
-    mapActions.setAdvanced({
-      advanced,
-    });
-    paramActions.resetParams(params);
-    projectActions.changeVersion({ version });
-
-    projectActions.changeScript({
-      script,
-    });
-    editActions.jsConfirm({
-      confirm: !!script,
-    });
-
-    if (advanced) {
-      const a = game['advanced-map']!;
-      mapLogics.loadAdvancedMap(
-        a.stages.map((stage: any) => {
-          let map;
-          let layer;
-          for (let obj of stage.layers) {
-            if (obj.type === 'main') {
-              map = obj.map;
-            } else if (obj.type === 'mapchip') {
-              layer = obj.map;
-            }
-          }
-          return {
-            size: stage.size,
-            map,
-            layer,
-          };
-        }),
-      );
-    } else {
-      mapLogics.loadParamMap(params);
-    }
+    loadGame(game);
   }
   render() {
     const {
