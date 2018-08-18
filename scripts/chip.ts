@@ -485,9 +485,11 @@ const chipTable: Record<string, Chip> = keyToNum({
   },
 });
 
-export const chipList = Object.keys(chipTable).map(key => Number(key));
+export const chipList: ChipCode[] = Object.keys(chipTable).map(key =>
+  Number(key),
+);
 // advanced-mapで使えるやつ
-export const advancedChipList = [
+export const advancedChipList: ChipCode[] = [
   ...chipList,
   ...Object.keys(athleticTable).map(key => Number(key) + 1000),
   ...Object.keys(enemyTable).map(key => Number(key) + 5000),

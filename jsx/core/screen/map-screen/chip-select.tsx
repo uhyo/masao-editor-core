@@ -1,4 +1,5 @@
 import * as React from 'react';
+import memoizeOne from 'memoize-one';
 
 import * as chip from '../../../../scripts/chip';
 import * as util from '../../../../scripts/util';
@@ -53,6 +54,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     mapchip: HTMLImageElement;
     chips: HTMLImageElement;
   } | null = null;
+  /**
+   * Memoized function to get current list of current chip list.
+   */
+  private getCurrentChipList = memoizeOne(getCurrentChipList);
   private backlayer: HTMLCanvasElement;
   /**
    * Ref to focusable area.
@@ -188,7 +193,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       );
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const chipList = advanced ? chip.advancedChipList : chip.chipList;
+      const chipList: chip.ChipCode[] = this.getCurrentChipList(
+        advanced,
+        customParts,
+      );
 
       let x = 0,
         y = 0,
@@ -407,14 +415,13 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   private chipNumber() {
     const {
       edit: { screen },
+      customParts: { customParts },
       advanced,
     } = this.props;
     if (screen === 'layer') {
       return 256;
-    } else if (advanced) {
-      return chip.advancedChipList.length;
     } else {
-      return chip.chipList.length;
+      return this.getCurrentChipList(advanced, customParts).length;
     }
   }
   /**
@@ -455,6 +462,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     const {
       edit: { chipselect_width, chipselect_scroll, screen },
       advanced,
+      customParts: { customParts },
     } = this.props;
 
     const penidx =
@@ -464,13 +472,9 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       editActions.changePenLayer({
         pen: penidx,
       });
-    } else if (advanced) {
-      editActions.changePen({
-        pen: chip.advancedChipList[penidx],
-      });
     } else {
       editActions.changePen({
-        pen: chip.chipList[penidx],
+        pen: this.getCurrentChipList(advanced, customParts)[penidx],
       });
     }
   }
@@ -479,5 +483,19 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   }
   protected handleBlur() {
     editLogics.blur('chipselect');
+  }
+}
+
+/**
+ * Get currently available chips.
+ */
+function getCurrentChipList(
+  advanced: boolean,
+  customParts: CustomPartsState['customParts'],
+): chip.ChipCode[] {
+  if (advanced) {
+    return chip.advancedChipList.concat(Object.keys(customParts));
+  } else {
+    return chip.chipList;
   }
 }
