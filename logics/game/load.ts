@@ -11,14 +11,22 @@ import { CustomPartsData } from '../../defs/map';
 
 type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 type AdvancedMap = masao.format.AdvancedMap;
+type MJSExtFields = masao.MJSExtFields;
 
 /**
  * Load masao-json-format game into editor.
  */
-export function loadGame(game: MasaoJSONFormat) {
+export function loadGame(
+  editorExtField: string | undefined,
+  game: MasaoJSONFormat,
+) {
   const version = masao.acceptVersion(game.version);
   const params = masao.param.addDefaults(game.params, version);
   const script = game.script || '';
+  const editorExt: MJSExtFields =
+    (game as any)[
+      editorExtField != null ? editorExtField : masao.extFieldDefault
+    ] || {};
 
   /**
    * Flag of whether advanced-map is used.
@@ -40,7 +48,7 @@ export function loadGame(game: MasaoJSONFormat) {
 
   if (advanced) {
     const a = game['advanced-map']!;
-    const customParts = loadCustomParts(a.customParts, game);
+    const customParts = loadCustomParts(a.customParts, editorExt);
     mapLogics.loadAdvancedMap(
       a.stages.map((stage: any) => {
         let map;
@@ -71,14 +79,13 @@ export function loadGame(game: MasaoJSONFormat) {
  */
 function loadCustomParts(
   customParts: AdvancedMap['customParts'],
-  a: MasaoJSONFormat,
+  ext: MJSExtFields,
 ): CustomPartsData {
   if (customParts == null) {
     // convert to empty data.
     return {};
   }
-  const ext = masao.getExtFields(a);
-  const customPartsExt = ext != null ? ext.customParts || {} : {};
+  const customPartsExt = ext.customParts || {};
   const result: CustomPartsData = {};
   for (const key in customParts) {
     const name =

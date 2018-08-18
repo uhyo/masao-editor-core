@@ -64,6 +64,10 @@ export interface IPropMasaoEditorCore {
   filename_mapchip: string;
 
   /**
+   * Name of editor-specific field in masao-json-format data.
+   */
+  editorExtField?: string;
+  /**
    * Default param data.
    */
   defaultParams?: Record<string, string>;
@@ -216,7 +220,7 @@ export default class MasaoEditorCore extends RefluxComponent<
     }
   }
   private loadGame(game: masao.format.MasaoJSONFormat) {
-    loadGame(game);
+    loadGame(this.props.editorExtField, game);
   }
   render() {
     const {
