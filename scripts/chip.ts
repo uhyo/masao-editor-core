@@ -723,12 +723,60 @@ export function chipFor(
   chip: ChipCode,
 ): Chip {
   if ('string' === typeof chip) {
-    // TODO currently, return unknown for string chip.
-    return {
-      pattern: unknown_pattern,
-      name: getCustomChipName(customParts, chip) || '不明',
-    };
+    // custom parts.
+    // get name of custom parts.
+    const name = getCustomChipName(customParts, chip) || '不明';
+    // get chip and override name.
+    const c = lookupChip(params, customParts, chip);
+    if (c != null) {
+      // TODO: add "custom" marker
+      const { pattern } = c;
+      return {
+        pattern,
+        name,
+      };
+    } else {
+      // undefined chip.
+      return {
+        pattern: unknown_pattern,
+        name: '不明',
+      };
+    }
   }
+  // it's native.
+  return (
+    lookupChip(params, customParts, chip) || {
+      pattern: unknown_pattern,
+      name: '不明',
+    }
+  );
+}
+
+/**
+ * Look up native chip definition, recursing for custom chips.
+ */
+function lookupChip(
+  params: Record<string, string>,
+  customParts: CustomPartsData,
+  chip: ChipCode,
+  // flags to prevent infinite loops.
+  visitedFlag: Record<string, boolean | undefined> = {},
+): Chip | null {
+  if ('string' === typeof chip) {
+    if (visitedFlag[chip]) {
+      // Infinite loop
+      return null;
+    }
+    visitedFlag[chip] = true;
+    const ccp = customParts[chip];
+    if (ccp == null) {
+      // This chip is undefined.
+      return null;
+    }
+    // Refer to its parent.
+    return lookupChip(params, customParts, ccp.extends, visitedFlag);
+  }
+  // otherwise, do normal process for native chip.
   let pa = athleticTypeParam[chip];
   if (pa != null && params[pa] !== '1') {
     //変わったアスレチックだ
@@ -835,10 +883,7 @@ export function chipFor(
     return obj;
   }
   // 不明だ
-  return {
-    pattern: unknown_pattern,
-    name: '不明',
-  };
+  return null;
 }
 
 // 従来の文字列表現チップと数値の相互変換
