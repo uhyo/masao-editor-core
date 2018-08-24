@@ -1,0 +1,8 @@
+.main-container {
+  flex: auto 1 1;
+}
+
+.float-wrapper {
+  float: left;
+  height: 0;
+}

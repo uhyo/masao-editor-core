@@ -18,6 +18,9 @@ export interface SubChipRendering {
 }
 export type ChipRendering = MainChipRendering | SubChipRendering;
 
+/**
+ * Expression of main layer chip.
+ */
 export interface Chip {
   pattern: number | ChipRendering | Array<number | ChipRendering>;
   name: string;
