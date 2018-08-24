@@ -1,6 +1,5 @@
-import * as React from 'react';
 import { Images } from '../../../defs/images';
-import { LoadImages } from '../load-images';
+import { wrapLoadImages } from '../load-images';
 import { ChipListMain, IPropChipListMain } from './main';
 
 export type IPropChipList = Pick<
@@ -15,10 +14,4 @@ export type IPropChipList = Pick<
 /**
  * Component which shows choosable list of chips.
  */
-export function ChipList({ images, ...props }: IPropChipList) {
-  return (
-    <LoadImages images={images}>
-      {images => <ChipListMain images={images} {...props} />}
-    </LoadImages>
-  );
-}
+export const ChipList = wrapLoadImages('images', ChipListMain);

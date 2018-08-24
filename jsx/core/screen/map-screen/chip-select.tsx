@@ -19,6 +19,7 @@ import * as styles from '../../css/chip-select.css';
 import { ChipList } from '../../../components/chip-select';
 import { IntoImages } from '../../../components/load-images';
 import { Images } from '../../../../defs/images';
+import { ChipDisplay } from '../../../components/chip-display';
 
 export interface IPropChipSelect {
   // 画像ファイル
@@ -41,6 +42,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     this.handleChipSelect = this.handleChipSelect.bind(this);
     this.drawMainChip = this.drawMainChip.bind(this);
     this.drawMapchipChip = this.drawMapchipChip.bind(this);
+    this.drawMainChipFromCode = this.drawMainChipFromCode.bind(this);
+    this.drawMapchipChipFromCode = this.drawMapchipChipFromCode.bind(this);
 
     this.getImagesObject = memoizeOne(this.getImagesObject);
   }
@@ -84,60 +87,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
    * Memoized function to get current list of current chip list.
    */
   private getCurrentChipList = memoizeOne(getCurrentChipList);
-  /**
-   * Ref to focusable area.
-   */
-  protected focusarea: HTMLElement | null = null;
-  /**
-   * Ref to main canvas.
-   */
-  protected canvas: HTMLCanvasElement | null = null;
-  /**
-   * Ref t chip preview canvas.
-   */
-  protected previewCanvas: HTMLCanvasElement | null = null;
-
-  draw() {
-    /*
-    //下のやつも描画
-    const canvas = this.previewCanvas;
-    if (canvas == null) {
-      return;
-    }
-    const ctx = canvas.getContext('2d');
-    if (ctx == null) {
-      return;
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (screen === 'layer') {
-      const pen_layer = this.props.edit.pen_layer;
-      if (pen_layer !== 0) {
-        ctx.drawImage(
-          this.images.mapchip,
-          (pen_layer & 15) * 32,
-          (pen_layer >> 4) * 32,
-          32,
-          32,
-          32,
-          0,
-          32,
-          32,
-        );
-      }
-    } else {
-      chip.drawChip(
-        ctx,
-        this.images,
-        params,
-        customParts,
-        this.props.edit.pen,
-        32,
-        0,
-        true,
-      );
-    }
-    */
-  }
   render() {
     const {
       params,
@@ -189,6 +138,9 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     // ???
     const chipselectedStyle = { width: `${chipselect_width * 32}px` };
 
+    /// renderer of chip.
+    const chipRenderer =
+      screen === 'layer' ? this.drawMapchipChip : this.drawMainChip;
     return (
       <div className={styles.wrapper}>
         <ChipList
@@ -205,9 +157,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
           onScroll={this.handleScroll}
           onResize={this.handleResize}
           onChipSelect={this.handleChipSelect}
-          onDrawChip={
-            screen === 'layer' ? this.drawMapchipChip : this.drawMainChip
-          }
+          onDrawChip={chipRenderer}
         />
         <div style={chipselectedStyle}>
           <div>
@@ -216,10 +166,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
             </p>
           </div>
           <div>
-            <canvas
-              ref={e => (this.previewCanvas = e)}
-              width="96"
-              height="64"
+            <ChipDisplay
+              images={images}
+              chipId={pen}
+              onDrawChip={
+                screen === 'layer'
+                  ? this.drawMapchipChipFromCode
+                  : this.drawMainChipFromCode
+              }
             />
           </div>
         </div>
@@ -285,6 +239,22 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     );
   }
   /**
+   * Function to draw one chip using ChipCode.
+   */
+  private drawMainChipFromCode(
+    ctx: CanvasRenderingContext2D,
+    images: IntoImages<Images>,
+    x: number,
+    y: number,
+    chipCode: chip.ChipCode,
+  ): void {
+    const {
+      params,
+      customParts: { customParts },
+    } = this.props;
+    chip.drawChip(ctx, images, params, customParts, chipCode, x, y, false);
+  }
+  /**
    * Function to draw one mapchip.
    */
   private drawMapchipChip(
@@ -305,6 +275,22 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       32,
       32,
     );
+  }
+  /**
+   * Function to draw one mapchip from ChipCode.
+   * It just ignores invalid code.
+   */
+  private drawMapchipChipFromCode(
+    ctx: CanvasRenderingContext2D,
+    images: IntoImages<Images>,
+    x: number,
+    y: number,
+    chipCode: chip.ChipCode,
+  ): void {
+    if ('string' === typeof chipCode) {
+      return;
+    }
+    this.drawMapchipChip(ctx, images, x, y, chipCode);
   }
 }
 

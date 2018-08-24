@@ -11,6 +11,17 @@ import Resizable from '../../core/util/resizable';
 import MousePad, { MousePadEvent } from '../../core/util/mousepad';
 import propChanged from '../../core/util/changed';
 
+/**
+ * Type of renderer of chip.
+ */
+export type ChipRenderer<ChipIdx> = (
+  ctx: CanvasRenderingContext2D,
+  images: IntoImages<Images>,
+  x: number,
+  y: number,
+  chipIndex: ChipIdx,
+) => void;
+
 export interface IPropChipListMain {
   /**
    * class name appended to the container.
@@ -68,13 +79,7 @@ export interface IPropChipListMain {
   /**
    * Callback to render a chip on given position.
    */
-  onDrawChip(
-    ctx: CanvasRenderingContext2D,
-    images: IntoImages<Images>,
-    x: number,
-    y: number,
-    chipIndex: number,
-  ): void;
+  onDrawChip: ChipRenderer<number>;
 }
 export interface IStateChipListMain {
   /**

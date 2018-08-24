@@ -1,13 +1,6 @@
 import * as React from 'react';
-import loadImage from '../../scripts/load-image';
-import { ExtractKeyFor } from '../../defs/helper-types';
-
-/**
- * Conversion of dictonary of image names to dictonary of img elements.
- */
-export type IntoImages<T> = {
-  [key in ExtractKeyFor<T, string>]: HTMLImageElement
-};
+import loadImage from '../../../scripts/load-image';
+import { IntoImages } from './into-images';
 
 export interface IPropLoadImages<T> {
   /**
