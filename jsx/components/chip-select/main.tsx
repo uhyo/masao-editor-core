@@ -313,11 +313,15 @@ export class ChipListMain extends React.PureComponent<
    * Handle mouse move in the main area.
    */
   private handleMouseMove({ elementX, elementY }: MousePadEvent) {
-    const { chipsWidth, scrollY, onChipSelect } = this.props;
+    const { chipsWidth, scrollY, onChipSelect, chipNumber } = this.props;
     // Calculate which chip is selected.
     const chipIndex =
       Math.floor(elementX / 32) +
       (Math.floor(elementY / 32) + scrollY) * chipsWidth;
+    // disallow ones that exceed bounds.
+    if (chipIndex < 0 || chipNumber <= chipIndex) {
+      return;
+    }
 
     onChipSelect(chipIndex);
   }
