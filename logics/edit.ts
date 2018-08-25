@@ -11,6 +11,7 @@ import customPartsStore from '../stores/custom-parts';
 import commandStore from '../stores/command';
 import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
+import { CustomPartsData } from '../defs/map';
 
 export type FocusPlace = editActions.FocusPlace;
 type Screen = editActions.Screen;
@@ -581,7 +582,13 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
 
     const id2 = Math.max(
       0,
-      Math.min(id + x + y * chipselect_width, chipNumber() - 1),
+      Math.min(
+        id + x + y * chipselect_width,
+        chipNumber(
+          mapStore.state.advanced,
+          customPartsStore.state.customParts,
+        ) - 1,
+      ),
     );
 
     editActions.setCursor({
@@ -594,7 +601,10 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
     const idy = Math.floor(id2 / chipselect_width);
 
     // height of chip list.
-    const chipselectHeight = Math.ceil(chipNumber() / chipselect_width);
+    const chipselectHeight = Math.ceil(
+      chipNumber(mapStore.state.advanced, customPartsStore.state.customParts) /
+        chipselect_width,
+    );
 
     const c_sc = Math.min(
       idy,
@@ -708,7 +718,10 @@ export function cursorButton(keydown: boolean) {
       });
     } else {
       editActions.changePen({
-        pen: chipList()[id],
+        pen: chipList(
+          mapStore.state.advanced,
+          customPartsStore.state.customParts,
+        )[id],
       });
     }
   }
@@ -717,20 +730,30 @@ export function cursorButton(keydown: boolean) {
 /**
  * Return the list of currently available chips.
  */
-export function chipList(): ChipCode[] {
-  const { advanced } = mapStore.state;
-  const { customParts } = customPartsStore.state;
-
+export function chipList(
+  advanced: boolean,
+  customParts: CustomPartsData,
+): ChipCode[] {
   if (advanced) {
-    return chip.advancedChipList.concat(Object.keys(customParts));
+    return chip.advancedChipList.concat(customPartsList(customParts));
   } else {
     return chip.chipList;
   }
 }
 
 /**
+ * Return the list of custom parts codes.
+ */
+export function customPartsList(customParts: CustomPartsData): ChipCode[] {
+  return Object.keys(customParts);
+}
+
+/**
  * Return the number of currently avaiable chips.
  */
-export function chipNumber(): number {
-  return chipList().length;
+export function chipNumber(
+  advanced: boolean,
+  customParts: CustomPartsData,
+): number {
+  return chipList(advanced, customParts).length;
 }

@@ -48,7 +48,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   private getCursorPosition(
     cursor: editActions.CursorState | null,
   ): number | null {
-    if (cursor == null || cursor.type === 'main') {
+    if (cursor == null || cursor.type !== 'chipselect') {
       return null;
     }
     return cursor.id;
@@ -58,12 +58,14 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
    */
   private chipNumber() {
     const {
+      advanced,
+      customParts: { customParts },
       edit: { screen },
     } = this.props;
     if (screen === 'layer') {
       return 256;
     } else {
-      return editLogics.chipNumber();
+      return editLogics.chipNumber(advanced, customParts);
     }
   }
   render() {
@@ -148,8 +150,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       </div>
     );
   }
-  protected handleResize(width: number, height: number, scroll: number) {
-    editActions.changeChipselectSize({ width, height });
+  protected handleResize(width: number, _height: number, scroll: number) {
+    editActions.changeChipselectSize({ width });
     editActions.changeChipselectScroll({ y: scroll });
   }
   protected handleScroll(y: number) {
@@ -157,6 +159,8 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   }
   protected handleChipSelect(chipIndex: number) {
     const {
+      advanced,
+      customParts: { customParts },
       edit: { screen },
     } = this.props;
 
@@ -166,7 +170,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       });
     } else {
       editActions.changePen({
-        pen: editLogics.chipList()[chipIndex],
+        pen: editLogics.chipList(advanced, customParts)[chipIndex],
       });
     }
   }
@@ -188,10 +192,11 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     chipIndex: number,
   ): void {
     const {
+      advanced,
       params,
       customParts: { customParts },
     } = this.props;
-    const chipList = editLogics.chipList();
+    const chipList = editLogics.chipList(advanced, customParts);
     chip.drawChip(
       ctx,
       images,

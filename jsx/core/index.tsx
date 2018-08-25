@@ -25,6 +25,7 @@ import commandStore from '../../stores/command';
 import updateStore from '../../stores/update';
 
 import ScreenSelect from './screen-select';
+import KeyEvent from './key-event';
 
 import Button from './util/button';
 import { Toolbar } from './util/toolbar';
@@ -251,36 +252,38 @@ export default class MasaoEditorCore extends RefluxComponent<
       });
     }
     return (
-      <div
-        className={
-          styles.wrapper +
-          (this.props.className ? ' ' + this.props.className : '')
-        }
-      >
-        <Toolbar>
-          <div className={styles.info}>
-            <div>
-              <div className={styles.toolboxLabel}>画面選択</div>
-              <ScreenSelect edit={edit} map={map} />
+      <>
+        <div
+          className={
+            styles.wrapper +
+            (this.props.className ? ' ' + this.props.className : '')
+          }
+        >
+          <Toolbar>
+            <div className={styles.info}>
+              <div>
+                <div className={styles.toolboxLabel}>画面選択</div>
+                <ScreenSelect edit={edit} map={map} />
+              </div>
+              {external_buttons}
             </div>
-            {external_buttons}
+          </Toolbar>
+          <div className={fity ? styles.screenWrapperFit : undefined}>
+            <ScreenRouter
+              images={images}
+              edit={edit}
+              map={map}
+              params={params}
+              project={project}
+              history={history}
+              customParts={customParts}
+              fit-y={fity}
+              jsWarning={jsWarning}
+            />
           </div>
-        </Toolbar>
-        <div className={fity ? styles.screenWrapperFit : undefined}>
-          <ScreenRouter
-            images={images}
-            edit={edit}
-            map={map}
-            params={params}
-            project={project}
-            history={history}
-            customParts={customParts}
-            fit-y={fity}
-            keyDisabled={keyDisabled}
-            jsWarning={jsWarning}
-          />
         </div>
-      </div>
+        <KeyEvent disabled={keyDisabled} />
+      </>
     );
   }
   protected handleExternal(

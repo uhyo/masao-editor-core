@@ -1,3 +1,6 @@
+.wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+}
 .chiplist {
-  height: stretch;
 }

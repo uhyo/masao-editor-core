@@ -68,17 +68,33 @@ export interface RectTool {
 
 export type ToolState = PenTool | EraserTool | HandTool | RectTool;
 
+/**
+ * Cursor on the map.
+ */
 export interface MainCursor {
   type: 'main';
   x: number;
   y: number;
 }
+/**
+ * Cursor on the chip select panel.
+ */
 export interface ChipselectCursor {
   type: 'chipselect';
   id: number;
 }
+/**
+ * Cursor on the custom chip editor.
+ */
+export interface CustomPartsCursor {
+  type: 'customparts';
+  /**
+   * index of custom chips.
+   */
+  index: number;
+}
 
-export type CursorState = MainCursor | ChipselectCursor;
+export type CursorState = MainCursor | ChipselectCursor | CustomPartsCursor;
 
 export interface ChangeScreenAction {
   screen: Screen;
@@ -165,7 +181,6 @@ export const scroll = createAction<ScrollAction>();
 
 export interface ChangeChipselectSizeAction {
   width: number;
-  height: number;
 }
 export const changeChipselectSize = createAction<ChangeChipselectSizeAction>();
 

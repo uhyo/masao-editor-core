@@ -33,10 +33,6 @@ export interface IPropScreenRouter {
    */
   'fit-y': boolean;
   /**
-   * Whether keyboard is disabled.
-   */
-  keyDisabled: boolean;
-  /**
    * Whether show a warning when editing a JS.
    */
   jsWarning: boolean;
@@ -51,7 +47,6 @@ export function ScreenRouter({
   project,
   history,
   'fit-y': fity,
-  keyDisabled,
   jsWarning,
 }: IPropScreenRouter) {
   if (edit.screen === 'map' || edit.screen === 'layer') {
@@ -65,7 +60,6 @@ export function ScreenRouter({
         project={project}
         history={history}
         fit-y={fity}
-        keyDisabled={keyDisabled}
       />
     );
   } else if (edit.screen === 'params') {

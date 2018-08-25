@@ -13,7 +13,6 @@ import MapEdit from './map-edit';
 import ChipSelect from './chip-select';
 import EditMode from './edit-mode';
 import MiniMap from './mini-map';
-import KeyEvent from './key-event';
 
 import * as styles from '../../css/screen/map-screen.css';
 
@@ -27,10 +26,6 @@ export interface IPropMapScreen {
   images: Images;
 
   'fit-y'?: boolean;
-  /**
-   * Whether key input is disabled.
-   */
-  keyDisabled: boolean;
 
   edit: EditState;
   customParts: CustomPartsState;
@@ -53,7 +48,6 @@ export const MapScreen = (props: IPropMapScreen) => {
 
     images,
     'fit-y': fity,
-    keyDisabled,
   } = props;
   let are = null;
   if (project.version === '2.8' && edit.screen === 'layer') {
@@ -114,7 +108,6 @@ export const MapScreen = (props: IPropMapScreen) => {
           </div>
         </div>
       </div>
-      <KeyEvent disabled={keyDisabled} />
     </>
   );
 };
