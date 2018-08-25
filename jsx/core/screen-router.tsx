@@ -12,6 +12,8 @@ import { MapScreen } from './screen/map-screen';
 import { ParamScreen } from './screen/param-screen';
 import { ProjectScreen } from './screen/project-screen';
 import { JsScreen } from './screen/js-screen';
+import { CustomPartsScreen } from './screen/custom-parts-screen';
+import { assertNever } from '../../scripts/util/assert-never';
 
 export interface IPropScreenRouter {
   /**
@@ -72,7 +74,16 @@ export function ScreenRouter({
     return <ProjectScreen project={project} map={map} edit={edit} />;
   } else if (edit.screen === 'js') {
     return <JsScreen jsWarning={jsWarning} edit={edit} project={project} />;
+  } else if (edit.screen === 'custom-parts') {
+    return (
+      <CustomPartsScreen
+        images={images}
+        edit={edit}
+        params={params}
+        customParts={customParts}
+      />
+    );
   } else {
-    return null;
+    return assertNever(edit.screen);
   }
 }
