@@ -286,7 +286,7 @@ export default class MasaoEditorCore extends RefluxComponent<
           <div className={styles.info}>
             <div>
               <div className={styles.toolboxLabel}>画面選択</div>
-              <ScreenSelect edit={edit} />
+              <ScreenSelect edit={edit} map={map} />
             </div>
             {external_buttons}
           </div>

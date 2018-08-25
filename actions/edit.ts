@@ -6,7 +6,13 @@ export { Action };
 
 export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
 
-export type Screen = 'map' | 'layer' | 'params' | 'project' | 'js';
+export type Screen =
+  | 'map'
+  | 'layer'
+  | 'params'
+  | 'project'
+  | 'js'
+  | 'custom-parts';
 
 export type FocusPlace = 'main' | 'chipselect';
 
