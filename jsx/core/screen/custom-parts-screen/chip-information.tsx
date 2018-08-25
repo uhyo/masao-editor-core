@@ -1,4 +1,4 @@
-import { ChipCode } from '../../../../scripts/chip';
+import { ChipCode, chipFor } from '../../../../scripts/chip';
 import * as React from 'react';
 import { ChipDisplay } from '../../../components/chip-display';
 import { Images } from '../../../../defs/images';
@@ -6,9 +6,11 @@ import { ChipRenderer } from '../../../components/chip-select/main';
 
 import * as styles from '../../css/screen/custom-parts-screen.css';
 import { CustomPartsData } from '../../../../defs/map';
+import { ParamsState } from '../../../../stores';
 
 export interface IPropChipInformation {
   images: Images;
+  params: ParamsState;
   customParts: CustomPartsData;
   currentChipCode: ChipCode | null;
   onDrawChip: ChipRenderer<ChipCode>;
@@ -18,6 +20,7 @@ export interface IPropChipInformation {
  */
 export function ChipInformation({
   images,
+  params,
   customParts,
   currentChipCode,
   onDrawChip,
@@ -25,7 +28,7 @@ export function ChipInformation({
   if (currentChipCode == null) {
     return null;
   }
-  const chipDef = customParts[currentChipCode];
+  const chipDef = chipFor(params, customParts, currentChipCode);
   if (chipDef == null) {
     return null;
   }
@@ -40,6 +43,7 @@ export function ChipInformation({
       </div>
       <div className={styles.chipDescription}>
         <p>{chipDef.name}</p>
+        <p>ベース: {chipDef.nativeName}</p>
       </div>
     </div>
   );

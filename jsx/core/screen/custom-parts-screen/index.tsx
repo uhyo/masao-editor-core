@@ -79,6 +79,7 @@ export function CustomPartsScreen({
       <div className={styles.main}>
         <ChipInformation
           images={images}
+          params={params}
           customParts={customParts}
           currentChipCode={currentChipCode}
           onDrawChip={chipDisplayCallback}

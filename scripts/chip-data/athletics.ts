@@ -1,7 +1,7 @@
-import { Chip } from './interface';
+import { NativeChip } from './interface';
 import { dossunsun_pattern, emptyblock_pattern } from './patterns';
 
-export const athleticTable: Record<string, Chip> = {
+export const athleticTable: Record<string, NativeChip> = {
   '1': {
     pattern: [
       50,
