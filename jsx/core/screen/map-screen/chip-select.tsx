@@ -80,13 +80,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       customParts: { customParts },
       images,
     } = this.props;
-    const {
-      cursor,
-      chipselect_width,
-      chipselect_height,
-      chipselect_scroll,
-      screen,
-    } = edit;
+    const { cursor, chipselect_width, chipselect_scroll, screen } = edit;
     // var w= screen==="layer" ? 16 : 8;
     // const ks = advanced ? chip.advancedChipList : chip.chipList;
     // var h= screen==="layer" ? Math.ceil(256/w) : Math.ceil(ks.length/w);
@@ -133,7 +127,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
           cursorColor={cursorColor}
           cursorPosition={cursorPosition}
           chipsWidth={chipselect_width}
-          chipsHeight={chipselect_height}
           scrollY={chipselect_scroll}
           onFocusChange={this.handleFocusChange}
           onScroll={this.handleScroll}

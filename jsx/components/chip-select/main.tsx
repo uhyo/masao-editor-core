@@ -52,10 +52,6 @@ export interface IPropChipListMain {
    */
   chipsWidth: number;
   /**
-   * Height of chip select area (in number of chips).
-   */
-  chipsHeight: number;
-  /**
    * Y-axis scroll position of the area.
    */
   scrollY: number;
@@ -120,12 +116,14 @@ export class ChipListMain extends React.PureComponent<
   }
   public render() {
     const {
-      props: { className, chipNumber, chipsWidth, chipsHeight, scrollY },
+      props: { className, chipNumber, chipsWidth, scrollY },
       state: { areaHeight },
     } = this;
 
     const canvasWidth = chipsWidth * 32;
-    const canvasHeight = chipsHeight * 32;
+    const canvasHeight = Math.ceil(areaHeight);
+    // チップ表示可能な列数を求める
+    const chipsHeight = Math.ceil(areaHeight / 32);
     // 中途半端な表示領域のために1段余裕を持たせる
     const allh = Math.ceil(chipNumber / chipsWidth) + 1;
     // スクロール可能な領域の大きさ
@@ -225,16 +223,17 @@ export class ChipListMain extends React.PureComponent<
   public componentDidMount() {
     this.draw('redraw');
   }
-  public componentDidUpdate(prevProps: IPropChipListMain) {
+  public componentDidUpdate(
+    prevProps: IPropChipListMain,
+    prevState: IStateChipListMain,
+  ) {
     if (
-      propChanged(prevProps, this.props, [
-        'images',
-        'chipNumber',
-        'chipsWidth',
-        'chipsHeight',
-        'scrollY',
-        'onDrawChip',
-      ])
+      propChanged(
+        prevProps,
+        this.props,
+        ['images', 'chipNumber', 'chipsWidth', 'scrollY', 'onDrawChip'],
+      ) ||
+      prevState.areaHeight !== this.state.areaHeight
     ) {
       // Some of information required to render chips is changed.
       this.draw('redraw');

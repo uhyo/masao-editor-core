@@ -37,7 +37,6 @@ export function CustomPartsScreen({
         cursorColor={cursorColor}
         cursorPosition={null}
         chipsWidth={chipselect_width}
-        chipsHeight={10}
         scrollY={0}
         onChipSelect={() => {}}
         onDrawChip={_code => {}}

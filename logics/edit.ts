@@ -536,7 +536,6 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
     view_width,
     view_height,
     chipselect_width,
-    chipselect_height,
     chipselect_scroll,
     tool,
   } = edit;
@@ -593,9 +592,12 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
 
     const idy = Math.floor(id2 / chipselect_width);
 
+    // height of chip list.
+    const chipselectHeight = Math.ceil(chipLength() / chipselect_width);
+
     const c_sc = Math.min(
       idy,
-      Math.max(chipselect_scroll, idy - chipselect_height + 1),
+      Math.max(chipselect_scroll, idy - chipselectHeight + 1),
     );
     if (c_sc !== chipselect_scroll) {
       editActions.changeChipselectScroll({
