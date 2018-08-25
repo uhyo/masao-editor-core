@@ -83,18 +83,7 @@ export interface ChipselectCursor {
   type: 'chipselect';
   id: number;
 }
-/**
- * Cursor on the custom chip editor.
- */
-export interface CustomPartsCursor {
-  type: 'customparts';
-  /**
-   * index of custom chips.
-   */
-  index: number;
-}
-
-export type CursorState = MainCursor | ChipselectCursor | CustomPartsCursor;
+export type CursorState = MainCursor | ChipselectCursor;
 
 export interface ChangeScreenAction {
   screen: Screen;

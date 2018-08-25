@@ -11,3 +11,19 @@ export interface LoadCustomPartsAction {
  * Action of loading custom parts definitions.
  */
 export const loadCustomParts = createAction<LoadCustomPartsAction>();
+
+/**
+ * Action of setting cursor position.
+ */
+export interface SetCursorAction {
+  cursor: number | null;
+}
+export const setCursor = createAction<SetCursorAction>();
+
+/**
+ * Action of setting current
+ */
+export interface SetCurrentChipAction {
+  chipIndex: number | null;
+}
+export const setCurrentChip = createAction<SetCurrentChipAction>();

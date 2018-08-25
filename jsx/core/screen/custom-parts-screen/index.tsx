@@ -14,6 +14,7 @@ import { customPartsList } from '../../../../logics/edit';
 import { ChipRenderer } from '../../../components/chip-select/main';
 
 import * as editActions from '../../../../actions/edit';
+import * as customPartsActions from '../../../../actions/custom-parts';
 
 export interface IPropCustomPartsScreen {
   images: Images;
@@ -26,16 +27,13 @@ export function CustomPartsScreen({
   images,
   params,
   edit,
-  customParts: { customParts },
+  customParts: { customParts, cursorPosition },
 }: IPropCustomPartsScreen) {
-  const { chipselect_width, cursor } = edit;
+  const { chipselect_width } = edit;
   const chips = customPartsList(customParts);
   const stageBackColorObject = stageBackColor(params, edit);
   const backgroundColor = cssColor(stageBackColorObject);
   const cursorColor = cssColor(complementColor(stageBackColorObject));
-  // cursor on chip selector.
-  const chipPosition =
-    cursor != null && cursor.type === 'customparts' ? cursor.index : null;
 
   // function to draw a chip.
   const drawChipCallback: ChipRenderer<number> = (
@@ -48,6 +46,9 @@ export function CustomPartsScreen({
     const chips = customPartsList(customParts);
     drawChip(ctx, images, params, customParts, chips[chipIndex], x, y, false);
   };
+  // function to update selection of chip.
+  const chipSelectCallback = (chipIndex: number) =>
+    customPartsActions.setCurrentChip({ chipIndex });
   return (
     <ScreenMainWrapper className={styles.wrapper}>
       <ChipList
@@ -56,10 +57,10 @@ export function CustomPartsScreen({
         chipNumber={chips.length}
         backgroundColor={backgroundColor}
         cursorColor={cursorColor}
-        cursorPosition={chipPosition}
+        cursorPosition={cursorPosition}
         chipsWidth={chipselect_width}
         scrollY={0}
-        onChipSelect={() => {}}
+        onChipSelect={chipSelectCallback}
         onDrawChip={drawChipCallback}
         onResize={width => {
           editActions.changeChipselectSize({ width });

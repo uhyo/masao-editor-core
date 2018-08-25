@@ -3,6 +3,7 @@ import editStore from '../../stores/edit';
 import { runMapCommand } from './map-screen';
 import { Command, ExternalCommand, commandNames } from './def';
 import { runExternalCommand } from './external';
+import { runCustomPartsCommand } from './custom-parts';
 
 export { Command, ExternalCommand, commandNames };
 
@@ -18,9 +19,11 @@ export function run(command: Command, keydown: boolean): boolean {
     }
   }
   const { screen } = editStore.state;
-  if (screen !== 'map' && screen !== 'layer') {
-    // 今のところマップ画面のみ
-    return false;
+  if (screen === 'map' || screen === 'layer') {
+    // マップ画面のコマンド
+    return runMapCommand(command, keydown);
+  } else if (screen === 'custom-parts') {
+    return runCustomPartsCommand(command, keydown);
   }
-  return runMapCommand(command, keydown);
+  return false;
 }

@@ -7,6 +7,14 @@ export interface CustomPartsState {
    * カスタムパーツの一覧
    */
   customParts: CustomPartsData;
+  /**
+   * 現在選択されているカスタムパーツ
+   */
+  currentChip: number | null;
+  /**
+   * カスタムパーツ選択画面のカーソルの位置
+   */
+  cursorPosition: number | null;
 }
 
 export class CustomPartsStore extends Store<CustomPartsState> {
@@ -15,6 +23,8 @@ export class CustomPartsStore extends Store<CustomPartsState> {
     this.listenables = [customPartsActions];
     this.state = {
       customParts: {},
+      currentChip: null,
+      cursorPosition: null,
     };
   }
   /**
@@ -23,9 +33,26 @@ export class CustomPartsStore extends Store<CustomPartsState> {
   public onLoadCustomParts({
     customParts,
   }: customPartsActions.LoadCustomPartsAction) {
+    // 選択済みチップを更新
+    const newCurrentChip = Object.keys(customParts).length > 0 ? 0 : null;
     this.setState({
       customParts,
+      currentChip: newCurrentChip,
     });
+  }
+  /**
+   * カーソルの位置をセット
+   */
+  public onSetCursor({ cursor }: customPartsActions.SetCursorAction) {
+    this.setState({ cursorPosition: cursor });
+  }
+  /**
+   * 現在のチップを選択
+   */
+  public onSetCurrentChip({
+    chipIndex,
+  }: customPartsActions.SetCurrentChipAction) {
+    this.setState({ currentChip: chipIndex });
   }
 }
 
