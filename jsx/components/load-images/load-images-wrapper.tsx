@@ -4,7 +4,10 @@ import { IntoImages } from './into-images';
 
 type WrappedProps<P extends object, K extends keyof P> = object &
   Pick<P, Exclude<keyof P, K>> &
-  { [K2 in K]: IntoImages<P[K2]> };
+  {
+    [K2 in K]: /* P[K2] should accept null. */
+    null extends P[K2] ? IntoImages<Exclude<P[K2], null>> : never
+  };
 /**
  * Convert component which takes image object into one which takes image urls.
  */
