@@ -1,5 +1,4 @@
 import * as React from 'react';
-import memoizeOne from 'memoize-one';
 
 import * as chip from '../../../../scripts/chip';
 import * as util from '../../../../scripts/util';
@@ -60,19 +59,13 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   private chipNumber() {
     const {
       edit: { screen },
-      customParts: { customParts },
-      advanced,
     } = this.props;
     if (screen === 'layer') {
       return 256;
     } else {
-      return this.getCurrentChipList(advanced, customParts).length;
+      return editLogics.chipNumber();
     }
   }
-  /**
-   * Memoized function to get current list of current chip list.
-   */
-  private getCurrentChipList = memoizeOne(getCurrentChipList);
   render() {
     const {
       params,
@@ -165,8 +158,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
   protected handleChipSelect(chipIndex: number) {
     const {
       edit: { screen },
-      advanced,
-      customParts: { customParts },
     } = this.props;
 
     if (screen === 'layer') {
@@ -175,7 +166,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       });
     } else {
       editActions.changePen({
-        pen: this.getCurrentChipList(advanced, customParts)[chipIndex],
+        pen: editLogics.chipList()[chipIndex],
       });
     }
   }
@@ -197,11 +188,10 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     chipIndex: number,
   ): void {
     const {
-      advanced,
       params,
       customParts: { customParts },
     } = this.props;
-    const chipList = this.getCurrentChipList(advanced, customParts);
+    const chipList = editLogics.chipList();
     chip.drawChip(
       ctx,
       images,
@@ -266,19 +256,5 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       return;
     }
     this.drawMapchipChip(ctx, images, x, y, chipCode);
-  }
-}
-
-/**
- * Get currently available chips.
- */
-function getCurrentChipList(
-  advanced: boolean,
-  customParts: CustomPartsState['customParts'],
-): chip.ChipCode[] {
-  if (advanced) {
-    return chip.advancedChipList.concat(Object.keys(customParts));
-  } else {
-    return chip.chipList;
   }
 }

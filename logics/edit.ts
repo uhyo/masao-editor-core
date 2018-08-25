@@ -7,6 +7,7 @@ import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
 import editStore from '../stores/edit';
 import mapStore from '../stores/map';
+import customPartsStore from '../stores/custom-parts';
 import commandStore from '../stores/command';
 import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
@@ -580,7 +581,7 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
 
     const id2 = Math.max(
       0,
-      Math.min(id + x + y * chipselect_width, chipLength() - 1),
+      Math.min(id + x + y * chipselect_width, chipNumber() - 1),
     );
 
     editActions.setCursor({
@@ -593,7 +594,7 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
     const idy = Math.floor(id2 / chipselect_width);
 
     // height of chip list.
-    const chipselectHeight = Math.ceil(chipLength() / chipselect_width);
+    const chipselectHeight = Math.ceil(chipNumber() / chipselect_width);
 
     const c_sc = Math.min(
       idy,
@@ -713,12 +714,23 @@ export function cursorButton(keydown: boolean) {
   }
 }
 
-export function chipList() {
+/**
+ * Return the list of currently available chips.
+ */
+export function chipList(): ChipCode[] {
   const { advanced } = mapStore.state;
+  const { customParts } = customPartsStore.state;
 
-  return advanced ? chip.advancedChipList : chip.chipList;
+  if (advanced) {
+    return chip.advancedChipList.concat(Object.keys(customParts));
+  } else {
+    return chip.chipList;
+  }
 }
-// チップの数
-export function chipLength(): number {
+
+/**
+ * Return the number of currently avaiable chips.
+ */
+export function chipNumber(): number {
   return chipList().length;
 }
