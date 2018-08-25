@@ -12,8 +12,9 @@ export interface IPropChipDisplayMain {
   images: IntoImages<Images> | null;
   /**
    * ID of chip.
+   * When null, do not render chip.
    */
-  chipId: ChipCode;
+  chipId: ChipCode | null;
   /**
    * Renderer of chip.
    */
@@ -52,7 +53,7 @@ export class ChipDisplayMain extends React.Component<IPropChipDisplayMain, {}> {
     }
     const { onDrawChip, images, chipId } = this.props;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (images == null) {
+    if (images == null || chipId == null) {
       return;
     }
     onDrawChip(ctx, images, 32, 0, chipId);
