@@ -25,10 +25,6 @@ import commandStore from '../../stores/command';
 import updateStore from '../../stores/update';
 
 import ScreenSelect from './screen-select';
-import { MapScreen } from './screen/map-screen';
-import { ParamScreen } from './screen/param-screen';
-import { ProjectScreen } from './screen/project-screen';
-import { JsScreen } from './screen/js-screen';
 
 import Button from './util/button';
 import { Toolbar } from './util/toolbar';
@@ -38,6 +34,7 @@ import './theme/color.css';
 import * as styles from './css/index.css';
 import memoizeOne from 'memoize-one';
 import { Images } from '../../defs/images';
+import { ScreenRouter } from './screen-router';
 
 export interface IDefnMasaoEditorCore {
   map: MapState;
@@ -229,10 +226,10 @@ export default class MasaoEditorCore extends RefluxComponent<
       props: {
         filename_pattern,
         filename_mapchip,
-        jsWarning,
+        jsWarning = false,
         externalCommands,
-        'fit-y': fity,
-        keyDisabled,
+        'fit-y': fity = false,
+        keyDisabled = false,
       },
       state: { map, params, edit, customParts, project, history },
     } = this;
@@ -240,30 +237,6 @@ export default class MasaoEditorCore extends RefluxComponent<
 
     const images = makeImages(filename_pattern, filename_mapchip, chips);
 
-    let screen = null;
-    if (edit.screen === 'map' || edit.screen === 'layer') {
-      screen = (
-        <MapScreen
-          images={images}
-          map={map}
-          params={params}
-          edit={edit}
-          customParts={customParts}
-          project={project}
-          history={history}
-          fit-y={fity}
-          keyDisabled={!!keyDisabled}
-        />
-      );
-    } else if (edit.screen === 'params') {
-      screen = <ParamScreen params={params} edit={edit} project={project} />;
-    } else if (edit.screen === 'project') {
-      screen = <ProjectScreen project={project} map={map} edit={edit} />;
-    } else if (edit.screen === 'js') {
-      screen = (
-        <JsScreen jsWarning={!!jsWarning} edit={edit} project={project} />
-      );
-    }
     let external_buttons = null;
     if (externalCommands != null) {
       external_buttons = externalCommands.map(com => {
@@ -294,7 +267,18 @@ export default class MasaoEditorCore extends RefluxComponent<
           </div>
         </Toolbar>
         <div className={fity ? styles.screenWrapperFit : undefined}>
-          {screen}
+          <ScreenRouter
+            images={images}
+            edit={edit}
+            map={map}
+            params={params}
+            project={project}
+            history={history}
+            customParts={customParts}
+            fit-y={fity}
+            keyDisabled={keyDisabled}
+            jsWarning={jsWarning}
+          />
         </div>
       </div>
     );
