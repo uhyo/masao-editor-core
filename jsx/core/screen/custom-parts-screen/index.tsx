@@ -8,6 +8,8 @@ import {
   complementColor,
 } from '../../../../scripts/util';
 import { Images } from '../../../../defs/images';
+import { ScreenMainWrapper } from '../../../components/screen/screen-main';
+import * as styles from '../../css/screen/custom-parts-screen.css';
 
 export interface IPropCustomPartsScreen {
   images: Images;
@@ -28,9 +30,9 @@ export function CustomPartsScreen({
   const backgroundColor = cssColor(stageBackColorObject);
   const cursorColor = cssColor(complementColor(stageBackColorObject));
   return (
-    <>
-      <p>かすたむぱ〜つ</p>
+    <ScreenMainWrapper>
       <ChipList
+        className={styles.chiplist}
         images={images}
         chipNumber={chips.length}
         backgroundColor={backgroundColor}
@@ -41,7 +43,7 @@ export function CustomPartsScreen({
         onChipSelect={() => {}}
         onDrawChip={_code => {}}
       />
-    </>
+    </ScreenMainWrapper>
   );
 }
 

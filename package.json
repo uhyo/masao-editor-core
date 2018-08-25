@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/uhyo/masao-editor",
   "devDependencies": {
+    "autoprefixer": "^9.1.3",
     "css-loader": "^0.28.11",
     "del": "^3.0.0",
     "extract-text-webpack-plugin": "^3.0.2",
