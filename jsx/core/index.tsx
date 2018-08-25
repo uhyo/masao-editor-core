@@ -36,6 +36,8 @@ import { Toolbar } from './util/toolbar';
 import './css/init.css';
 import './theme/color.css';
 import * as styles from './css/index.css';
+import memoizeOne from 'memoize-one';
+import { Images } from '../../defs/images';
 
 export interface IDefnMasaoEditorCore {
   map: MapState;
@@ -236,13 +238,13 @@ export default class MasaoEditorCore extends RefluxComponent<
     } = this;
     const chips: string = require('../../images/chips.png');
 
+    const images = makeImages(filename_pattern, filename_mapchip, chips);
+
     let screen = null;
     if (edit.screen === 'map' || edit.screen === 'layer') {
       screen = (
         <MapScreen
-          pattern={filename_pattern}
-          mapchip={filename_mapchip}
-          chips={chips}
+          images={images}
           map={map}
           params={params}
           edit={edit}
@@ -383,3 +385,14 @@ export default class MasaoEditorCore extends RefluxComponent<
   static paramStore: ParamsStore = paramStore;
   static editStore: EditStore = editStore;
 }
+
+/**
+ * Memoized function to make an images object.
+ */
+const makeImages = memoizeOne(
+  (pattern: string, mapchip: string, chips: string): Images => ({
+    pattern,
+    mapchip,
+    chips,
+  }),
+);

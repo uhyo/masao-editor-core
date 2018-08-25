@@ -18,12 +18,13 @@ import KeyEvent from './key-event';
 import * as styles from '../../css/screen/map-screen.css';
 
 import { Toolbar } from '../../util/toolbar';
+import { Images } from '../../../../defs/images';
 
 export interface IPropMapScreen {
-  // 画像
-  pattern: string;
-  mapchip: string;
-  chips: string;
+  /**
+   * Images used in this screen.
+   */
+  images: Images;
 
   'fit-y'?: boolean;
   /**
@@ -50,9 +51,7 @@ export const MapScreen = (props: IPropMapScreen) => {
     project,
     history,
 
-    pattern,
-    mapchip,
-    chips,
+    images,
     'fit-y': fity,
     keyDisabled,
   } = props;
@@ -93,9 +92,7 @@ export const MapScreen = (props: IPropMapScreen) => {
         <div className={styles.cmWrapper}>
           <div className={styles.chipselectWrapper}>
             <ChipSelect
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
+              images={images}
               params={params}
               edit={edit}
               customParts={customParts}
@@ -105,9 +102,7 @@ export const MapScreen = (props: IPropMapScreen) => {
           </div>
           <div className={styles.mainmapWrapper}>
             <MapEdit
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
+              images={images}
               stage={stage}
               lastUpdate={lastUpdate}
               params={params}

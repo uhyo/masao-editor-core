@@ -23,9 +23,7 @@ import { ChipDisplay } from '../../../components/chip-display';
 
 export interface IPropChipSelect {
   // 画像ファイル
-  pattern: string;
-  mapchip: string;
-  chips: string;
+  images: Images;
 
   // advanced-mapか
   advanced: boolean;
@@ -44,18 +42,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
     this.drawMapchipChip = this.drawMapchipChip.bind(this);
     this.drawMainChipFromCode = this.drawMainChipFromCode.bind(this);
     this.drawMapchipChipFromCode = this.drawMapchipChipFromCode.bind(this);
-
-    this.getImagesObject = memoizeOne(this.getImagesObject);
-  }
-  /**
-   * Function to pack image urls into an object.
-   */
-  private getImagesObject(pattern: string, mapchip: string, chips: string) {
-    return {
-      pattern,
-      mapchip,
-      chips,
-    };
   }
   /**
    * Function to generate cursor position from CursorState.
@@ -92,9 +78,7 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       params,
       edit,
       customParts: { customParts },
-      pattern,
-      mapchip,
-      chips,
+      images,
     } = this.props;
     const {
       cursor,
@@ -122,8 +106,6 @@ export default class ChipSelect extends React.Component<IPropChipSelect, {}> {
       }
     }
 
-    // 画像URLのセット
-    const images = this.getImagesObject(pattern, mapchip, chips);
     // 描画するチップのリスト
     const chipNumber = this.chipNumber();
     // 色
