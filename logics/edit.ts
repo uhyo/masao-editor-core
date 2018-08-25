@@ -12,6 +12,7 @@ import commandStore from '../stores/command';
 import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
 import { CustomPartsData } from '../defs/map';
+import { customPartsList } from '../scripts/custom-parts';
 
 export type FocusPlace = editActions.FocusPlace;
 type Screen = editActions.Screen;
@@ -739,13 +740,6 @@ export function chipList(
   } else {
     return chip.chipList;
   }
-}
-
-/**
- * Return the list of custom parts codes.
- */
-export function customPartsList(customParts: CustomPartsData): ChipCode[] {
-  return Object.keys(customParts);
 }
 
 /**

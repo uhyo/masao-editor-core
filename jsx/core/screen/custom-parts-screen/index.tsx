@@ -10,12 +10,12 @@ import {
 import { Images } from '../../../../defs/images';
 import { ScreenMainWrapper } from '../../../components/screen/screen-main';
 import * as styles from '../../css/screen/custom-parts-screen.css';
-import { customPartsList } from '../../../../logics/edit';
 import { ChipRenderer } from '../../../components/chip-select/main';
 
 import * as editActions from '../../../../actions/edit';
 import * as customPartsActions from '../../../../actions/custom-parts';
 import { ChipInformation } from './chip-information';
+import { customPartsList } from '../../../../scripts/custom-parts';
 
 export interface IPropCustomPartsScreen {
   images: Images;

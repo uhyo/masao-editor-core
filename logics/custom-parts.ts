@@ -2,6 +2,7 @@ import * as customPartsActions from '../actions/custom-parts';
 import editStore from '../stores/edit';
 import customPartsStore from '../stores/custom-parts';
 import { inRange } from '../scripts/util/in-range';
+import { customPartsList } from '../scripts/custom-parts';
 
 /**
  * カスタムパーツ選択のカーソルを移動させる
@@ -42,7 +43,7 @@ export function cursorButton(): void {
   if (cursorPosition == null) {
     return;
   }
-  const chipCode = Object.keys(customParts)[cursorPosition];
+  const chipCode = customPartsList(customParts)[cursorPosition];
   if ('string' !== typeof chipCode) {
     // invalid selection.
     return;
