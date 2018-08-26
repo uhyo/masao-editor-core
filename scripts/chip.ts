@@ -279,9 +279,9 @@ export function chipFor(
     const nativeCode = getNativeCode(customParts, chip);
     const c = nativeCode != null ? lookupChip(params, nativeCode) : null;
     if (c != null) {
-      const { pattern, nativeName, nativeCode } = c;
-      // カスタムパーツのサインをpatternに追加
+      const { pattern, category, nativeName, nativeCode } = c;
       return {
+        // カスタムパーツのサインをpatternに追加
         pattern: addRendering(pattern, {
           color: color || '#000000',
           x: 0,
@@ -290,6 +290,7 @@ export function chipFor(
           height: 5,
         }),
         name: name != null ? name : '不明',
+        category,
         nativeName,
         nativeCode,
       };
