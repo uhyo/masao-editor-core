@@ -1,7 +1,7 @@
 import { Chip } from '../../../../scripts/chip-data/interface';
 import { ChipRenderer } from '../../../components/chip-select/main';
 import { ChipCode, drawChip } from '../../../../scripts/chip';
-import * as customPartsActions from '../../../../actions/custom-parts';
+import * as customPartsLogics from '../../../../logics/custom-parts';
 import { ParamsState, CustomPartsState } from '../../../../stores';
 import { ChipInformation } from './chip-information';
 import * as React from 'react';
@@ -43,7 +43,7 @@ export function CustomChipMain({
   ) => drawChip(ctx, images, params, customParts, code, x, y, false);
 
   const nameChangeCallback = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    customPartsActions.setCustomChipName({
+    customPartsLogics.setCustomChipName({
       chipCode: currentChipCode,
       name: e.currentTarget.value,
     });
@@ -76,7 +76,7 @@ export function CustomChipMain({
               const propertyInfo = cpProperties[key];
               const value = currentProperties[key];
               const onChange = (value: unknown) => {
-                customPartsActions.setCustomPropertyValue({
+                customPartsLogics.setCustomPropertyValue({
                   chipCode: currentChipCode,
                   propertyName: key,
                   value,

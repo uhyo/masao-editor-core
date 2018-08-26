@@ -3,6 +3,7 @@ import editStore from '../stores/edit';
 import customPartsStore from '../stores/custom-parts';
 import { inRange } from '../scripts/util/in-range';
 import { customPartsList } from '../scripts/custom-parts';
+import updateStore from '../stores/update';
 
 /**
  * カスタムパーツ選択のカーソルを移動させる
@@ -49,4 +50,24 @@ export function cursorButton(): void {
     return;
   }
   customPartsActions.setCurrentChip({ chipIndex: cursorPosition });
+}
+
+/**
+ * カスタムパーツの名前をアップデート
+ */
+export function setCustomChipName(
+  arg: customPartsActions.SetCustomChipNameAction,
+): void {
+  customPartsActions.setCustomChipName(arg);
+  updateStore.update();
+}
+
+/**
+ * カスタムパーツのプロパティをアップデート
+ */
+export function setCustomPropertyValue(
+  arg: customPartsActions.SetCustomPropertyValueAction,
+): void {
+  customPartsActions.setCustomPropertyValue(arg);
+  updateStore.update();
 }
