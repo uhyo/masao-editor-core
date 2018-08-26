@@ -225,17 +225,19 @@ export class ChipListMain extends React.PureComponent<
         this.renderingScheduler = null;
       }
       // 時間かかりそうなのでとりあえず直前の状態で塗っとく
-      ctx.drawImage(
-        backLayer,
-        0,
-        scrollY * 32,
-        targetWidth,
-        targetHeight,
-        0,
-        0,
-        targetWidth,
-        targetHeight,
-      );
+      if (backLayer.width !== 0 && backLayer.height !== 0) {
+        ctx.drawImage(
+          backLayer,
+          0,
+          scrollY * 32,
+          targetWidth,
+          targetHeight,
+          0,
+          0,
+          targetWidth,
+          targetHeight,
+        );
+      }
     }
     // バックグランドの描画
     const backRendering =
@@ -249,17 +251,19 @@ export class ChipListMain extends React.PureComponent<
       // render chip set to main canvas.
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, targetWidth, targetHeight);
-      ctx.drawImage(
-        backLayer,
-        0,
-        scrollY * 32,
-        targetWidth,
-        targetHeight,
-        0,
-        0,
-        targetWidth,
-        targetHeight,
-      );
+      if (backLayer.width !== 0 && backLayer.height !== 0) {
+        ctx.drawImage(
+          backLayer,
+          0,
+          scrollY * 32,
+          targetWidth,
+          targetHeight,
+          0,
+          0,
+          targetWidth,
+          targetHeight,
+        );
+      }
       // draw cursor.
       if (cursorPosition != null) {
         const cursorX = cursorPosition % chipsWidth;
