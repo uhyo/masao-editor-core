@@ -212,6 +212,11 @@ export class ChipListMain extends React.PureComponent<
     if (ctx == null) {
       return;
     }
+    const targetWidth = mainCanvas.width;
+    const targetHeight = mainCanvas.height;
+    // 背景色をすぐ塗る
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
     if (mode === 'redraw') {
       // チップセットの書き換えが必要
       if (this.renderingScheduler != null) {
@@ -219,12 +224,19 @@ export class ChipListMain extends React.PureComponent<
         this.renderingScheduler.terminate();
         this.renderingScheduler = null;
       }
+      // 時間かかりそうなのでとりあえず直前の状態で塗っとく
+      ctx.drawImage(
+        backLayer,
+        0,
+        scrollY * 32,
+        targetWidth,
+        targetHeight,
+        0,
+        0,
+        targetWidth,
+        targetHeight,
+      );
     }
-    const targetWidth = mainCanvas.width;
-    const targetHeight = mainCanvas.height;
-    // とりあえず背景色は塗る
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, targetWidth, targetHeight);
     // バックグランドの描画
     const backRendering =
       mode === 'redraw' ? this.makeBackLayerTask() : Promise.resolve(true);
@@ -235,6 +247,8 @@ export class ChipListMain extends React.PureComponent<
       }
       // backlayer rendering is complete.
       // render chip set to main canvas.
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
       ctx.drawImage(
         backLayer,
         0,
