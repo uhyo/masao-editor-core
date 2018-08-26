@@ -61,13 +61,33 @@ export class CustomPartsStore extends Store<CustomPartsState> {
     chipCode,
     name,
   }: customPartsActions.SetCustomChipNameAction) {
-    // TODO
     this.setState({
       customParts: {
         ...this.state.customParts,
         [chipCode]: {
           ...this.state.customParts[chipCode]!,
           name,
+        },
+      },
+    });
+  }
+  /**
+   * カスタムパーツのプロパティを設定
+   */
+  public onSetCustomPropertyValue({
+    chipCode,
+    propertyName,
+    value,
+  }: customPartsActions.SetCustomPropertyValueAction) {
+    this.setState({
+      customParts: {
+        ...this.state.customParts,
+        [chipCode]: {
+          ...this.state.customParts[chipCode]!,
+          properties: {
+            ...this.state.customParts[chipCode]!.properties,
+            [propertyName]: value,
+          },
         },
       },
     });

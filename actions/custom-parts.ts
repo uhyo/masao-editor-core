@@ -36,3 +36,15 @@ export interface SetCustomChipNameAction {
   name: string;
 }
 export const setCustomChipName = createAction<SetCustomChipNameAction>();
+
+/**
+ * Set value of custom property.
+ */
+export interface SetCustomPropertyValueAction {
+  chipCode: string;
+  propertyName: string;
+  value: unknown;
+}
+export const setCustomPropertyValue = createAction<
+  SetCustomPropertyValueAction
+>();

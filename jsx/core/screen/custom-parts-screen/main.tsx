@@ -75,9 +75,20 @@ export function CustomChipMain({
             {cpPropertyKeys.map(key => {
               const propertyInfo = cpProperties[key];
               const value = currentProperties[key];
+              const onChange = (value: unknown) => {
+                customPartsActions.setCustomPropertyValue({
+                  chipCode: currentChipCode,
+                  propertyName: key,
+                  value,
+                });
+              };
               return (
                 <FormField key={key} name={propertyInfo.description}>
-                  <CustomPropertyField property={propertyInfo} value={value} />
+                  <CustomPropertyField
+                    property={propertyInfo}
+                    value={value}
+                    onChange={onChange}
+                  />
                 </FormField>
               );
             })}
