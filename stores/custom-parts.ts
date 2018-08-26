@@ -151,7 +151,7 @@ export class CustomPartsStore extends Store<CustomPartsState> {
   public onDeleteCustomParts({
     chipCode,
   }: customPartsActions.DeleteCustomPartsAction) {
-    const { customParts, cursorPosition } = this.state;
+    const { customParts, cursorPosition, currentChip } = this.state;
     const removedIndex = Object.keys(customParts).indexOf(chipCode);
     const newCursorPosition =
       cursorPosition == null
@@ -161,10 +161,13 @@ export class CustomPartsStore extends Store<CustomPartsState> {
             ? null
             : cursorPosition - 1
           : cursorPosition;
+    const newCurrentChip =
+      currentChip == null || currentChip === removedIndex ? null : currentChip;
     const { [chipCode]: _, ...rest } = this.state.customParts;
     this.setState({
       customParts: rest,
       cursorPosition: newCursorPosition,
+      currentChip: newCurrentChip,
     });
   }
 }

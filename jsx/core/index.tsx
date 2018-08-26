@@ -1,3 +1,5 @@
+// Apply Polyfill.
+import '../../scripts/polyfill/requestidlecallback';
 import * as React from 'react';
 import { autorun, IReactionDisposer } from 'mobx';
 
