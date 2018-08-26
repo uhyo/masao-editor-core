@@ -82,6 +82,9 @@ export function CustomPartsScreen({
         cursorPosition={cursorPosition}
         chipsWidth={chipselect_width}
         scrollY={0}
+        onFocusChange={focus =>
+          customPartsActions.setFocus({ focus: focus ? 'chipselect' : null })
+        }
         onChipSelect={chipSelectCallback}
         onDrawChip={drawChipCallback}
         onResize={width => {

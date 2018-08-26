@@ -12,6 +12,14 @@ export interface LoadCustomPartsAction {
  */
 export const loadCustomParts = createAction<LoadCustomPartsAction>();
 
+export interface SetFocusAction {
+  focus: 'chipselect' | null;
+}
+/**
+ * Action of setting focus.
+ */
+export const setFocus = createAction<SetFocusAction>();
+
 /**
  * Action of setting cursor position.
  */

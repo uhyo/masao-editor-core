@@ -1,5 +1,6 @@
 import { Command } from './def';
 import * as customPartsLogics from '../custom-parts';
+import customPartsStore from '../../stores/custom-parts';
 
 /**
  * カスタムパーツ画面のコマンドを実行
@@ -9,6 +10,11 @@ export function runCustomPartsCommand(
   keydown: boolean,
 ): boolean {
   if (!keydown) {
+    return false;
+  }
+  const { focus } = customPartsStore.state;
+  // カーソル系はフォーカスがあるときのみ
+  if (focus !== 'chipselect') {
     return false;
   }
   switch (command) {

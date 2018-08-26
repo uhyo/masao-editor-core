@@ -8,6 +8,10 @@ export interface CustomPartsState {
    */
   customParts: CustomPartsData;
   /**
+   * 現在カスタムパーツ選択欄がフォーカスされているか
+   */
+  focus: 'chipselect' | null;
+  /**
    * 現在選択されているカスタムパーツ
    */
   currentChip: number | null;
@@ -23,6 +27,7 @@ export class CustomPartsStore extends Store<CustomPartsState> {
     this.listenables = [customPartsActions];
     this.state = {
       customParts: {},
+      focus: null,
       currentChip: null,
       cursorPosition: null,
     };
@@ -39,6 +44,12 @@ export class CustomPartsStore extends Store<CustomPartsState> {
       customParts,
       currentChip: newCurrentChip,
     });
+  }
+  /**
+   * フォーカス状態をセット
+   */
+  public onSetFocus({ focus }: customPartsActions.SetFocusAction) {
+    this.setState({ focus });
   }
   /**
    * カーソルの位置をセット
