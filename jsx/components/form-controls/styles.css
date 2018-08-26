@@ -4,6 +4,12 @@
   flex-flow: column nowrap;
 }
 
+.text {
+  padding: 4px 0;
+  font-size: 0.9em;
+  color: #666666;
+}
+
 .field {
   label {
     display: block;

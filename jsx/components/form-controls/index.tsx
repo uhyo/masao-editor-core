@@ -10,6 +10,13 @@ export const FormControls: React.StatelessComponent<{}> = ({ children }) => {
 };
 
 /**
+ * Text between controls.
+ */
+export const FormText: React.StatelessComponent<{}> = ({ children }) => {
+  return <div className={styles.text}>{children}</div>;
+};
+
+/**
  * Wrapper of one form control.
  */
 export const FormField: React.StatelessComponent<{

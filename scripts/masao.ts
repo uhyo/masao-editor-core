@@ -1,8 +1,12 @@
-import { param, format } from 'masao';
+import { param, format, customParts } from 'masao';
 
 export { param, format };
+export const customPartsProperties = customParts.customPartsProperties;
 export type MasaoJSONFormat = format.MasaoJSONFormat;
 export type AdvancedMap = format.AdvancedMap;
+export type CustomPartsProperty = customParts.CustomPartsProperty;
+export type CustomPartsPropertySet = customParts.CustomPartsPropertySet;
+export type IntegerProperty = customParts.IntegerProperty;
 
 /**
  * default field name of editor-specific data.

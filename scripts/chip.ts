@@ -13,7 +13,7 @@ import { athleticTable } from './chip-data/athletics';
 import { enemyTable } from './chip-data/enemies';
 
 import { CustomPartsData } from '../defs/map';
-import { getCustomChipName } from './custom-parts';
+import { getCustomChipName, getNativeCode } from './custom-parts';
 import { chipTable } from './chip-data/regular';
 /**
  * Code of chip.
@@ -261,8 +261,9 @@ export function chipFor(
     // custom parts.
     // get name of custom parts.
     const name = getCustomChipName(customParts, chip);
-    // get chip and override name.
-    const c = lookupChip(params, customParts, chip);
+    // get native chip code.
+    const nativeCode = getNativeCode(customParts, chip);
+    const c = nativeCode != null ? lookupChip(params, nativeCode) : null;
     if (c != null) {
       const { pattern, nativeName, nativeCode } = c;
       return {
@@ -284,7 +285,7 @@ export function chipFor(
   }
   // it's native.
   return (
-    lookupChip(params, customParts, chip) || {
+    lookupChip(params, chip) || {
       pattern: unknown_pattern,
       name: '不明',
       nativeName: '不明',
@@ -294,30 +295,9 @@ export function chipFor(
 }
 
 /**
- * Look up native chip definition, recursing for custom chips.
+ * Look up native chip definition.
  */
-function lookupChip(
-  params: Record<string, string>,
-  customParts: CustomPartsData,
-  chip: ChipCode,
-  // flags to prevent infinite loops.
-  visitedFlag: Record<string, boolean | undefined> = {},
-): Chip | null {
-  if ('string' === typeof chip) {
-    if (visitedFlag[chip]) {
-      // Infinite loop
-      return null;
-    }
-    visitedFlag[chip] = true;
-    const ccp = customParts[chip];
-    if (ccp == null) {
-      // This chip is undefined.
-      return null;
-    }
-    // Refer to its parent.
-    return lookupChip(params, customParts, ccp.extends, visitedFlag);
-  }
-  // otherwise, do normal process for native chip.
+function lookupChip(params: Record<string, string>, chip: number): Chip | null {
   let pa = athleticTypeParam[chip];
   if (pa != null && params[pa] !== '1') {
     //変わったアスレチックだ

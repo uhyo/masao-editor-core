@@ -6,7 +6,13 @@ import { ParamsState, CustomPartsState } from '../../../../stores';
 import { ChipInformation } from './chip-information';
 import * as React from 'react';
 import { Images } from '../../../../defs/images';
-import { FormControls, FormField } from '../../../components/form-controls';
+import {
+  FormControls,
+  FormField,
+  FormText,
+} from '../../../components/form-controls';
+import { getCustomProperties } from '../../../../scripts/custom-parts';
+import { CustomPropertyField } from './field';
 
 export interface IPropCustomChipMain {
   images: Images;
@@ -22,6 +28,12 @@ export function CustomChipMain({
   currentChipCode,
   chipDef,
 }: IPropCustomChipMain) {
+  // list of custom parts properties.
+  const cpProperties = getCustomProperties(customParts, currentChipCode);
+  const cpPropertyKeys = Object.keys(cpProperties);
+  // current properties.
+  const currentData = customParts[currentChipCode];
+  const currentProperties = currentData != null ? currentData.properties : {};
   const chipDisplayCallback: ChipRenderer<ChipCode> = (
     ctx,
     images,
@@ -47,6 +59,7 @@ export function CustomChipMain({
         />
       ) : null}
       <FormControls>
+        <FormText>基本情報</FormText>
         <FormField name="カスタムパーツ名">
           <input
             type="text"
@@ -54,6 +67,22 @@ export function CustomChipMain({
             onChange={nameChangeCallback}
           />
         </FormField>
+        {cpPropertyKeys.length === 0 ? (
+          <FormText>このパーツのカスタム設定はありません。</FormText>
+        ) : (
+          <>
+            <FormText>カスタム設定</FormText>
+            {cpPropertyKeys.map(key => {
+              const propertyInfo = cpProperties[key];
+              const value = currentProperties[key];
+              return (
+                <FormField key={key} name={propertyInfo.description}>
+                  <CustomPropertyField property={propertyInfo} value={value} />
+                </FormField>
+              );
+            })}
+          </>
+        )}
       </FormControls>
     </>
   );

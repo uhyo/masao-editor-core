@@ -16,3 +16,8 @@
 .chip-description {
   flex: auto 1 1;
 }
+
+/* style of input which displays default value. */
+.input-default {
+  color: #777777;
+}
