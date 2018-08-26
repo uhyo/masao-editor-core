@@ -5,15 +5,20 @@ import {
   MainChipRendering,
   SubChipRendering,
   Chip,
+  ColorRendering,
 } from './chip-data/interface';
 
-import { unknown_pattern } from './chip-data/patterns';
+import { unknown_pattern, addRendering } from './chip-data/patterns';
 
 import { athleticTable } from './chip-data/athletics';
 import { enemyTable } from './chip-data/enemies';
 
 import { CustomPartsData } from '../defs/map';
-import { getCustomChipName, getNativeCode } from './custom-parts';
+import {
+  getCustomChipName,
+  getNativeCode,
+  getCustomChipColor,
+} from './custom-parts';
 import { chipTable } from './chip-data/regular';
 /**
  * Code of chip.
@@ -181,6 +186,11 @@ export function drawChip(
         width,
         height,
       );
+    } else if ((pi as ColorRendering).color != null) {
+      // pi is a ColorRendering.
+      pi = pi as ColorRendering;
+      ctx.fillStyle = pi.color;
+      ctx.fillRect(x + pi.x, y + pi.y, pi.width, pi.height);
     }
   }
 }
@@ -219,10 +229,12 @@ export function chipRenderRect(
     }
     const chip = (pi as MainChipRendering).chip;
     if (chip != null) {
-      const width = pi.width || 32;
-      const height = pi.height || 32;
-      const dx = pi.dx || 0;
-      const dy = pi.dy || 0;
+      // pi is a MainChipRendering.
+      const pim = pi as MainChipRendering;
+      const width = pim.width || 32;
+      const height = pim.height || 32;
+      const dx = pim.dx || 0;
+      const dy = pim.dy || 0;
       rects.push({
         minX: dx,
         minY: dy,
@@ -233,11 +245,12 @@ export function chipRenderRect(
       (pi as SubChipRendering).subx != null &&
       (pi as SubChipRendering).suby != null
     ) {
-      // subの場合
-      const width = pi.width || 16;
-      const height = pi.height || 16;
-      const dx = pi.dx || 0;
-      const dy = pi.dy || 0;
+      // pi is a SubChipRendering.
+      const pis = pi as SubChipRendering;
+      const width = pis.width || 16;
+      const height = pis.height || 16;
+      const dx = pis.dx || 0;
+      const dy = pis.dy || 0;
       rects.push({
         minX: dx,
         minY: dy,
@@ -261,13 +274,21 @@ export function chipFor(
     // custom parts.
     // get name of custom parts.
     const name = getCustomChipName(customParts, chip);
+    const color = getCustomChipColor(customParts, chip);
     // get native chip code.
     const nativeCode = getNativeCode(customParts, chip);
     const c = nativeCode != null ? lookupChip(params, nativeCode) : null;
     if (c != null) {
       const { pattern, nativeName, nativeCode } = c;
+      // カスタムパーツのサインをpatternに追加
       return {
-        pattern,
+        pattern: addRendering(pattern, {
+          color: color || '#000000',
+          x: 0,
+          y: 0,
+          width: 10,
+          height: 5,
+        }),
         name: name != null ? name : '不明',
         nativeName,
         nativeCode,

@@ -15,6 +15,19 @@ export function getCustomChipName(
   }
   return obj.name;
 }
+/**
+ * Get color of given custom chip.
+ */
+export function getCustomChipColor(
+  customParts: CustomPartsData,
+  code: string,
+): string | null {
+  const obj = customParts[code];
+  if (obj == null) {
+    return null;
+  }
+  return obj.color;
+}
 
 /**
  * Return the list of custom parts codes.

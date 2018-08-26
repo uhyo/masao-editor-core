@@ -14,6 +14,10 @@ export interface OneCustomChip {
    * Properties of this custom parts.
    */
   properties: Record<string, unknown>;
+  /**
+   * Color derived by its id.
+   */
+  color: string;
 }
 
 export type CustomPartsData = Record<string, OneCustomChip | undefined>;

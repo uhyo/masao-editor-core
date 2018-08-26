@@ -98,6 +98,7 @@ export class CustomPartsScreen extends React.Component<
         extends: 5100,
         name: 'カスタムパーツ',
         properties: {},
+        color: '#ffffff',
       };
       customPartsLogics.generateNewCustomParts(cloneof);
     };

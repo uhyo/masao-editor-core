@@ -16,7 +16,24 @@ export interface SubChipRendering {
   width?: number;
   height?: number;
 }
-export type ChipRendering = MainChipRendering | SubChipRendering;
+/**
+ * Color tip appended.
+ */
+export interface ColorRendering {
+  color: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type ChipRendering =
+  | number
+  | MainChipRendering
+  | SubChipRendering
+  | ColorRendering;
+
+export type RenderInstruction = ChipRendering | ChipRendering[];
 
 /**
  * Expression of chip known to be native.
@@ -25,7 +42,7 @@ export interface NativeChip {
   /**
    * How to render this chip,
    */
-  pattern: number | ChipRendering | Array<number | ChipRendering>;
+  pattern: RenderInstruction;
   /**
    * Name of this chip.
    */

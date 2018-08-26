@@ -1,3 +1,4 @@
+import * as SparkMd5 from 'spark-md5';
 import * as customPartsActions from '../actions/custom-parts';
 import editStore from '../stores/edit';
 import customPartsStore from '../stores/custom-parts';
@@ -65,6 +66,24 @@ export function generateNewCustomPartsId(): string {
 }
 
 /**
+ * カスタムパーツIDから色を生成
+ */
+export function generateColorFromId(id: string): string {
+  // IDに対してMD5ハッシュを取る
+  const hashed = SparkMd5.hash(id, true);
+  // 最初の2バイトをHSLのHに変換（0〜360）
+  const h = Math.floor(
+    (((hashed.charCodeAt(0) << 8) | hashed.charCodeAt(1)) * 360) / 65536,
+  );
+  // 次の1バイトをSに変換（70〜100）
+  const s = 70 + Math.floor((hashed.charCodeAt(2) * 30) / 256);
+  // 次の1バイトをLに変換（30〜70）
+  const l = 30 + Math.floor((hashed.charCodeAt(3) * 40) / 256);
+
+  return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+/**
  * カスタムパーツの名前をアップデート
  */
 export function setCustomChipName(
@@ -109,10 +128,12 @@ export function deleteCustomParts(
  */
 export function generateNewCustomParts(cloneof: OneCustomChip): void {
   const newid = generateNewCustomPartsId();
+  const color = generateColorFromId(newid);
   // 名前をちょっと変更
   const definition = {
     ...cloneof,
     name: `${cloneof.name}（コピー）`,
+    color,
   };
   customPartsActions.addNewCustomParts({
     chipCode: newid,

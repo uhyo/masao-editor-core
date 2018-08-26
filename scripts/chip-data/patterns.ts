@@ -1,4 +1,4 @@
-import { ChipRendering } from './interface';
+import { ChipRendering, RenderInstruction } from './interface';
 
 // 汎用チップパターン
 export const dossunsun_pattern: ChipRendering = {
@@ -28,3 +28,19 @@ export const unknown_pattern: ChipRendering = {
   width: 32,
   height: 32,
 };
+
+/**
+ * Append a rendering to pattern.
+ */
+export function addRendering(
+  current: RenderInstruction,
+  pattern: ChipRendering,
+): RenderInstruction {
+  if (Array.isArray(current)) {
+    return current.concat([pattern]);
+  } else if (Array.isArray(pattern)) {
+    return [current, ...pattern];
+  } else {
+    return [current, pattern];
+  }
+}

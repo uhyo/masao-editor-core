@@ -9,6 +9,7 @@ import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
 import * as customPartsActions from '../../actions/custom-parts';
 import { CustomPartsData } from '../../defs/map';
+import { generateColorFromId } from '../custom-parts';
 
 type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 type AdvancedMap = masao.format.AdvancedMap;
@@ -101,6 +102,7 @@ function loadCustomParts(
       customPartsExt[key] != null ? customPartsExt[key].name || key : key;
     result[key] = {
       name,
+      color: generateColorFromId(key),
       ...customParts[key],
     };
   }
