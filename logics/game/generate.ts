@@ -106,14 +106,18 @@ function mapToParam(
       };
       stages.push(obj);
     }
-    const { customParts: cp, ext } = generateCustomPartsData(customParts);
+    const { customParts: cp, ext: customPartsExt } = generateCustomPartsData(
+      customParts,
+    );
     return {
       params: {},
       advancedMap: {
         stages,
         customParts: cp,
       },
-      ext,
+      ext: {
+        customParts: customPartsExt,
+      },
     };
   } else {
     // 昔のmap形式
