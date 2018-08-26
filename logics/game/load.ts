@@ -7,6 +7,7 @@ import * as mapActions from '../../actions/map';
 import * as mapLogics from '../map';
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
+import * as customPartsActions from '../../actions/custom-parts';
 import { CustomPartsData } from '../../defs/map';
 
 type MasaoJSONFormat = masao.format.MasaoJSONFormat;
@@ -70,7 +71,15 @@ export function loadGame(
     );
   } else {
     mapLogics.loadParamMap(params);
+    // カスタムパーツは無しにする
+    customPartsActions.loadCustomParts({
+      customParts: {},
+    });
   }
+  //最後にスクリーンを変更
+  editActions.changeScreen({
+    screen: 'map',
+  });
 }
 
 /**

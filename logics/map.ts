@@ -66,10 +66,6 @@ export function loadAdvancedMap(
       layer: layer2,
       stage: i + 1,
     });
-    // TODO: how do we provide names?
-    customPartsActions.loadCustomParts({
-      customParts,
-    });
     historyActions.newHistory({
       stage: i + 1,
       stageData: {
@@ -79,6 +75,9 @@ export function loadAdvancedMap(
       },
     });
   }
+  customPartsActions.loadCustomParts({
+    customParts,
+  });
 }
 
 // paramの変更をmapに適用
