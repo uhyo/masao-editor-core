@@ -145,6 +145,28 @@ export class CustomPartsStore extends Store<CustomPartsState> {
       },
     });
   }
+  /**
+   * カスタムパーツを消去
+   */
+  public onDeleteCustomParts({
+    chipCode,
+  }: customPartsActions.DeleteCustomPartsAction) {
+    const { customParts, cursorPosition } = this.state;
+    const removedIndex = Object.keys(customParts).indexOf(chipCode);
+    const newCursorPosition =
+      cursorPosition == null
+        ? null
+        : removedIndex <= cursorPosition
+          ? cursorPosition === 0
+            ? null
+            : cursorPosition - 1
+          : cursorPosition;
+    const { [chipCode]: _, ...rest } = this.state.customParts;
+    this.setState({
+      customParts: rest,
+      cursorPosition: newCursorPosition,
+    });
+  }
 }
 
 export default new CustomPartsStore();

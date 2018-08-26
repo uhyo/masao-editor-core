@@ -21,7 +21,7 @@ interface IPropToolbox {
  */
 export function Toolbox({ label, children }: IPropToolbox) {
   return (
-    <div>
+    <div className={styles.toolbox}>
       <div className={styles.toolboxLabel}>{label}</div>
       <div className={styles.toolboxRow}>{children}</div>
     </div>

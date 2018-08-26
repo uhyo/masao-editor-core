@@ -4,6 +4,7 @@ import * as styles from './button.css';
 
 export interface IPropButton {
   label?: string;
+  title?: string;
   onClick?(): void;
   disabled?: boolean;
 }
@@ -13,7 +14,7 @@ export default class Button extends React.Component<IPropButton, {}> {
     this.handleKey = this.handleKey.bind(this);
   }
   render() {
-    const { label, onClick, disabled, children } = this.props;
+    const { label, title, onClick, disabled, children } = this.props;
     const child = React.Children.count(children) > 0 ? children : label;
     const cl = disabled ? styles.disabled : styles.button;
 
@@ -26,6 +27,7 @@ export default class Button extends React.Component<IPropButton, {}> {
     return (
       <div
         role="button"
+        title={title}
         aria-disabled={disabled}
         className={cl}
         tabIndex={disabled ? undefined : 0}

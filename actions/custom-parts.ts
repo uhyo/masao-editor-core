@@ -76,3 +76,12 @@ export interface AddNewCustomPartsAction {
  * Add a new custom chip.
  */
 export const addNewCustomParts = createAction<AddNewCustomPartsAction>();
+
+export interface DeleteCustomPartsAction {
+  chipCode: string;
+}
+
+/**
+ * Delete a custom chip.
+ */
+export const deleteCustomParts = createAction<DeleteCustomPartsAction>();

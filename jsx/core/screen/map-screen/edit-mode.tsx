@@ -9,7 +9,6 @@ import Button from '../../util/button';
 import Select from '../../util/select';
 import Switch from '../../util/switch';
 
-import * as style from '../../css/edit-mode.css';
 import { Toolbox } from '../../../components/toolbar';
 
 export interface IPropEditMode {
@@ -115,7 +114,7 @@ export default class EditMode extends React.Component<IPropEditMode, {}> {
     };
 
     return (
-      <div className={style.wrapper}>
+      <>
         <Toolbox label="編集モード">
           <Select
             contents={contents}
@@ -144,7 +143,7 @@ export default class EditMode extends React.Component<IPropEditMode, {}> {
           <Button label="戻る" disabled={back_disabled} onClick={back} />
           <Button label="進む" disabled={forward_disabled} onClick={forward} />
         </Toolbox>
-      </div>
+      </>
     );
   }
 }

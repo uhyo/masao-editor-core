@@ -16,10 +16,7 @@ import {
   getCustomPartsBases,
 } from '../../../../scripts/custom-parts';
 import { CustomPropertyField } from './field';
-import { Toolbar, Toolbox } from '../../../components/toolbar';
-import Button from '../../util/button';
-import memoizeOne from 'memoize-one';
-import { countChipInMap } from '../../../../logics/map';
+import { OneCustomChip } from '../../../../defs/map';
 
 export interface IPropCustomChipMain {
   images: Images;
@@ -27,21 +24,22 @@ export interface IPropCustomChipMain {
   params: ParamsState;
   customParts: CustomPartsState;
   currentChipCode: string;
+  currentData: OneCustomChip;
+  currentUseCount: number;
   chipDef: Chip;
 }
 export class CustomChipMain extends React.PureComponent<
   IPropCustomChipMain,
   {}
 > {
-  private countChipUsage: (chipCode: string) => number = memoizeOne(
-    (chipCode: string) => countChipInMap(this.props.map, chipCode),
-  );
   public render() {
     const {
       images,
       params,
       customParts: { customParts },
       currentChipCode,
+      currentData,
+      currentUseCount,
       chipDef,
     } = this.props;
     // list of custom parts properties.
@@ -50,12 +48,6 @@ export class CustomChipMain extends React.PureComponent<
       currentChipCode,
     );
     const cpPropertyKeys = Object.keys(cpProperties);
-    // current properties.
-    const currentData = customParts[currentChipCode];
-
-    if (currentData == null) {
-      return <p>不明なカスタムパーツです。</p>;
-    }
 
     const currentProperties = currentData.properties;
     const chipDisplayCallback: ChipRenderer<ChipCode> = (
@@ -78,22 +70,14 @@ export class CustomChipMain extends React.PureComponent<
         base: Number(e.currentTarget.value),
       });
     };
-    const newPartsCallback = () => {
-      customPartsLogics.generateNewCustomParts(currentData);
-    };
     return (
       <>
-        <Toolbar>
-          <Toolbox label="カスタムパーツ編集">
-            <Button onClick={newPartsCallback}>新規作成</Button>
-          </Toolbox>
-        </Toolbar>
         {currentChipCode != null && chipDef != null ? (
           <ChipInformation
             images={images}
             currentChipCode={currentChipCode}
             chipDef={chipDef}
-            currentUseCount={this.countChipUsage(currentChipCode)}
+            currentUseCount={currentUseCount}
             onDrawChip={chipDisplayCallback}
           />
         ) : null}

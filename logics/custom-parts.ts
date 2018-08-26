@@ -95,6 +95,16 @@ export function setCustomPropertyValue(
 }
 
 /**
+ * カスタムパーツを消去
+ */
+export function deleteCustomParts(
+  arg: customPartsActions.DeleteCustomPartsAction,
+): void {
+  customPartsActions.deleteCustomParts(arg);
+  updateStore.update();
+}
+
+/**
  * 新しいカスタムパーツを登録
  */
 export function generateNewCustomParts(cloneof: OneCustomChip): void {
