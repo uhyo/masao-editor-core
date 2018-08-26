@@ -1,4 +1,4 @@
-import { CustomPartsData } from '../defs/map';
+import { CustomPartsData, OneCustomChip } from '../defs/map';
 import { createAction } from '../scripts/reflux-util';
 import { ChipCode } from '../scripts/chip';
 /**
@@ -66,3 +66,13 @@ export interface SetCustomPropertyValueAction {
 export const setCustomPropertyValue = createAction<
   SetCustomPropertyValueAction
 >();
+
+export interface AddNewCustomPartsAction {
+  chipCode: string;
+  definition: OneCustomChip;
+}
+
+/**
+ * Add a new custom chip.
+ */
+export const addNewCustomParts = createAction<AddNewCustomPartsAction>();

@@ -131,6 +131,20 @@ export class CustomPartsStore extends Store<CustomPartsState> {
       },
     });
   }
+  /**
+   * 新しいカスタムパーツを追加
+   */
+  public onAddNewCustomParts({
+    chipCode,
+    definition,
+  }: customPartsActions.AddNewCustomPartsAction) {
+    this.setState({
+      customParts: {
+        ...this.state.customParts,
+        [chipCode]: definition,
+      },
+    });
+  }
 }
 
 export default new CustomPartsStore();

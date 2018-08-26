@@ -4,6 +4,7 @@ import customPartsStore from '../stores/custom-parts';
 import { inRange } from '../scripts/util/in-range';
 import { customPartsList } from '../scripts/custom-parts';
 import updateStore from '../stores/update';
+import { OneCustomChip } from '../defs/map';
 
 /**
  * カスタムパーツ選択のカーソルを移動させる
@@ -53,6 +54,17 @@ export function cursorButton(): void {
 }
 
 /**
+ * 新しいカスタムパーツIDを生成
+ */
+export function generateNewCustomPartsId(): string {
+  const idLength = 10;
+  return new Array(idLength)
+    .fill(0)
+    .map(() => String.fromCharCode(0x61 + Math.floor(Math.random() * 26)))
+    .join('');
+}
+
+/**
  * カスタムパーツの名前をアップデート
  */
 export function setCustomChipName(
@@ -80,4 +92,32 @@ export function setCustomPropertyValue(
 ): void {
   customPartsActions.setCustomPropertyValue(arg);
   updateStore.update();
+}
+
+/**
+ * 新しいカスタムパーツを登録
+ */
+export function generateNewCustomParts(cloneof: OneCustomChip): void {
+  const newid = generateNewCustomPartsId();
+  // 名前をちょっと変更
+  const definition = {
+    ...cloneof,
+    name: `${cloneof.name}（コピー）`,
+  };
+  customPartsActions.addNewCustomParts({
+    chipCode: newid,
+    definition,
+  });
+  updateStore.update();
+  // indexに変換
+  const chipIndex = customPartsList(customPartsStore.state.customParts).indexOf(
+    newid,
+  );
+  if (chipIndex < 0) {
+    // ???
+    return;
+  }
+  customPartsActions.setCurrentChip({
+    chipIndex,
+  });
 }

@@ -36,8 +36,8 @@ export function ChipInformation({
       <div className={styles.chipDescription}>
         <p>
           <b>{chipDef.name}</b>
-          <p>マップ内の使用数: {currentUseCount}</p>
         </p>
+        <p>マップ内の使用数: {currentUseCount}</p>
       </div>
     </div>
   );

@@ -78,11 +78,14 @@ export class CustomChipMain extends React.PureComponent<
         base: Number(e.currentTarget.value),
       });
     };
+    const newPartsCallback = () => {
+      customPartsLogics.generateNewCustomParts(currentData);
+    };
     return (
       <>
         <Toolbar>
           <Toolbox label="カスタムパーツ編集">
-            <Button>新規作成</Button>
+            <Button onClick={newPartsCallback}>新規作成</Button>
           </Toolbox>
         </Toolbar>
         {currentChipCode != null && chipDef != null ? (
