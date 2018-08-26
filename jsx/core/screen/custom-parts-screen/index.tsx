@@ -1,4 +1,9 @@
-import { CustomPartsState, EditState, ParamsState } from '../../../../stores';
+import {
+  CustomPartsState,
+  EditState,
+  ParamsState,
+  MapState,
+} from '../../../../stores';
 import { ChipList } from '../../../components/chip-select';
 import * as React from 'react';
 import { drawChip, chipFor } from '../../../../scripts/chip';
@@ -20,6 +25,7 @@ import { CustomChipMain } from './main';
 export interface IPropCustomPartsScreen {
   images: Images;
   edit: EditState;
+  map: MapState;
   params: ParamsState;
   customParts: CustomPartsState;
 }
@@ -28,6 +34,7 @@ export function CustomPartsScreen({
   images,
   params,
   edit,
+  map,
   customParts,
 }: IPropCustomPartsScreen) {
   const { chipselect_width } = edit;
@@ -97,6 +104,7 @@ export function CustomPartsScreen({
         ) : (
           <CustomChipMain
             images={images}
+            map={map}
             params={params}
             customParts={customParts}
             currentChipCode={currentChipCode}

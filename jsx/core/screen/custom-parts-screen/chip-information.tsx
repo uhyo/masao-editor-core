@@ -11,6 +11,7 @@ export interface IPropChipInformation {
   images: Images;
   currentChipCode: ChipCode;
   chipDef: Chip;
+  currentUseCount: number;
   onDrawChip: ChipRenderer<ChipCode>;
 }
 /**
@@ -20,6 +21,7 @@ export function ChipInformation({
   images,
   currentChipCode,
   chipDef,
+  currentUseCount,
   onDrawChip,
 }: IPropChipInformation) {
   return (
@@ -32,8 +34,10 @@ export function ChipInformation({
         />
       </div>
       <div className={styles.chipDescription}>
-        <p>{chipDef.name}</p>
-        <p>ベース: {chipDef.nativeName}</p>
+        <p>
+          <b>{chipDef.name}</b>
+          <p>マップ内の使用数: {currentUseCount}</p>
+        </p>
       </div>
     </div>
   );

@@ -73,6 +73,7 @@ export function ScreenRouter({
       <CustomPartsScreen
         images={images}
         edit={edit}
+        map={map}
         params={params}
         customParts={customParts}
       />

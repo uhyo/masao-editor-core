@@ -4,9 +4,10 @@ import * as mapActions from '../actions/map';
 import * as customPartsActions from '../actions/custom-parts';
 import * as historyActions from '../actions/history';
 
-import mapStore from '../stores/map';
+import mapStore, { MapState } from '../stores/map';
 
 import { mapStringToChip, layerStringToChip, ChipCode } from '../scripts/chip';
+import { countElements2 } from '../scripts/util/count-elements';
 
 // マップを全部読みなおした
 export function loadAdvancedMap(
@@ -133,4 +134,13 @@ function zerofill2(x: number, y: number): Array<Array<number>> {
     result.push(new Array(x).fill(0));
   }
   return result;
+}
+
+/**
+ * Count all occurences of given chip in the map.
+ */
+export function countChipInMap(map: MapState, chip: ChipCode): number {
+  return map.data
+    .map(stage => countElements2(stage.map, chip))
+    .reduce((a, b) => a + b, 0);
 }

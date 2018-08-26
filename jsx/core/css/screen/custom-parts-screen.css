@@ -13,6 +13,7 @@
 .chip-display {
   flex: auto 0 0;
   align-self: center;
+  padding: 6px 0;
 }
 .chip-description {
   flex: auto 1 1;
