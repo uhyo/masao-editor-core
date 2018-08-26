@@ -10,6 +10,7 @@ import Scroll from '../../core/util/scroll';
 import Resizable from '../../core/util/resizable';
 import MousePad, { MousePadEvent } from '../../core/util/mousepad';
 import propChanged from '../../core/util/changed';
+import { IdleScheduler } from '../../../scripts/scheduler';
 
 /**
  * Type of renderer of chip.
@@ -97,6 +98,10 @@ export class ChipListMain extends React.PureComponent<
    */
   private mainCanvas = React.createRef<HTMLCanvasElement>();
   /**
+   * Scheduler for background rendering.
+   */
+  private renderingScheduler: IdleScheduler | null = null;
+  /**
    * Focusable area.
    */
   private focusArea = React.createRef<HTMLDivElement>();
@@ -176,13 +181,20 @@ export class ChipListMain extends React.PureComponent<
     );
   }
   /**
-   * draw chips onto canvas.
+   * Invoke the draw chips operation.
    */
-  private draw(mode: 'redraw' | 'cursor') {
+  private draw(mode: 'redraw' | 'current') {
     const {
       backLayer,
       mainCanvas: { current: mainCanvas },
-      props: { images, cursorColor, cursorPosition, chipsWidth, scrollY },
+      props: {
+        images,
+        backgroundColor,
+        cursorColor,
+        cursorPosition,
+        chipsWidth,
+        scrollY,
+      },
     } = this;
     if (images == null) {
       // images are not available yet.
@@ -196,20 +208,44 @@ export class ChipListMain extends React.PureComponent<
       // canvas is not available.
       return;
     }
-    if (mode === 'redraw') {
-      // 裏でチップセットを書き換える
-      backLayer.width = mainCanvas.width;
-      backLayer.height = mainCanvas.height;
-      renderChipsTo(backLayer, images, this.props);
+    const ctx = mainCanvas.getContext('2d');
+    if (ctx == null) {
+      return;
     }
-    if (mode === 'redraw' || mode === 'cursor') {
-      // render chip set to main canvas.
-      const ctx = mainCanvas.getContext('2d');
-      if (ctx == null) {
+    if (mode === 'redraw') {
+      // チップセットの書き換えが必要
+      if (this.renderingScheduler != null) {
+        // すでにレンダリング処理中なのでこれは不要になった
+        this.renderingScheduler.terminate();
+        this.renderingScheduler = null;
+      }
+    }
+    const targetWidth = mainCanvas.width;
+    const targetHeight = mainCanvas.height;
+    // とりあえず背景色は塗る
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+    // バックグランドの描画
+    const backRendering =
+      mode === 'redraw' ? this.makeBackLayerTask() : Promise.resolve(true);
+    backRendering.then(completed => {
+      if (!completed) {
+        // This rederning line is abandoned.
         return;
       }
-      ctx.drawImage(backLayer, 0, 0);
-
+      // backlayer rendering is complete.
+      // render chip set to main canvas.
+      ctx.drawImage(
+        backLayer,
+        0,
+        scrollY * 32,
+        targetWidth,
+        targetHeight,
+        0,
+        0,
+        targetWidth,
+        targetHeight,
+      );
       // draw cursor.
       if (cursorPosition != null) {
         const cursorX = cursorPosition % chipsWidth;
@@ -218,7 +254,27 @@ export class ChipListMain extends React.PureComponent<
         const screenY = (cursorY - scrollY) * 32 + 0.5;
         drawCusror(ctx, cursorColor, screenX, screenY, 32, 32);
       }
+    });
+  }
+  /**
+   * Make a task to render on backlayer canvas.
+   */
+  private makeBackLayerTask(): Promise<boolean> {
+    const {
+      backLayer,
+      mainCanvas: { current: mainCanvas },
+      props: { images, chipNumber, chipsWidth },
+    } = this;
+    if (mainCanvas == null || images == null) {
+      return Promise.resolve(false);
     }
+    // calculate backlayer size.
+    backLayer.width = mainCanvas.width;
+    backLayer.height = Math.ceil(chipNumber / chipsWidth) * 32;
+    this.renderingScheduler = new IdleScheduler(
+      renderChipsTo(backLayer, images, this.props),
+    );
+    return this.renderingScheduler.run();
   }
   public componentDidMount() {
     this.draw('redraw');
@@ -231,14 +287,21 @@ export class ChipListMain extends React.PureComponent<
       propChanged(
         prevProps,
         this.props,
-        ['images', 'chipNumber', 'chipsWidth', 'scrollY', 'onDrawChip'],
+        ['images', 'chipNumber', 'chipsWidth', 'onDrawChip'],
       ) ||
       prevState.areaHeight !== this.state.areaHeight
     ) {
       // Some of information required to render chips is changed.
       this.draw('redraw');
-    } else if (propChanged(prevProps, this.props, ['cursorPosition'])) {
-      this.draw('cursor');
+    } else if (
+      propChanged(prevProps, this.props, [
+        'scrollY',
+        'cursorPosition',
+        'backgroundColor',
+        'cursorColor',
+      ])
+    ) {
+      this.draw('current');
     }
   }
   /**
@@ -327,7 +390,7 @@ export class ChipListMain extends React.PureComponent<
 }
 
 /**
- * Render chips to canvas.
+ * Return a generator function of task of rendering chips to canvas.
  */
 function renderChipsTo(
   canvas: HTMLCanvasElement,
@@ -345,36 +408,38 @@ function renderChipsTo(
       chipIndex: number,
     ): void;
   },
-): void {
-  const {
-    chipNumber,
-    backgroundColor,
-    chipsWidth,
-    scrollY,
-    onDrawChip,
-  } = options;
+): (() => IterableIterator<() => void>) {
+  const { chipNumber, chipsWidth, onDrawChip } = options;
 
   const ctx = canvas.getContext('2d');
   if (ctx == null) {
-    return;
+    return function*(): IterableIterator<never> {};
   }
-  // Fill with background color.
-  ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return function*() {
+    // First, clear the canvas.
+    yield () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+    // render chips. one task renders 16 chips.
+    let x = 0;
+    let y = 0;
+    let i = 0;
+    while (i < chipNumber) {
+      console.log('yield', i);
+      yield () => {
+        for (let cnt = 0; cnt < 16 && i < chipNumber; i++, cnt++) {
+          onDrawChip(ctx, images, x, y, i);
 
-  // render chips.
-  let x = 0;
-  let y = 0;
-  for (let i = chipsWidth * scrollY; i < chipNumber; i++) {
-    onDrawChip(ctx, images, x, y, i);
-
-    // move rendering position,
-    x += 32;
-    if (x + 32 > chipsWidth * 32) {
-      x = 0;
-      y += 32;
+          // move rendering position,
+          x += 32;
+          if (x + 32 > chipsWidth * 32) {
+            x = 0;
+            y += 32;
+          }
+        }
+      };
     }
-  }
+  };
 }
 
 /**
