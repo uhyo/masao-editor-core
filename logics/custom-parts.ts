@@ -63,6 +63,16 @@ export function setCustomChipName(
 }
 
 /**
+ * カスタムパーツのベースをアップデート
+ */
+export function setCustomChipBase(
+  arg: customPartsActions.SetCustomChipBaseAction,
+): void {
+  customPartsActions.setCustomChipBase(arg);
+  updateStore.update();
+}
+
+/**
  * カスタムパーツのプロパティをアップデート
  */
 export function setCustomPropertyValue(

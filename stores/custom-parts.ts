@@ -83,6 +83,34 @@ export class CustomPartsStore extends Store<CustomPartsState> {
     });
   }
   /**
+   * カスタムパーツのベースを変更
+   */
+  public onSetCustomChipBase({
+    chipCode,
+    base,
+  }: customPartsActions.SetCustomChipBaseAction) {
+    const { customParts } = this.state;
+    const current = customParts[chipCode];
+    if (current == null) {
+      // TODO ???
+      return;
+    }
+    if (current.extends === base) {
+      // not changed
+      return;
+    }
+    this.setState({
+      customParts: {
+        ...customParts,
+        [chipCode]: {
+          ...current,
+          extends: base,
+          properties: {},
+        },
+      },
+    });
+  }
+  /**
    * カスタムパーツのプロパティを設定
    */
   public onSetCustomPropertyValue({

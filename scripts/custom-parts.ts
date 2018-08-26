@@ -1,6 +1,7 @@
 import { CustomPartsData } from '../defs/map';
 import { CustomPartsPropertySet, customPartsProperties } from './masao';
 import { ChipCode } from './chip';
+import { enemyTable } from './chip-data/enemies';
 /**
  * Get name of given custom chip.
  */
@@ -54,11 +55,27 @@ export function getNativeCode(
 export function getCustomProperties(
   customParts: CustomPartsData,
   code: ChipCode,
-): CustomPartsPropertySet {
+): {
+  nativeCode: number | undefined;
+  properties: CustomPartsPropertySet;
+} {
   const nativeCode = getNativeCode(customParts, code);
   if (nativeCode == null) {
-    return {};
+    return {
+      nativeCode: undefined,
+      properties: {},
+    };
   }
   const ps = customPartsProperties[nativeCode];
-  return ps || {};
+  return {
+    nativeCode,
+    properties: ps || {},
+  };
 }
+
+/**
+ * Return the list of chip codes which can be a base of custom parts.
+ */
+export const getCustomPartsBases: number[] = Object.keys(enemyTable).map(
+  key => 5000 + Number(key),
+);

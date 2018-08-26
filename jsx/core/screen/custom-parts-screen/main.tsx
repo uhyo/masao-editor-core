@@ -1,6 +1,6 @@
 import { Chip } from '../../../../scripts/chip-data/interface';
 import { ChipRenderer } from '../../../components/chip-select/main';
-import { ChipCode, drawChip } from '../../../../scripts/chip';
+import { ChipCode, drawChip, chipFor } from '../../../../scripts/chip';
 import * as customPartsLogics from '../../../../logics/custom-parts';
 import { ParamsState, CustomPartsState } from '../../../../stores';
 import { ChipInformation } from './chip-information';
@@ -11,7 +11,10 @@ import {
   FormField,
   FormText,
 } from '../../../components/form-controls';
-import { getCustomProperties } from '../../../../scripts/custom-parts';
+import {
+  getCustomProperties,
+  getCustomPartsBases,
+} from '../../../../scripts/custom-parts';
 import { CustomPropertyField } from './field';
 
 export interface IPropCustomChipMain {
@@ -29,11 +32,19 @@ export function CustomChipMain({
   chipDef,
 }: IPropCustomChipMain) {
   // list of custom parts properties.
-  const cpProperties = getCustomProperties(customParts, currentChipCode);
+  const { nativeCode, properties: cpProperties } = getCustomProperties(
+    customParts,
+    currentChipCode,
+  );
   const cpPropertyKeys = Object.keys(cpProperties);
   // current properties.
   const currentData = customParts[currentChipCode];
-  const currentProperties = currentData != null ? currentData.properties : {};
+
+  if (currentData == null) {
+    return <p>不明なカスタムパーツです。</p>;
+  }
+
+  const currentProperties = currentData.properties;
   const chipDisplayCallback: ChipRenderer<ChipCode> = (
     ctx,
     images,
@@ -46,6 +57,12 @@ export function CustomChipMain({
     customPartsLogics.setCustomChipName({
       chipCode: currentChipCode,
       name: e.currentTarget.value,
+    });
+  };
+  const baseChangeCallback = (e: React.SyntheticEvent<HTMLSelectElement>) => {
+    customPartsLogics.setCustomChipBase({
+      chipCode: currentChipCode,
+      base: Number(e.currentTarget.value),
     });
   };
   return (
@@ -66,6 +83,23 @@ export function CustomChipMain({
             value={chipDef.name}
             onChange={nameChangeCallback}
           />
+        </FormField>
+        <FormField name="ベース">
+          {'string' === typeof currentData.extends ? (
+            currentData.extends
+          ) : (
+            <select value={String(nativeCode)} onChange={baseChangeCallback}>
+              {getCustomPartsBases.map(nc => {
+                const { name } = chipFor(params, customParts, nc);
+
+                return (
+                  <option key={nc} value={String(nc)}>
+                    {name}
+                  </option>
+                );
+              })}
+            </select>
+          )}
         </FormField>
         {cpPropertyKeys.length === 0 ? (
           <FormText>このパーツのカスタム設定はありません。</FormText>

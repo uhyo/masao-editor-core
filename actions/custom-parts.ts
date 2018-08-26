@@ -1,5 +1,6 @@
 import { CustomPartsData } from '../defs/map';
 import { createAction } from '../scripts/reflux-util';
+import { ChipCode } from '../scripts/chip';
 /**
  * custom partsの定義を読み込んだ
  */
@@ -44,6 +45,15 @@ export interface SetCustomChipNameAction {
   name: string;
 }
 export const setCustomChipName = createAction<SetCustomChipNameAction>();
+
+export interface SetCustomChipBaseAction {
+  chipCode: string;
+  base: ChipCode;
+}
+/**
+ * Set base of custom chip.
+ */
+export const setCustomChipBase = createAction<SetCustomChipBaseAction>();
 
 /**
  * Set value of custom property.
