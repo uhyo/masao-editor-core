@@ -23,29 +23,3 @@
   left: 0;
   top: 0;
 }
-
-.param > label {
-  display: block;
-  border-bottom: 1px dashed #cccccc;
-  margin-bottom: 2px;
-}
-.param {
-  label {
-    display: block;
-    border-bottom: 1px dashed #cccccc;
-    margin-bottom: 2px;
-
-    & > b,
-    & > span {
-      display: inline-block;
-    }
-    b {
-      width: 340px;
-    }
-    input[type='text'],
-    input[type='number'],
-    select {
-      min-width: 300px;
-    }
-  }
-}
