@@ -28,7 +28,7 @@ import ScreenSelect from './screen-select';
 import KeyEvent from './key-event';
 
 import Button from './util/button';
-import { Toolbar } from './util/toolbar';
+import { Toolbar, Toolbox } from '../components/toolbar';
 
 import './css/init.css';
 import './theme/color.css';
@@ -260,13 +260,10 @@ export default class MasaoEditorCore extends RefluxComponent<
           }
         >
           <Toolbar>
-            <div className={styles.info}>
-              <div>
-                <div className={styles.toolboxLabel}>画面選択</div>
-                <ScreenSelect edit={edit} map={map} />
-              </div>
-              {external_buttons}
-            </div>
+            <Toolbox label="画面選択">
+              <ScreenSelect edit={edit} map={map} />
+            </Toolbox>
+            {external_buttons}
           </Toolbar>
           <div className={fity ? styles.screenWrapperFit : undefined}>
             <ScreenRouter

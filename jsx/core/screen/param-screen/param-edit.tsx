@@ -10,6 +10,7 @@ import { EditState, ParamsState, ProjectState } from '../../../../stores';
 
 import * as styles from '../../css/param-edit.css';
 import { FormField, FormControls } from '../../../components/form-controls';
+import { Toolbar, Toolbox } from '../../../components/toolbar';
 
 export interface IPropParamEdit {
   edit: EditState;
@@ -49,17 +50,19 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
       editActions.changeParamType({ param_type });
     };
     const typeMenu = (
-      <div className={styles.menu}>
-        <Select
-          contents={paramTypesContents}
-          value={param_type}
-          onChange={onParamtypeChange}
-        />
-      </div>
+      <Toolbar>
+        <Toolbox label="パラメータの種類">
+          <Select
+            contents={paramTypesContents}
+            value={param_type}
+            onChange={onParamtypeChange}
+          />
+        </Toolbox>
+      </Toolbar>
     );
 
     return (
-      <div className={styles.wrapper}>
+      <>
         {typeMenu}
         <div ref="main" className={styles.main}>
           <FormControls>
@@ -210,7 +213,7 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
             })}
           </FormControls>
         </div>
-      </div>
+      </>
     );
   }
 }

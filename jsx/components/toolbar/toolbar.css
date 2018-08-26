@@ -1,0 +1,19 @@
+.wrapper {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--toolbar-line-color);
+
+  background-color: var(--toolbar-surface);
+}
+
+.toolbox-label {
+  margin: 0.2em;
+
+  font-size: 0.8em;
+  color: #666666;
+}
+
+.toolbox-row {
+  display: flex;
+  margin: 0 0 4px 0;
+}

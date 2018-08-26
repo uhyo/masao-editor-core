@@ -16,7 +16,7 @@ import MiniMap from './mini-map';
 
 import * as styles from '../../css/screen/map-screen.css';
 
-import { Toolbar } from '../../util/toolbar';
+import { Toolbar } from '../../../components/toolbar';
 import { Images } from '../../../../defs/images';
 
 export interface IPropMapScreen {

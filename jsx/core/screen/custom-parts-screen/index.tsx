@@ -16,6 +16,7 @@ import * as editActions from '../../../../actions/edit';
 import * as customPartsActions from '../../../../actions/custom-parts';
 import { ChipInformation } from './chip-information';
 import { customPartsList } from '../../../../scripts/custom-parts';
+import { FormControls, FormField } from '../../../components/form-controls';
 
 export interface IPropCustomPartsScreen {
   images: Images;
@@ -84,6 +85,11 @@ export function CustomPartsScreen({
           currentChipCode={currentChipCode}
           onDrawChip={chipDisplayCallback}
         />
+        <FormControls>
+          <FormField name="カスタムパーツ名">
+            <input type="text" value="" />
+          </FormField>
+        </FormControls>
       </div>
     </ScreenMainWrapper>
   );
