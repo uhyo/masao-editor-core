@@ -1,7 +1,7 @@
 import { CustomPartsState, EditState, ParamsState } from '../../../../stores';
 import { ChipList } from '../../../components/chip-select';
 import * as React from 'react';
-import { drawChip, ChipCode } from '../../../../scripts/chip';
+import { drawChip, chipFor } from '../../../../scripts/chip';
 import {
   stageBackColor,
   cssColor,
@@ -14,9 +14,8 @@ import { ChipRenderer } from '../../../components/chip-select/main';
 
 import * as editActions from '../../../../actions/edit';
 import * as customPartsActions from '../../../../actions/custom-parts';
-import { ChipInformation } from './chip-information';
 import { customPartsList } from '../../../../scripts/custom-parts';
-import { FormControls, FormField } from '../../../components/form-controls';
+import { CustomChipMain } from './main';
 
 export interface IPropCustomPartsScreen {
   images: Images;
@@ -29,12 +28,22 @@ export function CustomPartsScreen({
   images,
   params,
   edit,
-  customParts: { customParts, currentChip, cursorPosition },
+  customParts,
 }: IPropCustomPartsScreen) {
   const { chipselect_width } = edit;
-  const chips = customPartsList(customParts);
+  const {
+    customParts: customPartsData,
+    currentChip,
+    cursorPosition,
+  } = customParts;
+  const chips = customPartsList(customPartsData);
   // currentChipはindexなのでchipCodeを得る
   const currentChipCode = currentChip != null ? chips[currentChip] : null;
+  // chip definition
+  const chipDef =
+    currentChipCode != null
+      ? chipFor(params, customPartsData, currentChipCode)
+      : null;
 
   const stageBackColorObject = stageBackColor(params, edit);
   const backgroundColor = cssColor(stageBackColorObject);
@@ -48,16 +57,18 @@ export function CustomPartsScreen({
     y,
     chipIndex,
   ) => {
-    const chips = customPartsList(customParts);
-    drawChip(ctx, images, params, customParts, chips[chipIndex], x, y, false);
+    const chips = customPartsList(customPartsData);
+    drawChip(
+      ctx,
+      images,
+      params,
+      customPartsData,
+      chips[chipIndex],
+      x,
+      y,
+      false,
+    );
   };
-  const chipDisplayCallback: ChipRenderer<ChipCode> = (
-    ctx,
-    images,
-    x,
-    y,
-    code,
-  ) => drawChip(ctx, images, params, customParts, code, x, y, false);
   // function to update selection of chip.
   const chipSelectCallback = (chipIndex: number) =>
     customPartsActions.setCurrentChip({ chipIndex });
@@ -78,18 +89,17 @@ export function CustomPartsScreen({
         }}
       />
       <div className={styles.main}>
-        <ChipInformation
-          images={images}
-          params={params}
-          customParts={customParts}
-          currentChipCode={currentChipCode}
-          onDrawChip={chipDisplayCallback}
-        />
-        <FormControls>
-          <FormField name="カスタムパーツ名">
-            <input type="text" value="" />
-          </FormField>
-        </FormControls>
+        {currentChipCode == null || chipDef == null ? (
+          <p>カスタムパーツを選択してください。</p>
+        ) : (
+          <CustomChipMain
+            images={images}
+            params={params}
+            customParts={customParts}
+            currentChipCode={currentChipCode}
+            chipDef={chipDef}
+          />
+        )}
       </div>
     </ScreenMainWrapper>
   );

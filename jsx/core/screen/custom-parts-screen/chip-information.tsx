@@ -1,18 +1,16 @@
-import { ChipCode, chipFor } from '../../../../scripts/chip';
+import { ChipCode } from '../../../../scripts/chip';
 import * as React from 'react';
 import { ChipDisplay } from '../../../components/chip-display';
 import { Images } from '../../../../defs/images';
 import { ChipRenderer } from '../../../components/chip-select/main';
 
 import * as styles from '../../css/screen/custom-parts-screen.css';
-import { CustomPartsData } from '../../../../defs/map';
-import { ParamsState } from '../../../../stores';
+import { Chip } from '../../../../scripts/chip-data/interface';
 
 export interface IPropChipInformation {
   images: Images;
-  params: ParamsState;
-  customParts: CustomPartsData;
-  currentChipCode: ChipCode | null;
+  currentChipCode: ChipCode;
+  chipDef: Chip;
   onDrawChip: ChipRenderer<ChipCode>;
 }
 /**
@@ -20,18 +18,10 @@ export interface IPropChipInformation {
  */
 export function ChipInformation({
   images,
-  params,
-  customParts,
   currentChipCode,
+  chipDef,
   onDrawChip,
 }: IPropChipInformation) {
-  if (currentChipCode == null) {
-    return null;
-  }
-  const chipDef = chipFor(params, customParts, currentChipCode);
-  if (chipDef == null) {
-    return null;
-  }
   return (
     <div className={styles.chipInformation}>
       <div className={styles.chipDisplay}>
