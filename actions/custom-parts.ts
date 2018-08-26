@@ -27,3 +27,12 @@ export interface SetCurrentChipAction {
   chipIndex: number | null;
 }
 export const setCurrentChip = createAction<SetCurrentChipAction>();
+
+/**
+ * Set name of custom chip.
+ */
+export interface SetCustomChipNameAction {
+  chipCode: string;
+  name: string;
+}
+export const setCustomChipName = createAction<SetCustomChipNameAction>();

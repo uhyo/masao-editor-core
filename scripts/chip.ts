@@ -260,14 +260,14 @@ export function chipFor(
   if ('string' === typeof chip) {
     // custom parts.
     // get name of custom parts.
-    const name = getCustomChipName(customParts, chip) || '不明';
+    const name = getCustomChipName(customParts, chip);
     // get chip and override name.
     const c = lookupChip(params, customParts, chip);
     if (c != null) {
       const { pattern, nativeName, nativeCode } = c;
       return {
         pattern,
-        name,
+        name: name != null ? name : '不明',
         nativeName,
         nativeCode,
       };

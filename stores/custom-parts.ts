@@ -54,6 +54,24 @@ export class CustomPartsStore extends Store<CustomPartsState> {
   }: customPartsActions.SetCurrentChipAction) {
     this.setState({ currentChip: chipIndex });
   }
+  /**
+   * カスタムパーツの名前を変更
+   */
+  public onSetCustomChipName({
+    chipCode,
+    name,
+  }: customPartsActions.SetCustomChipNameAction) {
+    // TODO
+    this.setState({
+      customParts: {
+        ...this.state.customParts,
+        [chipCode]: {
+          ...this.state.customParts[chipCode]!,
+          name,
+        },
+      },
+    });
+  }
 }
 
 export default new CustomPartsStore();

@@ -1,5 +1,4 @@
 import { CustomPartsData } from '../defs/map';
-import { ChipCode } from './chip';
 /**
  * Get name of given custom chip.
  */
@@ -17,6 +16,6 @@ export function getCustomChipName(
 /**
  * Return the list of custom parts codes.
  */
-export function customPartsList(customParts: CustomPartsData): ChipCode[] {
+export function customPartsList(customParts: CustomPartsData): string[] {
   return Object.keys(customParts);
 }
