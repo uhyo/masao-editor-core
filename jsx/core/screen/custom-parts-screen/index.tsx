@@ -96,11 +96,11 @@ export class CustomPartsScreen extends React.Component<
       // 新規の場合は最初のデータを作る
       const cloneof = currentData || {
         extends: 5100,
-        name: 'カスタムパーツ',
+        name: 'カスタム亀',
         properties: {},
         color: '#ffffff',
       };
-      customPartsLogics.generateNewCustomParts(cloneof);
+      customPartsLogics.generateNewCustomParts(cloneof, 'カスタム亀');
     };
     return (
       <ScreenMainWrapper className={styles.wrapper}>

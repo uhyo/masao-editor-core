@@ -28,7 +28,7 @@ export function runByKey(
   appDisabled: boolean,
 ): boolean {
   const k = keyString(key);
-  if (keydown) {
+  if (keydown && process.env.NODE_ENV !== 'production') {
     console.log(k);
   }
 

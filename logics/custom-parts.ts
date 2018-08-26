@@ -126,13 +126,16 @@ export function deleteCustomParts(
 /**
  * 新しいカスタムパーツを登録
  */
-export function generateNewCustomParts(cloneof: OneCustomChip): void {
+export function generateNewCustomParts(
+  cloneof: OneCustomChip,
+  newName?: string,
+): void {
   const newid = generateNewCustomPartsId();
   const color = generateColorFromId(newid);
   // 名前をちょっと変更
   const definition = {
     ...cloneof,
-    name: `${cloneof.name}（コピー）`,
+    name: newName != null ? newName : `${cloneof.name}（コピー）`,
     color,
   };
   customPartsActions.addNewCustomParts({
