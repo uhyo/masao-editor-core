@@ -122,7 +122,7 @@ export function drawChip(
           //270
           ctx.save();
           ctx.translate(xx + width / 2, yy + height / 2);
-          ctx.rotate((Math.PI * 3) / 4);
+          ctx.rotate((Math.PI * 3) / 2);
           ctx.translate(-xx - width / 2, -yy - height / 2);
         }
         ctx.drawImage(
@@ -157,7 +157,7 @@ export function drawChip(
           //270
           ctx.save();
           ctx.translate(x + 16, y + 16);
-          ctx.rotate((Math.PI * 3) / 4);
+          ctx.rotate((Math.PI * 3) / 2);
           ctx.translate(-x - 16, -y - 16);
         }
         ctx.drawImage(images.pattern, sx, sy, 32, 32, x, y, 32, 32);
