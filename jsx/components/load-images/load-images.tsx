@@ -41,6 +41,21 @@ export class LoadImages<T extends {}> extends React.PureComponent<
     const { images } = this.props;
     this.mounted = true;
     // List of keys whose property has string field.
+    this.loadImages(images);
+  }
+  public compoenntWillUnmount() {
+    this.mounted = false;
+  }
+  public componentDidUpdate(prevProps: IPropLoadImages<T>) {
+    if (prevProps.images !== this.props.images) {
+      // Reload of images is required.
+      this.loadImages(this.props.images);
+    }
+  }
+  /**
+   * Load images and asynchronously update loadedImags.
+   */
+  private loadImages(images: T) {
     const imagesKeys = Object.keys(images).filter(
       key => 'string' === typeof (images as any)[key],
     );
@@ -63,9 +78,6 @@ export class LoadImages<T extends {}> extends React.PureComponent<
         // TODO: error handling
         console.error(err);
       });
-  }
-  public compoenntWillUnmount() {
-    this.mounted = false;
   }
   public render() {
     return this.props.children(this.state.loadedImages);
