@@ -443,7 +443,6 @@ function renderChipsTo(
     let y = 0;
     let i = 0;
     while (i < chipNumber) {
-      console.log('yield', i);
       yield () => {
         for (let cnt = 0; cnt < 16 && i < chipNumber; i++, cnt++) {
           onDrawChip(ctx, images, x, y, i);
