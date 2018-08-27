@@ -9,6 +9,8 @@ import * as paramsLogic from '../../../../logics/params';
 import { EditState, ParamsState, ProjectState } from '../../../../stores';
 
 import * as styles from '../../css/param-edit.css';
+import { FormField, FormControls } from '../../../components/form-controls';
+import { Toolbar, Toolbox } from '../../../components/toolbar';
 
 export interface IPropParamEdit {
   edit: EditState;
@@ -25,7 +27,11 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
   }
   render() {
     const data = masao.param.data;
-    const { params, project, edit: { param_type } } = this.props;
+    const {
+      params,
+      project,
+      edit: { param_type },
+    } = this.props;
     const keys = Object.keys(data);
     const paramTypesContents = [
       {
@@ -44,20 +50,22 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
       editActions.changeParamType({ param_type });
     };
     const typeMenu = (
-      <div className={styles.menu}>
-        <Select
-          contents={paramTypesContents}
-          value={param_type}
-          onChange={onParamtypeChange}
-        />
-      </div>
+      <Toolbar>
+        <Toolbox label="パラメータの種類">
+          <Select
+            contents={paramTypesContents}
+            value={param_type}
+            onChange={onParamtypeChange}
+          />
+        </Toolbox>
+      </Toolbar>
     );
 
     return (
-      <div className={styles.wrapper}>
+      <>
         {typeMenu}
         <div ref="main" className={styles.main}>
-          <div>
+          <FormControls>
             {(param_type === ''
               ? keys
               : masao.paramTypes[param_type].params
@@ -198,17 +206,14 @@ export default class ParamEdit extends React.Component<IPropParamEdit, {}> {
                 }
               }
               return (
-                <div key={key} className={styles.param}>
-                  <label>
-                    <b>{description}</b>
-                    <span>{field}</span>
-                  </label>
-                </div>
+                <FormField key={key} name={description}>
+                  {field}
+                </FormField>
               );
             })}
-          </div>
+          </FormControls>
         </div>
-      </div>
+      </>
     );
   }
 }

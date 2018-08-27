@@ -1,0 +1,25 @@
+.wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.main {
+  flex: auto 1 1;
+}
+.chip-information {
+  background-color: var(--chipselect-bg);
+  display: flex;
+  flex-flow: row nowrap;
+}
+.chip-display {
+  flex: auto 0 0;
+  align-self: center;
+  padding: 6px 0;
+}
+.chip-description {
+  flex: auto 1 1;
+}
+
+/* style of input which displays default value. */
+.input-default {
+  color: #777777;
+}

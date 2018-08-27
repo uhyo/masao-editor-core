@@ -1,7 +1,8 @@
-import { Chip } from './interface';
+import { NativeChip } from './interface';
+import { fromNativeTable } from './native';
 // 敵データのテーブル
 
-export const enemyTable: Record<string, Chip> = {
+const nativeEnemyTable: Record<string, NativeChip> = {
   '100': {
     pattern: [
       140,
@@ -352,3 +353,5 @@ export const enemyTable: Record<string, Chip> = {
     category: 'enemy',
   },
 };
+
+export const enemyTable = fromNativeTable(nativeEnemyTable);

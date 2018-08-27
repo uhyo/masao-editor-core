@@ -1,3 +1,5 @@
+// Apply Polyfill.
+import '../../scripts/polyfill/requestidlecallback';
 import * as React from 'react';
 import { autorun, IReactionDisposer } from 'mobx';
 
@@ -7,18 +9,17 @@ import * as masao from '../../scripts/masao';
 
 export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
-import * as editActions from '../../actions/edit';
 import * as paramActions from '../../actions/params';
 import * as projectActions from '../../actions/project';
-import * as mapActions from '../../actions/map';
 import * as keyActions from '../../actions/key';
 import * as mapLogics from '../../logics/map';
-import { getCurrentGame } from '../../logics/game';
+import { getCurrentGame, loadGame } from '../../logics/game';
 import { Command, ExternalCommand } from '../../logics/command';
 
 import mapStore, { MapState, MapStore } from '../../stores/map';
 import paramStore, { ParamsState, ParamsStore } from '../../stores/params';
 import editStore, { EditState, EditStore } from '../../stores/edit';
+import customPartsStore, { CustomPartsState } from '../../stores/custom-parts';
 import projectStore, { ProjectState } from '../../stores/project';
 import historyStore, { HistoryState } from '../../stores/history';
 import keyStore from '../../stores/key';
@@ -26,22 +27,23 @@ import commandStore from '../../stores/command';
 import updateStore from '../../stores/update';
 
 import ScreenSelect from './screen-select';
-import { MapScreen } from './screen/map-screen';
-import { ParamScreen } from './screen/param-screen';
-import { ProjectScreen } from './screen/project-screen';
-import { JsScreen } from './screen/js-screen';
+import KeyEvent from './key-event';
 
 import Button from './util/button';
-import { Toolbar } from './util/toolbar';
+import { Toolbar, Toolbox } from '../components/toolbar';
 
 import './css/init.css';
 import './theme/color.css';
 import * as styles from './css/index.css';
+import memoizeOne from 'memoize-one';
+import { Images } from '../../defs/images';
+import { ScreenRouter } from './screen-router';
 
 export interface IDefnMasaoEditorCore {
   map: MapState;
   params: ParamsState;
   edit: EditState;
+  customParts: CustomPartsState;
   project: ProjectState;
   history: HistoryState;
 }
@@ -63,6 +65,10 @@ export interface IPropMasaoEditorCore {
    */
   filename_mapchip: string;
 
+  /**
+   * Name of editor-specific field in masao-json-format data.
+   */
+  editorExtField?: string;
   /**
    * Default param data.
    */
@@ -125,6 +131,7 @@ export default class MasaoEditorCore extends RefluxComponent<
         map: mapStore,
         params: paramStore,
         edit: editStore,
+        customParts: customPartsStore,
         project: projectStore,
         history: historyStore,
       },
@@ -215,88 +222,24 @@ export default class MasaoEditorCore extends RefluxComponent<
     }
   }
   private loadGame(game: masao.format.MasaoJSONFormat) {
-    const version = masao.acceptVersion(game.version);
-    const params = masao.param.addDefaults(game.params, version);
-    const script = game.script || '';
-
-    const advanced = game['advanced-map'] != null;
-
-    mapActions.setAdvanced({
-      advanced,
-    });
-    paramActions.resetParams(params);
-    projectActions.changeVersion({ version });
-
-    projectActions.changeScript({
-      script,
-    });
-    editActions.jsConfirm({
-      confirm: !!script,
-    });
-
-    if (advanced) {
-      const a = game['advanced-map']!;
-      mapLogics.loadAdvancedMap(
-        a.stages.map((stage: any) => {
-          let map;
-          let layer;
-          for (let obj of stage.layers) {
-            if (obj.type === 'main') {
-              map = obj.map;
-            } else if (obj.type === 'mapchip') {
-              layer = obj.map;
-            }
-          }
-          return {
-            size: stage.size,
-            map,
-            layer,
-          };
-        }),
-      );
-    } else {
-      mapLogics.loadParamMap(params);
-    }
+    loadGame(this.props.editorExtField, game);
   }
   render() {
     const {
       props: {
         filename_pattern,
         filename_mapchip,
-        jsWarning,
+        jsWarning = false,
         externalCommands,
-        'fit-y': fity,
-        keyDisabled,
+        'fit-y': fity = false,
+        keyDisabled = false,
       },
-      state: { map, params, edit, project, history },
+      state: { map, params, edit, customParts, project, history },
     } = this;
     const chips: string = require('../../images/chips.png');
 
-    let screen = null;
-    if (edit.screen === 'map' || edit.screen === 'layer') {
-      screen = (
-        <MapScreen
-          pattern={filename_pattern}
-          mapchip={filename_mapchip}
-          chips={chips}
-          map={map}
-          params={params}
-          edit={edit}
-          project={project}
-          history={history}
-          fit-y={fity}
-          keyDisabled={!!keyDisabled}
-        />
-      );
-    } else if (edit.screen === 'params') {
-      screen = <ParamScreen params={params} edit={edit} project={project} />;
-    } else if (edit.screen === 'project') {
-      screen = <ProjectScreen project={project} map={map} edit={edit} />;
-    } else if (edit.screen === 'js') {
-      screen = (
-        <JsScreen jsWarning={!!jsWarning} edit={edit} project={project} />
-      );
-    }
+    const images = makeImages(filename_pattern, filename_mapchip, chips);
+
     let external_buttons = null;
     if (externalCommands != null) {
       external_buttons = externalCommands.map(com => {
@@ -311,25 +254,35 @@ export default class MasaoEditorCore extends RefluxComponent<
       });
     }
     return (
-      <div
-        className={
-          styles.wrapper +
-          (this.props.className ? ' ' + this.props.className : '')
-        }
-      >
-        <Toolbar>
-          <div className={styles.info}>
-            <div>
-              <div className={styles.toolboxLabel}>画面選択</div>
-              <ScreenSelect edit={edit} />
-            </div>
+      <>
+        <div
+          className={
+            styles.wrapper +
+            (this.props.className ? ' ' + this.props.className : '')
+          }
+        >
+          <Toolbar>
+            <Toolbox label="画面選択">
+              <ScreenSelect edit={edit} map={map} />
+            </Toolbox>
             {external_buttons}
+          </Toolbar>
+          <div className={fity ? styles.screenWrapperFit : undefined}>
+            <ScreenRouter
+              images={images}
+              edit={edit}
+              map={map}
+              params={params}
+              project={project}
+              history={history}
+              customParts={customParts}
+              fit-y={fity}
+              jsWarning={jsWarning}
+            />
           </div>
-        </Toolbar>
-        <div className={fity ? styles.screenWrapperFit : undefined}>
-          {screen}
         </div>
-      </div>
+        <KeyEvent disabled={keyDisabled} />
+      </>
     );
   }
   protected handleExternal(
@@ -337,12 +290,13 @@ export default class MasaoEditorCore extends RefluxComponent<
   ) {
     //paramにmapの内容を突っ込む
     return () => {
-      const { map, project, edit, params, history } = this.state;
+      const { map, project, edit, customParts, params, history } = this.state;
 
       req(this.getCurrentGame(), {
         map,
         project,
         edit,
+        customParts,
         params,
         history,
       });
@@ -417,3 +371,14 @@ export default class MasaoEditorCore extends RefluxComponent<
   static paramStore: ParamsStore = paramStore;
   static editStore: EditStore = editStore;
 }
+
+/**
+ * Memoized function to make an images object.
+ */
+const makeImages = memoizeOne(
+  (pattern: string, mapchip: string, chips: string): Images => ({
+    pattern,
+    mapchip,
+    chips,
+  }),
+);

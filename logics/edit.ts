@@ -7,9 +7,12 @@ import * as mapActions from '../actions/map';
 import * as historyActions from '../actions/history';
 import editStore from '../stores/edit';
 import mapStore from '../stores/map';
+import customPartsStore from '../stores/custom-parts';
 import commandStore from '../stores/command';
 import updateStore from '../stores/update';
 import { getCurrentGame } from './game';
+import { CustomPartsData } from '../defs/map';
+import { customPartsList } from '../scripts/custom-parts';
 
 export type FocusPlace = editActions.FocusPlace;
 type Screen = editActions.Screen;
@@ -536,7 +539,6 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
     view_width,
     view_height,
     chipselect_width,
-    chipselect_height,
     chipselect_scroll,
     tool,
   } = edit;
@@ -581,7 +583,13 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
 
     const id2 = Math.max(
       0,
-      Math.min(id + x + y * chipselect_width, chipLength() - 1),
+      Math.min(
+        id + x + y * chipselect_width,
+        chipNumber(
+          mapStore.state.advanced,
+          customPartsStore.state.customParts,
+        ) - 1,
+      ),
     );
 
     editActions.setCursor({
@@ -593,9 +601,15 @@ export function moveCursorBy({ x, y }: { x: number; y: number }): void {
 
     const idy = Math.floor(id2 / chipselect_width);
 
+    // height of chip list.
+    const chipselectHeight = Math.ceil(
+      chipNumber(mapStore.state.advanced, customPartsStore.state.customParts) /
+        chipselect_width,
+    );
+
     const c_sc = Math.min(
       idy,
-      Math.max(chipselect_scroll, idy - chipselect_height + 1),
+      Math.max(chipselect_scroll, idy - chipselectHeight + 1),
     );
     if (c_sc !== chipselect_scroll) {
       editActions.changeChipselectScroll({
@@ -705,18 +719,35 @@ export function cursorButton(keydown: boolean) {
       });
     } else {
       editActions.changePen({
-        pen: chipList()[id],
+        pen: chipList(
+          mapStore.state.advanced,
+          customPartsStore.state.customParts,
+        )[id],
       });
     }
   }
 }
 
-export function chipList() {
-  const { advanced } = mapStore.state;
-
-  return advanced ? chip.advancedChipList : chip.chipList;
+/**
+ * Return the list of currently available chips.
+ */
+export function chipList(
+  advanced: boolean,
+  customParts: CustomPartsData,
+): ChipCode[] {
+  if (advanced) {
+    return chip.advancedChipList.concat(customPartsList(customParts));
+  } else {
+    return chip.chipList;
+  }
 }
-// チップの数
-export function chipLength(): number {
-  return chipList().length;
+
+/**
+ * Return the number of currently avaiable chips.
+ */
+export function chipNumber(
+  advanced: boolean,
+  customParts: CustomPartsData,
+): number {
+  return chipList(advanced, customParts).length;
 }

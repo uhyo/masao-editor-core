@@ -1,7 +1,28 @@
-import { param, format } from 'masao';
+import { param, format, customParts } from 'masao';
 
 export { param, format };
+export const customPartsProperties = customParts.customPartsProperties;
 export type MasaoJSONFormat = format.MasaoJSONFormat;
+export type AdvancedMap = format.AdvancedMap;
+export type CustomPartsProperty = customParts.CustomPartsProperty;
+export type CustomPartsPropertySet = customParts.CustomPartsPropertySet;
+export type IntegerProperty = customParts.IntegerProperty;
+
+/**
+ * default field name of editor-specific data.
+ */
+export const extFieldDefault = '_meme_core';
+/**
+ * Editor-specific data saved in masao-json-format.
+ */
+export interface MJSExtFields {
+  customParts?: Record<
+    string,
+    {
+      name: string;
+    }
+  >;
+}
 
 export interface ParamType {
   name: string;

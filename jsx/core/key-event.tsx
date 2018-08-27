@@ -1,6 +1,6 @@
 import * as React from 'react';
 // key eventを感知
-import * as keyLogics from '../../../../logics/key';
+import * as keyLogics from '../../logics/key';
 
 export interface IPropKeyEvents {
   /**

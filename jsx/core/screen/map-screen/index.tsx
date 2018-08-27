@@ -4,6 +4,7 @@ import {
   EditState,
   HistoryState,
   MapState,
+  CustomPartsState,
   ParamsState,
   ProjectState,
 } from '../../../../stores';
@@ -12,25 +13,22 @@ import MapEdit from './map-edit';
 import ChipSelect from './chip-select';
 import EditMode from './edit-mode';
 import MiniMap from './mini-map';
-import KeyEvent from './key-event';
 
 import * as styles from '../../css/screen/map-screen.css';
 
-import { Toolbar } from '../../util/toolbar';
+import { Toolbar } from '../../../components/toolbar';
+import { Images } from '../../../../defs/images';
 
 export interface IPropMapScreen {
-  // 画像
-  pattern: string;
-  mapchip: string;
-  chips: string;
+  /**
+   * Images used in this screen.
+   */
+  images: Images;
 
   'fit-y'?: boolean;
-  /**
-   * Whether key input is disabled.
-   */
-  keyDisabled: boolean;
 
   edit: EditState;
+  customParts: CustomPartsState;
   params: ParamsState;
   map: MapState;
   project: ProjectState;
@@ -44,14 +42,12 @@ export const MapScreen = (props: IPropMapScreen) => {
     map,
     params,
     edit,
+    customParts,
     project,
     history,
 
-    pattern,
-    mapchip,
-    chips,
+    images,
     'fit-y': fity,
-    keyDisabled,
   } = props;
   let are = null;
   if (project.version === '2.8' && edit.screen === 'layer') {
@@ -80,36 +76,38 @@ export const MapScreen = (props: IPropMapScreen) => {
       {are}
       <div className={mapsClass}>
         <div className={styles.minimapWrapper}>
-          <MiniMap params={params} edit={edit} stage={stage} />
+          <MiniMap
+            params={params}
+            edit={edit}
+            customParts={customParts}
+            stage={stage}
+          />
         </div>
         <div className={styles.cmWrapper}>
           <div className={styles.chipselectWrapper}>
             <ChipSelect
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
+              images={images}
               params={params}
               edit={edit}
+              customParts={customParts}
               project={project}
               advanced={advanced}
             />
           </div>
           <div className={styles.mainmapWrapper}>
             <MapEdit
-              pattern={pattern}
-              mapchip={mapchip}
-              chips={chips}
+              images={images}
               stage={stage}
               lastUpdate={lastUpdate}
               params={params}
               edit={edit}
+              customParts={customParts}
               project={project}
               fit-y={fity}
             />
           </div>
         </div>
       </div>
-      <KeyEvent disabled={keyDisabled} />
     </>
   );
 };

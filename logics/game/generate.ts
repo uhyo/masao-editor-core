@@ -1,12 +1,19 @@
-// Game objectに関するlogic
-import * as masao from '../scripts/masao';
-import { chipToMapString, chipToLayerString, ChipCode } from '../scripts/chip';
+/*
+ * Generation of game object.
+ */
+import * as masao from '../../scripts/masao';
+import {
+  chipToMapString,
+  chipToLayerString,
+  ChipCode,
+} from '../../scripts/chip';
 
-export type MasaoJSONFormat = masao.format.MasaoJSONFormat;
+type MasaoJSONFormat = masao.format.MasaoJSONFormat;
 
-import mapStore, { MapState } from '../stores/map';
-import projectStore from '../stores/project';
-import paramsStore from '../stores/params';
+import mapStore, { MapState } from '../../stores/map';
+import customPartsStore, { CustomPartsState } from '../../stores/custom-parts';
+import projectStore from '../../stores/project';
+import paramsStore from '../../stores/params';
 
 /**
  * Option bag to `getCurrentGame`.
@@ -19,6 +26,10 @@ export interface GetCurrentGameOption {
     x: number;
     y: number;
   };
+  /**
+   * Name of field of extensional data.
+   */
+  extField?: string;
 }
 /**
  * Generate an object of current game.
@@ -26,11 +37,18 @@ export interface GetCurrentGameOption {
 export function getCurrentGame(
   options: GetCurrentGameOption = {},
 ): MasaoJSONFormat {
+  const extField =
+    options.extField != null ? options.extField : masao.extFieldDefault;
   const map = mapStore.state;
+  const customParts = customPartsStore.state;
   const project = projectStore.state;
   const params = paramsStore.state;
 
-  const { params: mp, advancedMap } = mapToParam(map, options.masaoPosition);
+  const { params: mp, advancedMap, ext } = mapToParam(
+    map,
+    customParts,
+    options.masaoPosition,
+  );
 
   const version = project.version;
   const allParams = masao.param.sanitize({
@@ -44,6 +62,10 @@ export function getCurrentGame(
     script: project.script || void 0,
     'advanced-map': advancedMap,
   });
+  // add extensions.
+  if (ext != null) {
+    (obj as any)[extField] = ext;
+  }
   console.log('MADE', obj);
   return obj;
 }
@@ -56,10 +78,12 @@ type LayerObject = masao.format.LayerObject;
  */
 function mapToParam(
   map: MapState,
+  customParts: CustomPartsState,
   masaoPosition?: { x: number; y: number },
 ): {
   params: Record<string, string>;
   advancedMap: AdvancedMap | undefined;
+  ext?: masao.MJSExtFields;
 } {
   if (map.advanced) {
     // advancedなmapを発行
@@ -82,10 +106,17 @@ function mapToParam(
       };
       stages.push(obj);
     }
+    const { customParts: cp, ext: customPartsExt } = generateCustomPartsData(
+      customParts,
+    );
     return {
       params: {},
       advancedMap: {
         stages,
+        customParts: cp,
+      },
+      ext: {
+        customParts: customPartsExt,
       },
     };
   } else {
@@ -117,6 +148,38 @@ function mapToParam(
       advancedMap: void 0,
     };
   }
+}
+
+/**
+ * generate custom parts definition data.
+ */
+function generateCustomPartsData(
+  customParts: CustomPartsState,
+): {
+  customParts: AdvancedMap['customParts'];
+  ext: masao.MJSExtFields['customParts'];
+} {
+  const result: AdvancedMap['customParts'] = {};
+  const ext: Record<string, { name: string }> = {};
+  for (const key in customParts.customParts) {
+    const cpo = customParts.customParts[key];
+    if (cpo == null) {
+      continue;
+    }
+    result[key] = {
+      extends: cpo.extends,
+      properties: cpo.properties,
+    };
+    ext[key] = {
+      name: cpo.name,
+    };
+  }
+  // return undefined if empty.
+  const finalResult = Object.keys(result).length === 0 ? undefined : result;
+  return {
+    customParts: finalResult,
+    ext,
+  };
 }
 
 /**

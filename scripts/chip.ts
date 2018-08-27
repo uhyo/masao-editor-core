@@ -5,487 +5,31 @@ import {
   MainChipRendering,
   SubChipRendering,
   Chip,
+  ColorRendering,
 } from './chip-data/interface';
 
-import { dossunsun_pattern, unknown_pattern } from './chip-data/patterns';
+import { unknown_pattern, addRendering } from './chip-data/patterns';
 
 import { athleticTable } from './chip-data/athletics';
 import { enemyTable } from './chip-data/enemies';
 
+import { CustomPartsData } from '../defs/map';
+import {
+  getCustomChipName,
+  getNativeCode,
+  getCustomChipColor,
+} from './custom-parts';
+import { chipTable } from './chip-data/regular';
 /**
  * Code of chip.
  */
 export type ChipCode = number | string;
 
-/* categoryの種類
- * masao: 正男
- * block: ブロック
- * enemy: 敵
- * athletic: 仕掛け
- * bg: 背景
- * water: 水
- * item: アイテム
- */
-function keyToNum<T>(obj: Record<string, T>): Record<string, T> {
-  const result: Record<string, T> = {};
-  for (let k in obj) {
-    const code = k === '.' ? 0 : k.charCodeAt(0);
-    result[code] = obj[k];
-  }
-  return result;
-}
-const chipTable: Record<string, Chip> = keyToNum({
-  A: {
-    pattern: 100,
-    name: '主人公',
-    category: 'masao',
-  },
-  B: {
-    pattern: [
-      {
-        chip: 140,
-      },
-      {
-        subx: 0,
-        suby: 0,
-      },
-    ],
-    name: '亀（足元に空白があると向きを変える）',
-    category: 'enemy',
-  },
-  C: {
-    pattern: [
-      {
-        chip: 140,
-      },
-      {
-        subx: 48,
-        suby: 0,
-      },
-    ],
-    name: '亀（足元に空白があると落ちる）',
-    category: 'enemy',
-  },
-  D: {
-    pattern: [
-      {
-        chip: 140,
-      },
-      {
-        subx: 32,
-        suby: 0,
-      },
-    ],
-    name: '亀（足元に空白があると落ちる 3匹連続）',
-  },
-  E: {
-    pattern: 143,
-    name: 'ピカチー',
-    category: 'enemy',
-  },
-  F: {
-    pattern: 150,
-    name: 'チコリン',
-    category: 'enemy',
-  },
-  G: {
-    pattern: 152,
-    name: 'ヒノララシ',
-    category: 'enemy',
-  },
-  H: {
-    pattern: [
-      {
-        chip: 147,
-      },
-      {
-        subx: 16,
-        suby: 0,
-      },
-    ],
-    name: 'ポッピー（上下移動）',
-    category: 'enemy',
-  },
-  I: {
-    pattern: [
-      {
-        chip: 147,
-      },
-      {
-        subx: 48,
-        suby: 0,
-      },
-    ],
-    name: 'ポッピー（直進）',
-    category: 'enemy',
-  },
-  J: {
-    pattern: [
-      {
-        chip: 147,
-      },
-      {
-        subx: 32,
-        suby: 0,
-      },
-    ],
-    name: 'ポッピー（直進　3羽連続）',
-    category: 'enemy',
-  },
-  K: {
-    pattern: {
-      chip: 190,
-      width: 96,
-    },
-    name: '動く床（上下移動）',
-    category: 'athletic',
-  },
-  L: {
-    pattern: {
-      chip: 190,
-      width: 96,
-    },
-    name: '動く床（左右移動）',
-    category: 'athletic',
-  },
-  M: {
-    pattern: {
-      chip: 190,
-      width: 96,
-    },
-    name: '動く床（左右移動×2）',
-    category: 'athletic',
-  },
-  N: {
-    pattern: dossunsun_pattern,
-    name: 'ドッスンスン',
-    category: 'athletic',
-  },
-  O: {
-    pattern: 154,
-    name: 'マリリ',
-    category: 'enemy',
-  },
-  P: {
-    pattern: 158,
-    name: 'ヤチャモ',
-    category: 'enemy',
-  },
-  Q: {
-    pattern: 160,
-    name: 'ミズタロウ',
-    category: 'enemy',
-  },
-  R: {
-    pattern: 164,
-    name: 'エアームズ',
-    category: 'enemy',
-  },
-  S: {
-    pattern: 196,
-    name: 'グラーダ',
-    category: 'enemy',
-  },
-  T: {
-    pattern: 198,
-    name: 'カイオール',
-    category: 'enemy',
-  },
-  U: {
-    pattern: [
-      50,
-      {
-        subx: 0,
-        suby: 16,
-      },
-    ],
-    name: 'ファイヤーバー（左回り）',
-    category: 'athletic',
-  },
-  V: {
-    pattern: [
-      50,
-      {
-        subx: 16,
-        suby: 16,
-      },
-    ],
-    name: 'ファイヤーバー（右回り）',
-    category: 'athletic',
-  },
-  W: {
-    pattern: 166,
-    name: 'タイキング',
-    category: 'enemy',
-  },
-  X: {
-    pattern: 167,
-    name: 'クラゲッソ',
-    category: 'enemy',
-  },
-  Y: {
-    pattern: 86,
-    name: '水草',
-    category: 'bg',
-  },
-  Z: {
-    pattern: 248,
-    name: 'センクウザ',
-    category: 'enemy',
-  },
-  a: {
-    pattern: 20,
-    name: 'ブロック1',
-    category: 'block',
-  },
-  b: {
-    pattern: 21,
-    name: 'ブロック2',
-    category: 'block',
-  },
-  c: {
-    pattern: 22,
-    name: 'ブロック3',
-    category: 'block',
-  },
-  d: {
-    pattern: 23,
-    name: 'ブロック4',
-    category: 'block',
-  },
-  e: {
-    pattern: 24,
-    name: 'ブロック5',
-    category: 'block',
-  },
-  f: {
-    pattern: 25,
-    name: 'ブロック6',
-    category: 'block',
-  },
-  g: {
-    pattern: 26,
-    name: 'ブロック7',
-    category: 'block',
-  },
-  h: {
-    pattern: 27,
-    name: 'ブロック8',
-    category: 'block',
-  },
-  i: {
-    pattern: 28,
-    name: 'ブロック9',
-    category: 'block',
-  },
-  j: {
-    pattern: 29,
-    name: 'ブロック10',
-    category: 'block',
-  },
-  k: {
-    pattern: [40, 90],
-    name: '？ブロック（コイン）',
-    category: 'block',
-  },
-  l: {
-    pattern: [
-      40,
-      90,
-      {
-        subx: 32,
-        suby: 0,
-      },
-    ],
-    name: '？ブロック（コイン3枚）',
-    category: 'block',
-  },
-  m: {
-    pattern: [40, 42],
-    name: '？ブロック（ファイヤーボール）',
-    category: 'block',
-  },
-  n: {
-    pattern: [40, 43],
-    name: '？ブロック（バリア）',
-    category: 'block',
-  },
-  o: {
-    pattern: [40, 44],
-    name: '？ブロック（タイム）',
-    category: 'block',
-  },
-  p: {
-    pattern: [40, 45],
-    name: '？ブロック（ジェット）',
-    category: 'block',
-  },
-  q: {
-    pattern: [40, 46],
-    name: '？ブロック（ヘルメット）',
-    category: 'block',
-  },
-  r: {
-    pattern: [40, 47],
-    name: '？ブロック（しっぽ）',
-    category: 'block',
-  },
-  s: {
-    pattern: [40, 48],
-    name: '？ブロック（ドリル）',
-    category: 'block',
-  },
-  t: {
-    pattern: [40, 49],
-    name: '？ブロック（グレネード）',
-    category: 'block',
-  },
-  u: {
-    pattern: {
-      chip: 60,
-      width: 64,
-    },
-    name: 'リンク土管1',
-    category: 'athletic',
-  },
-  v: {
-    pattern: {
-      chip: 62,
-      width: 64,
-    },
-    name: 'リンク土管2',
-    category: 'athletic',
-  },
-  w: {
-    pattern: {
-      chip: 64,
-      width: 64,
-    },
-    name: 'リンク土管3',
-    category: 'athletic',
-  },
-  x: {
-    pattern: {
-      chip: 66,
-      width: 64,
-    },
-    name: 'リンク土管4',
-    category: 'athletic',
-  },
-  y: {
-    pattern: [40, 59],
-    name: '？ブロック（1up茸）',
-    category: 'block',
-  },
-  z: {
-    pattern: 69,
-    name: 'すべる床',
-    category: 'lblock',
-  },
-  '+': {
-    pattern: 36,
-    name: '一言メッセージ1',
-    category: 'bg',
-  },
-  '-': {
-    pattern: 37,
-    name: '一言メッセージ2',
-    category: 'bg',
-  },
-  '*': {
-    pattern: 38,
-    name: '一言メッセージ3',
-    category: 'bg',
-  },
-  '/': {
-    pattern: 39,
-    name: '一言メッセージ4',
-    category: 'bg',
-  },
-  '1': {
-    pattern: 1,
-    name: '雲の左側',
-    category: 'bg',
-  },
-  '2': {
-    pattern: 2,
-    name: '雲の右側',
-    category: 'bg',
-  },
-  '3': {
-    pattern: 3,
-    name: '草',
-    category: 'bg',
-  },
-  '4': {
-    pattern: 4,
-    name: '水',
-    category: 'water',
-  },
-  '5': {
-    pattern: 5,
-    name: '上向きのトゲ',
-    category: 'athletic',
-  },
-  '6': {
-    pattern: 6,
-    name: '下向きのトゲ',
-    category: 'athletic',
-  },
-  '7': {
-    pattern: 96,
-    name: 'ろうそく',
-    category: 'bg',
-  },
-  '8': {
-    pattern: 94,
-    name: '星',
-    category: 'item',
-  },
-  '9': {
-    pattern: 90,
-    name: 'コイン',
-    category: 'item',
-  },
-  '{': {
-    pattern: 140,
-    name: '亀（追尾）',
-    category: 'enemy',
-  },
-  '}': {
-    pattern: 143,
-    name: '重力無視の追跡ピカチー等',
-    category: 'enemy',
-  },
-  '[': {
-    pattern: 35,
-    name: '下から通れる床',
-    category: 'athletic',
-  },
-  ']': {
-    pattern: 30,
-    name: 'ハシゴ',
-    category: 'athletic',
-  },
-  '<': {
-    pattern: 18,
-    name: '上り坂',
-    category: 'block',
-  },
-  '>': {
-    pattern: 19,
-    name: '下り坂',
-    category: 'block',
-  },
-  '.': {
-    pattern: 0,
-    name: '空白',
-  },
-});
-
-export const chipList = Object.keys(chipTable).map(key => Number(key));
+export const chipList: ChipCode[] = Object.keys(chipTable).map(key =>
+  Number(key),
+);
 // advanced-mapで使えるやつ
-export const advancedChipList = [
+export const advancedChipList: ChipCode[] = [
   ...chipList,
   ...Object.keys(athleticTable).map(key => Number(key) + 1000),
   ...Object.keys(enemyTable).map(key => Number(key) + 5000),
@@ -523,6 +67,7 @@ export function drawChip(
   ctx: CanvasRenderingContext2D,
   images: ImagesObject,
   params: Record<string, string>,
+  customParts: CustomPartsData,
   chip: ChipCode,
   x: number,
   y: number,
@@ -534,7 +79,7 @@ export function drawChip(
   if (chip === 0) {
     return;
   }
-  const t = chipFor(params, chip);
+  const t = chipFor(params, customParts, chip);
   if (t == null) {
     return;
   }
@@ -641,6 +186,11 @@ export function drawChip(
         width,
         height,
       );
+    } else if ((pi as ColorRendering).color != null) {
+      // pi is a ColorRendering.
+      pi = pi as ColorRendering;
+      ctx.fillStyle = pi.color;
+      ctx.fillRect(x + pi.x, y + pi.y, pi.width, pi.height);
     }
   }
 }
@@ -648,6 +198,7 @@ export function drawChip(
 // チップの描画範囲を返す（相対座標）
 export function chipRenderRect(
   params: Record<string, string>,
+  customParts: CustomPartsData,
   chip: number,
 ): Rect {
   const rect: Rect = {
@@ -659,7 +210,7 @@ export function chipRenderRect(
   if (chip === 0) {
     return rect;
   }
-  const t = chipFor(params, chip);
+  const t = chipFor(params, customParts, chip);
   if (t == null) {
     return rect;
   }
@@ -678,10 +229,12 @@ export function chipRenderRect(
     }
     const chip = (pi as MainChipRendering).chip;
     if (chip != null) {
-      const width = pi.width || 32;
-      const height = pi.height || 32;
-      const dx = pi.dx || 0;
-      const dy = pi.dy || 0;
+      // pi is a MainChipRendering.
+      const pim = pi as MainChipRendering;
+      const width = pim.width || 32;
+      const height = pim.height || 32;
+      const dx = pim.dx || 0;
+      const dy = pim.dy || 0;
       rects.push({
         minX: dx,
         minY: dy,
@@ -692,11 +245,12 @@ export function chipRenderRect(
       (pi as SubChipRendering).subx != null &&
       (pi as SubChipRendering).suby != null
     ) {
-      // subの場合
-      const width = pi.width || 16;
-      const height = pi.height || 16;
-      const dx = pi.dx || 0;
-      const dy = pi.dy || 0;
+      // pi is a SubChipRendering.
+      const pis = pi as SubChipRendering;
+      const width = pis.width || 16;
+      const height = pis.height || 16;
+      const dx = pis.dx || 0;
+      const dy = pis.dy || 0;
       rects.push({
         minX: dx,
         minY: dy,
@@ -708,19 +262,73 @@ export function chipRenderRect(
   return containerRect(...rects);
 }
 
-//チップオブジェクト
-export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
+/**
+ * Get a chip object for given code.
+ */
+export function chipFor(
+  params: Record<string, string>,
+  customParts: CustomPartsData,
+  chip: ChipCode,
+): Chip {
   if ('string' === typeof chip) {
-    // TODO currently, return unknown for string chip.
-    return {
+    // custom parts.
+    // get name of custom parts.
+    const name = getCustomChipName(customParts, chip);
+    const color = getCustomChipColor(customParts, chip);
+    // get native chip code.
+    const nativeCode = getNativeCode(customParts, chip);
+    const c = nativeCode != null ? lookupChip(params, nativeCode) : null;
+    if (c != null) {
+      const { pattern, category, nativeName, nativeCode } = c;
+      return {
+        // カスタムパーツのサインをpatternに追加
+        pattern: addRendering(pattern, {
+          color: color || '#000000',
+          x: 0,
+          y: 0,
+          width: 10,
+          height: 5,
+        }),
+        name: name != null ? name : '不明',
+        category,
+        nativeName,
+        nativeCode,
+      };
+    } else {
+      // undefined chip.
+      return {
+        pattern: unknown_pattern,
+        name: '不明',
+        nativeName: '不明',
+        // ???
+        nativeCode: 0,
+      };
+    }
+  }
+  // it's native.
+  return (
+    lookupChip(params, chip) || {
       pattern: unknown_pattern,
       name: '不明',
-    };
-  }
+      nativeName: '不明',
+      nativeCode: 0,
+    }
+  );
+}
+
+/**
+ * Look up native chip definition.
+ */
+function lookupChip(params: Record<string, string>, chip: number): Chip | null {
   let pa = athleticTypeParam[chip];
   if (pa != null && params[pa] !== '1') {
     //変わったアスレチックだ
-    return athleticTable[params[pa]];
+    const ac = athleticTable[params[pa]];
+    return {
+      ...ac,
+      nativeCode: chip,
+      nativeName: ac.name,
+    };
   } else if (chip === 106 && params['layer_mode'] === '2') {
     //ブロック10はレイヤーありのとき透明になる
     return {
@@ -740,6 +348,8 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
       ],
       name: 'ブロック10（透明）',
       category: 'block',
+      nativeName: 'ブロック10',
+      nativeCode: chip,
     };
   } else if (chip === 91 && params['layer_mode'] === '2') {
     //下から通れる床
@@ -756,6 +366,8 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
       ],
       name: '下から通れる床（透明）',
       category: 'block',
+      nativeName: '下から通れる床',
+      nativeCode: chip,
     };
   } else if (chip === 93 && params['layer_mode'] === '2') {
     //ハシゴ
@@ -772,6 +384,8 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
       ],
       name: 'ハシゴ（透明）',
       category: 'block',
+      nativeName: 'ハシゴ',
+      nativeCode: chip,
     };
   } else if (chip === 60 && params['layer_mode'] === '2') {
     //坂も透明になる
@@ -788,6 +402,8 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
       ],
       name: '上り坂（透明）',
       category: 'block',
+      nativeName: '上り坂',
+      nativeCode: chip,
     };
   } else if (chip === 62 && params['layer_mode'] === '2') {
     //坂も透明になる
@@ -804,12 +420,18 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
       ],
       name: '下り坂（透明）',
       category: 'block',
+      nativeName: '下り坂',
+      nativeCode: chip,
     };
   } else if (chip >= 1000 && chip < 5000) {
     // athleticだ
     const obj = athleticTable[chip - 1000];
     if (obj != null) {
-      return obj;
+      return {
+        ...obj,
+        nativeCode: chip,
+        nativeName: obj.name,
+      };
     }
   } else if (chip >= 5000 && chip < 10000) {
     // enemyだ
@@ -823,10 +445,7 @@ export function chipFor(params: Record<string, string>, chip: ChipCode): Chip {
     return obj;
   }
   // 不明だ
-  return {
-    pattern: unknown_pattern,
-    name: '不明',
-  };
+  return null;
 }
 
 // 従来の文字列表現チップと数値の相互変換

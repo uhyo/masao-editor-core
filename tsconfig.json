@@ -1,8 +1,8 @@
 {
-  "compilerOptions":{
+  "compilerOptions": {
     "declaration": true,
     "importHelpers": true,
-    "jsx":"react",
+    "jsx": "react",
     "module": "es2015",
     "moduleResolution": "Node",
     "noEmitOnError": true,
@@ -14,14 +14,8 @@
     "removeComments": true,
     "rootDir": "./",
     "strict": true,
-    "target":"es2016"
+    "target": "es2016"
   },
-  "include": [
-    "./**/*.ts",
-    "./**/*.tsx"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": ["node_modules", "dist-types"]
 }
-
-
-

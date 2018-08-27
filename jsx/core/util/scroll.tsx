@@ -145,13 +145,13 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     const vh = height + screenY;
 
     const horStyle = {
-      width: `${(100 * screenX / vw).toFixed(3)}%`,
-      left: `${(100 * x / vw).toFixed(3)}%`,
+      width: `${((100 * screenX) / vw).toFixed(3)}%`,
+      left: `${((100 * x) / vw).toFixed(3)}%`,
     };
 
     const verStyle = {
-      height: `${(100 * screenY / vh).toFixed(3)}%`,
-      top: `${(100 * y / vh).toFixed(3)}%`,
+      height: `${((100 * screenY) / vh).toFixed(3)}%`,
+      top: `${((100 * y) / vh).toFixed(3)}%`,
     };
 
     const wrapperStyle: Record<string, string> = {
@@ -312,7 +312,9 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     this.hsc_parent =
       target === this.horTip
         ? (this.horArea as HTMLElement)
-        : target === this.verTip ? (this.verArea as HTMLElement) : null;
+        : target === this.verTip
+          ? (this.verArea as HTMLElement)
+          : null;
     this.hsc_x = elementX;
     this.hsc_y = elementY;
     if (this.mouse_flag === false) {
@@ -340,7 +342,9 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
 
   // スクロールを処理
   doFreeScroll(target: HTMLElement, elementX: number, elementY: number) {
-    const { props: { width, height, screenX, screenY } } = this;
+    const {
+      props: { width, height, screenX, screenY },
+    } = this;
     const { width: target_width, height: target_height } = getAbsolutePosition(
       target,
     );
@@ -348,14 +352,14 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     if (target === this.horArea) {
       // 瞬間移動（横）
       const pos = Math.round(
-        elementX / target_width * (width + screenX) - screenX / 2,
+        (elementX / target_width) * (width + screenX) - screenX / 2,
       );
       this.setScroll(pos, null);
       return;
     } else if (target === this.verArea) {
       // 瞬間移動（縦）
       const pos = Math.round(
-        elementY / target_height * (height + screenY) - screenY / 2,
+        (elementY / target_height) * (height + screenY) - screenY / 2,
       );
       this.setScroll(null, pos);
       return;
@@ -372,7 +376,9 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     if (target == null || parent == null) {
       return;
     }
-    const { props: { width, height, screenX, screenY } } = this;
+    const {
+      props: { width, height, screenX, screenY },
+    } = this;
     const {
       x: parent_x,
       y: parent_y,
@@ -385,10 +391,12 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     const py = pageY - parent_y;
 
     if (target === this.horTip) {
-      const pos = Math.round((px - handX) / parent_width * (width + screenX));
+      const pos = Math.round(((px - handX) / parent_width) * (width + screenX));
       this.setScroll(pos, null);
     } else if (target === this.verTip) {
-      const pos = Math.round((py - handY) / parent_height * (height + screenY));
+      const pos = Math.round(
+        ((py - handY) / parent_height) * (height + screenY),
+      );
       this.setScroll(null, pos);
     }
   }

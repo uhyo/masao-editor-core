@@ -1,0 +1,33 @@
+.wrapper {
+  padding: 6px;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.text {
+  padding: 4px 0;
+  font-size: 0.9em;
+  color: #666666;
+}
+
+.field {
+  label {
+    display: block;
+    border-bottom: 1px dashed #cccccc;
+    margin-bottom: 2px;
+
+    & > b,
+    & > span {
+      display: inline-block;
+    }
+    b {
+      width: 340px;
+      color: #333333;
+    }
+    input[type='text'],
+    input[type='number'],
+    select {
+      min-width: 300px;
+    }
+  }
+}

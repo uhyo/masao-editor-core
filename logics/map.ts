@@ -1,10 +1,13 @@
 // load new maps
+import { CustomPartsData } from '../defs/map';
 import * as mapActions from '../actions/map';
+import * as customPartsActions from '../actions/custom-parts';
 import * as historyActions from '../actions/history';
 
-import mapStore from '../stores/map';
+import mapStore, { MapState } from '../stores/map';
 
-import { mapStringToChip, layerStringToChip } from '../scripts/chip';
+import { mapStringToChip, layerStringToChip, ChipCode } from '../scripts/chip';
+import { countElements2 } from '../scripts/util/count-elements';
 
 // マップを全部読みなおした
 export function loadAdvancedMap(
@@ -16,6 +19,7 @@ export function loadAdvancedMap(
     map?: Array<Array<string | number>>;
     layer?: Array<Array<string | number>>;
   }>,
+  customParts: CustomPartsData,
 ): void {
   const l = data.length;
   for (let i = 0; i < l; i++) {
@@ -24,14 +28,18 @@ export function loadAdvancedMap(
       break;
     }
     const { size, map, layer } = data[i];
-    // TODO
-    const map2 = [];
+    // メインレイヤーのデータを読み込み
+    const map2: ChipCode[][] = [];
     for (let y = 0; y < size.y; y++) {
-      const row = new Array(size.x);
+      const row: ChipCode[] = new Array(size.x);
       row.fill(0);
       if (map != null && map[y] != null) {
         for (const [x, c] of map[y].entries()) {
-          if ('number' === typeof c && 0 <= c) {
+          if ('string' === typeof c) {
+            // カスタムパーツ
+            row[x] = c;
+          } else if (0 <= c) {
+            // 通常チップは0以上で整数に変換
             row[x] = c | 0;
           }
         }
@@ -39,9 +47,9 @@ export function loadAdvancedMap(
       map2.push(row);
     }
 
-    const layer2 = [];
+    const layer2: number[][] = [];
     for (let y = 0; y < size.y; y++) {
-      const row = new Array(size.x);
+      const row: number[] = new Array(size.x);
       row.fill(0);
       if (layer != null && layer[y] != null) {
         for (const [x, c] of layer[y].entries()) {
@@ -67,6 +75,9 @@ export function loadAdvancedMap(
       },
     });
   }
+  customPartsActions.loadCustomParts({
+    customParts,
+  });
 }
 
 // paramの変更をmapに適用
@@ -122,4 +133,13 @@ function zerofill2(x: number, y: number): Array<Array<number>> {
     result.push(new Array(x).fill(0));
   }
   return result;
+}
+
+/**
+ * Count all occurences of given chip in the map.
+ */
+export function countChipInMap(map: MapState, chip: ChipCode): number {
+  return map.data
+    .map(stage => countElements2(stage.map, chip))
+    .reduce((a, b) => a + b, 0);
 }

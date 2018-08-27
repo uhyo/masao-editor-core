@@ -93,10 +93,6 @@ export interface EditState {
    */
   chipselect_width: number;
   /**
-   * チップ選択画面の縦幅
-   */
-  chipselect_height: number;
-  /**
    * チップ選択画面のスクロール位置(Y)
    */
   chipselect_scroll: number;
@@ -148,7 +144,6 @@ export class EditStore extends Store<EditState> {
       render_layer: false,
       tool: null,
       chipselect_width: 8,
-      chipselect_height: 9,
       chipselect_scroll: 0,
       focus: null,
       cursor: null,
@@ -239,17 +234,10 @@ export class EditStore extends Store<EditState> {
       });
     }
   }
-  onChangeChipselectSize({
-    width,
-    height,
-  }: editActions.ChangeChipselectSizeAction) {
-    if (
-      width !== this.state.chipselect_width ||
-      height !== this.state.chipselect_height
-    ) {
+  onChangeChipselectSize({ width }: editActions.ChangeChipselectSizeAction) {
+    if (width !== this.state.chipselect_width) {
       this.setState({
         chipselect_width: width,
-        chipselect_height: height,
       });
     }
   }
