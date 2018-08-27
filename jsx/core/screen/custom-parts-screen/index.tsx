@@ -100,7 +100,10 @@ export class CustomPartsScreen extends React.Component<
         properties: {},
         color: '#ffffff',
       };
-      customPartsLogics.generateNewCustomParts(cloneof, 'カスタム亀');
+      customPartsLogics.generateNewCustomParts(
+        cloneof,
+        currentData == null ? 'カスタム亀' : undefined,
+      );
     };
     return (
       <ScreenMainWrapper className={styles.wrapper}>
