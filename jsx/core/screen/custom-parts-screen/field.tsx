@@ -5,6 +5,7 @@ import {
 } from '../../../../scripts/masao';
 
 import * as styles from '../../css/screen/custom-parts-screen.css';
+import { FilteredInput } from '../../../components/filterd-input';
 
 export interface IPropCustomPropertyField {
   property: CustomPartsProperty;
@@ -36,21 +37,22 @@ interface IPropIntegerField {
   value: unknown;
   onChange?(value: number): void;
 }
+const isValidInteger = (value: string) =>
+  value !== '' && Number.isFinite(Number(value));
 function IntegerField({ property, value, onChange }: IPropIntegerField) {
   const isDefault = value == null;
   // convert value to integer.
   const intValue = isDefault ? property.default : Number(value) | 0;
   const changeHandler =
-    onChange &&
-    (({ currentTarget: { value } }: React.SyntheticEvent<HTMLInputElement>) =>
-      onChange(Number(value)));
+    onChange && ((value: string) => onChange(Number(value)));
   return (
-    <input
+    <FilteredInput
       className={isDefault ? styles.inputDefault : undefined}
       type="number"
       value={String(intValue)}
       onChange={changeHandler}
       readOnly={changeHandler == null}
+      filter={isValidInteger}
     />
   );
 }
