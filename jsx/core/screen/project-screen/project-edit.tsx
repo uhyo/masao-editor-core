@@ -186,14 +186,20 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize> {
     }
   }
   render() {
-    const { index, stage: { size }, onResize } = this.props;
+    const {
+      index,
+      stage: { size },
+      onResize,
+    } = this.props;
     const { top, right, bottom, left } = this.state;
 
     const df = (num: number) => {
       const cls =
         num < 0
           ? styles.stageDiffMinus
-          : num > 0 ? styles.stageDiffPlus : styles.stageDiff;
+          : num > 0
+            ? styles.stageDiffPlus
+            : styles.stageDiff;
 
       return <div className={cls}>{num <= 0 ? num : `+${num}`}</div>;
     };
@@ -205,7 +211,10 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize> {
     };
     return (
       <div>
-        <div>ステージ{index + 1}</div>
+        <div>
+          ステージ
+          {index}
+        </div>
         <div className={styles.stageControl}>
           <div className={styles.stageControlRowHor}>
             <div className={styles.stageControlSet}>
@@ -262,7 +271,9 @@ class StageSize extends React.Component<IPropStageSize, IStateStageSize> {
   private makeHandler(dir: 'top' | 'right' | 'bottom' | 'left', step: number) {
     return () => {
       const {
-        props: { stage: { size } },
+        props: {
+          stage: { size },
+        },
         state: { top, right, bottom, left },
       } = this;
       const nv = this.state[dir] + step;
