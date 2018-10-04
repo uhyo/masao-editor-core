@@ -29,10 +29,6 @@ export interface IPropScreenRouter {
   history: HistoryState;
 
   /**
-   * Whether the editor should fit the y-axis of container.
-   */
-  'fit-y': boolean;
-  /**
    * Whether show a warning when editing a JS.
    */
   jsWarning: boolean;
@@ -46,7 +42,6 @@ export function ScreenRouter({
   map,
   project,
   history,
-  'fit-y': fity,
   jsWarning,
 }: IPropScreenRouter) {
   if (edit.screen === 'map' || edit.screen === 'layer') {
@@ -59,7 +54,6 @@ export function ScreenRouter({
         customParts={customParts}
         project={project}
         history={history}
-        fit-y={fity}
       />
     );
   } else if (edit.screen === 'params') {

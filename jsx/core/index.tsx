@@ -38,6 +38,7 @@ import * as styles from './css/index.css';
 import memoizeOne from 'memoize-one';
 import { Images } from '../../defs/images';
 import { ScreenRouter } from './screen-router';
+import { ThemeProvider } from './theme/context';
 
 export interface IDefnMasaoEditorCore {
   map: MapState;
@@ -231,7 +232,7 @@ export default class MasaoEditorCore extends RefluxComponent<
         filename_mapchip,
         jsWarning = false,
         externalCommands,
-        'fit-y': fity = false,
+        'fit-y': fitY = false,
         keyDisabled = false,
       },
       state: { map, params, edit, customParts, project, history },
@@ -254,7 +255,11 @@ export default class MasaoEditorCore extends RefluxComponent<
       });
     }
     return (
-      <>
+      <ThemeProvider
+        value={{
+          fitY,
+        }}
+      >
         <div
           className={
             styles.wrapper +
@@ -267,7 +272,7 @@ export default class MasaoEditorCore extends RefluxComponent<
             </Toolbox>
             {external_buttons}
           </Toolbar>
-          <div className={fity ? styles.screenWrapperFit : undefined}>
+          <div className={fitY ? styles.screenWrapperFit : undefined}>
             <ScreenRouter
               images={images}
               edit={edit}
@@ -276,13 +281,12 @@ export default class MasaoEditorCore extends RefluxComponent<
               project={project}
               history={history}
               customParts={customParts}
-              fit-y={fity}
               jsWarning={jsWarning}
             />
           </div>
         </div>
         <KeyEvent disabled={keyDisabled} />
-      </>
+      </ThemeProvider>
     );
   }
   protected handleExternal(

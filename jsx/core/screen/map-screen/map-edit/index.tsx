@@ -31,16 +31,12 @@ import {
 import * as editLogics from '../../../../../logics/edit';
 import { Images } from '../../../../../defs/images';
 import { IntoImages, wrapLoadImages } from '../../../../components/load-images';
+import { ThemeConsumer } from '../../../theme/context';
 
 type ChipCode = chip.ChipCode;
 
 export interface IPropMapEdit {
   images: IntoImages<Images> | null;
-
-  /**
-   * Whether this component should fit the parent in y-axis.
-   */
-  'fit-y'?: boolean;
 
   stage: StageData;
   lastUpdate: LastUpdateData;
@@ -644,7 +640,6 @@ export default wrapLoadImages(
           grid,
         },
         stage: { size },
-        'fit-y': fity,
       } = this.props;
       const width = view_width * 32;
       const height = view_height * 32;
@@ -658,65 +653,69 @@ export default wrapLoadImages(
 
       // TODO
       return (
-        <div
-          ref={e => (this.focusarea = e)}
-          className={fity ? styles.wrapperFitY : styles.wrapper}
-          tabIndex={0}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-        >
-          <Scroll
-            width={scrollWidth}
-            height={scrollHeight}
-            fit-x
-            fit-y={fity}
-            x={scroll_x}
-            y={scroll_y}
-            screenX={view_width}
-            screenY={view_height}
-            onScroll={this.handleScroll}
-          >
-            <Resizable
-              width={width}
-              height={height}
-              minWidth={32}
-              minHeight={32}
-              grid={{ x: 32, y: 32 }}
-              fit-x
-              fit-y={fity}
-              onResize={this.handleResize}
+        <ThemeConsumer>
+          {({ fitY }) => (
+            <div
+              ref={e => (this.focusarea = e)}
+              className={fitY ? styles.wrapperFitY : styles.wrapper}
+              tabIndex={0}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
             >
-              <div className={styles.canvasWrapper}>
-                <canvas
-                  ref={e => (this.canvas = e)}
+              <Scroll
+                width={scrollWidth}
+                height={scrollHeight}
+                fit-x
+                fit-y={fitY}
+                x={scroll_x}
+                y={scroll_y}
+                screenX={view_width}
+                screenY={view_height}
+                onScroll={this.handleScroll}
+              >
+                <Resizable
                   width={width}
                   height={height}
-                />
-                <MousePad
-                  onMouseDown={this.handleMouseDown}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseUp={this.handleMouseUp}
-                  onClick={this.handleClick}
-                  elementXCorrection={
-                    scroll_stick_right ? view_width_remainder : 0
-                  }
-                  elementYCorrection={
-                    scroll_stick_bottom ? view_height_remainder : 0
-                  }
+                  minWidth={32}
+                  minHeight={32}
+                  grid={{ x: 32, y: 32 }}
+                  fit-x
+                  fit-y={fitY}
+                  onResize={this.handleResize}
                 >
-                  <canvas
-                    ref={e => (this.grid_canvas = e)}
-                    className={styles.overlapCanvas}
-                    style={c2style}
-                    width={width}
-                    height={height}
-                    onContextMenu={this.handleContextMenu}
-                  />
-                </MousePad>
-              </div>
-            </Resizable>
-          </Scroll>
-        </div>
+                  <div className={styles.canvasWrapper}>
+                    <canvas
+                      ref={e => (this.canvas = e)}
+                      width={width}
+                      height={height}
+                    />
+                    <MousePad
+                      onMouseDown={this.handleMouseDown}
+                      onMouseMove={this.handleMouseMove}
+                      onMouseUp={this.handleMouseUp}
+                      onClick={this.handleClick}
+                      elementXCorrection={
+                        scroll_stick_right ? view_width_remainder : 0
+                      }
+                      elementYCorrection={
+                        scroll_stick_bottom ? view_height_remainder : 0
+                      }
+                    >
+                      <canvas
+                        ref={e => (this.grid_canvas = e)}
+                        className={styles.overlapCanvas}
+                        style={c2style}
+                        width={width}
+                        height={height}
+                        onContextMenu={this.handleContextMenu}
+                      />
+                    </MousePad>
+                  </div>
+                </Resizable>
+              </Scroll>
+            </div>
+          )}
+        </ThemeConsumer>
       );
     }
     protected handleResize(widthr: number, heightr: number) {

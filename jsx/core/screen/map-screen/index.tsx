@@ -25,8 +25,6 @@ export interface IPropMapScreen {
    */
   images: Images;
 
-  'fit-y'?: boolean;
-
   edit: EditState;
   customParts: CustomPartsState;
   params: ParamsState;
@@ -47,7 +45,6 @@ export const MapScreen = (props: IPropMapScreen) => {
     history,
 
     images,
-    'fit-y': fity,
   } = props;
   let are = null;
   if (project.version === '2.8' && edit.screen === 'layer') {
@@ -103,7 +100,6 @@ export const MapScreen = (props: IPropMapScreen) => {
               edit={edit}
               customParts={customParts}
               project={project}
-              fit-y={fity}
             />
           </div>
         </div>
