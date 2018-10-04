@@ -11,8 +11,12 @@
   overflow-y: scroll;
 }
 
-.main > div {
+.main-fitting > div {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+.main-non-fitting {
+  max-height: 80vh;
 }
