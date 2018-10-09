@@ -43,7 +43,18 @@ module.exports = {
       },
       {
         test: /\.(?:png|gif)$/,
-        loaders: ['url-loader', 'img-loader'],
+        loaders: [
+          'url-loader',
+          {
+            loader: 'img-loader',
+            options: {
+              plugins: [
+                require('imagemin-gifsicle')({}),
+                require('imagemin-optipng')({}),
+              ],
+            },
+          },
+        ],
       },
     ],
   },
