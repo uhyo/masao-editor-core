@@ -17,14 +17,6 @@ var replace = require('gulp-replace');
 var concat = require('gulp-concat');
 const merge2 = require('merge2');
 
-gulp.task('bundle', ['tsc'], () => {
-  return jsxCompiler(false);
-});
-
-gulp.task('watch-bundle', ['tsc'], () => {
-  return jsxCompiler(true);
-});
-
 const tsProject = gulp_ts.createProject('tsconfig.json');
 const tsTarget = [
   './defs/**/*.ts',
@@ -46,9 +38,12 @@ gulp.task('tsc', () => {
     stream.dts.pipe(gulp.dest('dist-types/')),
   ]);
 });
-gulp.task('watch-tsc', ['tsc'], () => {
-  gulp.watch(tsTarget, ['tsc']);
-});
+gulp.task(
+  'watch-tsc',
+  gulp.series('tsc', () => {
+    gulp.watch(tsTarget, gulp.task('tsc'));
+  }),
+);
 gulp.task('build-files', () => {
   return gulp
     .src(['images/**/*', 'jsx/**/*.css'], {
@@ -57,18 +52,21 @@ gulp.task('build-files', () => {
     .pipe(changed('dist-es6/'))
     .pipe(gulp.dest('dist-es6/'));
 });
-gulp.task('watch-build-files', ['build-files'], () => {
-  gulp.watch(['images/**/*', 'jsx/**/*.css'], ['build-files']);
-});
+gulp.task(
+  'watch-build-files',
+  gulp.series('build-files', () => {
+    gulp.watch(['images/**/*', 'jsx/**/*.css'], gulp.task('build-files'));
+  }),
+);
 
-gulp.task('mc_canvas-static', function() {
+gulp.task('mc_canvas-static', () => {
   return gulp
     .src('mc_canvas/Samples/*.gif')
     .pipe(changed('dist/'))
     .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('mc_canvas-uglify', function() {
+gulp.task('mc_canvas-uglify', () => {
   return gulp
     .src([
       'mc_canvas/Outputs/CanvasMasao.js',
@@ -84,14 +82,17 @@ gulp.task('mc_canvas-uglify', function() {
     .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('mc_canvas', ['mc_canvas-static', 'mc_canvas-uglify'], function() {
-  return gulp
-    .src(['dist/CanvasMasao.js', 'dist/CanvasMasao_v28.js'])
-    .pipe(concat('CanvasMasao.min.js'))
-    .pipe(gulp.dest('dist/'));
-});
+gulp.task(
+  'mc_canvas',
+  gulp.series('mc_canvas-static', 'mc_canvas-uglify', () => {
+    return gulp
+      .src(['dist/CanvasMasao.js', 'dist/CanvasMasao_v28.js'])
+      .pipe(concat('CanvasMasao.min.js'))
+      .pipe(gulp.dest('dist/'));
+  }),
+);
 
-gulp.task('html', function() {
+gulp.task('html', () => {
   return gulp
     .src(['html/**/*'], {
       base: 'html',
@@ -100,7 +101,7 @@ gulp.task('html', function() {
     .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('tcm', function() {
+gulp.task('tcm', () => {
   return gulp
     .src(['jsx/**/*.css'], {
       base: '.',
@@ -114,7 +115,7 @@ gulp.task('tcm', function() {
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('webserver', function() {
+gulp.task('webserver', () => {
   gulp.src('dist').pipe(
     webserver({
       port: 8000,
@@ -123,30 +124,52 @@ gulp.task('webserver', function() {
   );
 });
 
-gulp.task('clean', function(cb) {
+gulp.task('clean', cb => {
   del(['dist', 'dist-es6', 'dist-types'], cb);
 });
 
 gulp.task(
+  'bundle',
+  gulp.series('tsc', () => {
+    return jsxCompiler(false);
+  }),
+);
+
+gulp.task(
+  'watch-bundle',
+  gulp.series('tsc', () => {
+    return jsxCompiler(true);
+  }),
+);
+
+gulp.task(
   'watch',
-  ['tcm', 'watch-tsc', 'watch-build-files', 'watch-bundle', 'html'],
-  function() {
-    //w
-    gulp.watch('html/*.html', ['html']);
-    gulp.watch('jsx/**/*.css', ['tcm']);
-  },
+  gulp.series(
+    'tcm',
+    'watch-tsc',
+    'watch-build-files',
+    'watch-bundle',
+    'html',
+    () => {
+      //w
+      gulp.watch('html/*.html', gulp.task('html'));
+      gulp.watch('jsx/**/*.css', gulp.task('tcm'));
+    },
+  ),
 );
 gulp.task(
   'watch-no-bundle',
-  ['tcm', 'watch-tsc', 'watch-build-files', 'html'],
-  function() {
+  gulp.series('tcm', 'watch-tsc', 'watch-build-files', 'html', () => {
     //w
-    gulp.watch('html/*.html', ['html']);
-    gulp.watch('jsx/**/*.css', ['tcm']);
-  },
+    gulp.watch('html/*.html', gulp.task('html'));
+    gulp.watch('jsx/**/*.css', gulp.task('tcm'));
+  }),
 );
 
-gulp.task('default', ['tcm', 'tsc', 'build-files', 'bundle', 'mc_canvas']);
+gulp.task(
+  'default',
+  gulp.series('tcm', 'tsc', 'build-files', 'bundle', 'mc_canvas'),
+);
 
 //jsx compiling
 function jsxCompiler(watch) {
