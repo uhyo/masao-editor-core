@@ -50,7 +50,7 @@ module.exports = {
             options: {
               plugins: [
                 require('imagemin-gifsicle')({}),
-                require('imagemin-optipng')({}),
+                require('imagemin-pngquant')({}),
               ],
             },
           },
