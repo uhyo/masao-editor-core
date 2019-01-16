@@ -130,8 +130,8 @@ gulp.task('clean', cb => {
 
 gulp.task(
   'bundle',
-  gulp.series('tsc', () => {
-    return jsxCompiler(false);
+  gulp.series('tsc', cb => {
+    jsxCompiler(false, cb);
   }),
 );
 
@@ -172,7 +172,7 @@ gulp.task(
 );
 
 //jsx compiling
-function jsxCompiler(watch) {
+function jsxCompiler(watch, cb) {
   /*
     return gulp.src('./jsx/entrypoint.tsx')
     .pipe(gulpWebpack(Object.assign({watch, verbose: true}, require('./webpack.config.js')), webpack))
@@ -215,6 +215,7 @@ function jsxCompiler(watch) {
         return;
       }
       handleStats(stats, false);
+      cb();
     });
   }
   /*
