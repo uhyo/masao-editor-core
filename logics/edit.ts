@@ -49,10 +49,12 @@ export interface Rect {
 }
 export function resizeMapData(stage: number, resize: Rect): void {
   // 新しいマップサイズを計算
-  const data = mapStore.state.data[stage];
+  const data = mapStore.state.data[stage - 1];
   const newwidth = data.size.x + resize.left + resize.right;
   const newheight = data.size.y + resize.top + resize.bottom;
 
+  console.log(stage, data.size);
+  console.log(newwidth, newheight, data.size.y, resize.top, resize.bottom);
   if (newwidth < 16 || newheight < 10) {
     // サポート外の数値にはできない
     return;
