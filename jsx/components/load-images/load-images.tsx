@@ -68,7 +68,8 @@ export class LoadImages<T extends {}> extends React.PureComponent<
         }
         const loadedImages = {} as IntoImages<T>;
         imgs.forEach((img, i) => {
-          loadedImages[imagesKeys[i]] = img;
+          // TODO: fix types
+          (loadedImages as any)[imagesKeys[i]] = img;
         });
         this.setState({
           loadedImages,

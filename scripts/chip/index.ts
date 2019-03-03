@@ -41,7 +41,7 @@ export interface ImagesObject {
 export function chipRenderRect(
   params: Record<string, string>,
   customParts: CustomPartsData,
-  chip: number,
+  chip: ChipCode,
 ): Rect {
   const rect: Rect = {
     minX: 0,

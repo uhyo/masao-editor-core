@@ -106,15 +106,19 @@ export default wrapLoadImages(
       const { stage } = props;
       // double-buffering
       // TODO
+      const chipPollutionMap = (chip: ChipCode) =>
+        this.chipPollution('map', chip);
+      const chipPollutionLayer = (chip: number) =>
+        this.chipPollution('layer', chip);
       this.updator_map = new MapUpdator(
         stage.size.x,
         stage.size.y,
-        this.chipPollution.bind(this, 'map'),
+        chipPollutionMap,
       );
       this.updator_layer = new MapUpdator(
         stage.size.x,
         stage.size.y,
-        this.chipPollution.bind(this, 'layer'),
+        chipPollutionLayer,
       );
       this.backlayer_map = new BackLayer(
         stage.size.x,
@@ -600,7 +604,10 @@ export default wrapLoadImages(
         this.drawLayer(ctx, c, x * 32, y * 32);
       }
     }
-    protected chipPollution(type: 'map' | 'layer', c: number): Rect {
+    protected chipPollution<K extends 'map' | 'layer'>(
+      type: K,
+      c: K extends 'map' ? ChipCode : number,
+    ): Rect {
       if (type === 'layer') {
         // layerのチップは全部普通
         return {
