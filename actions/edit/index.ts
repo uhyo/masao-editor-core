@@ -1,10 +1,19 @@
 //edit actions
-import { Action, createAction } from '../scripts/reflux-util';
-import { ChipCode } from '../scripts/chip';
+import { Action, createAction } from '../../scripts/reflux-util';
+import { ChipCode } from '../../scripts/chip';
+import { ToolState } from './tool';
+import { CursorState } from './cursor';
 
-export { Action };
+export { Action, ToolState, CursorState };
 
-export type Mode = 'pen' | 'eraser' | 'hand' | 'spuit' | 'rect' | 'fill';
+export type Mode =
+  | 'pen'
+  | 'eraser'
+  | 'hand'
+  | 'spuit'
+  | 'rect'
+  | 'fill'
+  | 'select';
 
 export type Screen =
   | 'map'
@@ -15,75 +24,6 @@ export type Screen =
   | 'custom-parts';
 
 export type FocusPlace = 'main' | 'chipselect';
-
-// ツールの使用中状態
-export interface PenTool {
-  type: 'pen';
-}
-export interface EraserTool {
-  type: 'eraser';
-}
-export interface HandTool {
-  type: 'hand';
-
-  /**
-   * マウスが押された場所x
-   */
-  mouse_sx: number;
-  /**
-   * マウスが押された場所y
-   */
-  mouse_sy: number;
-  /**
-   * マウスが押されたときのスクロール状態x
-   */
-  scroll_sx: number;
-  /**
-   * マウスが押されたときのスクロール状態y
-   */
-  scroll_sy: number;
-}
-export interface RectTool {
-  type: 'rect';
-
-  /**
-   * 開始地点x
-   */
-  start_x: number;
-  /**
-   * 開始地点y
-   */
-  start_y: number;
-
-  /**
-   * 終了地点x
-   */
-  end_x: number;
-
-  /**
-   * 終了地点y
-   */
-  end_y: number;
-}
-
-export type ToolState = PenTool | EraserTool | HandTool | RectTool;
-
-/**
- * Cursor on the map.
- */
-export interface MainCursor {
-  type: 'main';
-  x: number;
-  y: number;
-}
-/**
- * Cursor on the chip select panel.
- */
-export interface ChipselectCursor {
-  type: 'chipselect';
-  id: number;
-}
-export type CursorState = MainCursor | ChipselectCursor;
 
 export interface ChangeScreenAction {
   screen: Screen;
