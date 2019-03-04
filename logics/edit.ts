@@ -255,6 +255,19 @@ export function mouseDown(
         stageData: mapStore.state.data[stage - 1],
       });
     }
+  } else if (mode === 'select') {
+    const rx = x + scroll_x;
+    const ry = y + scroll_y;
+
+    if (isInArea(rx, ry, availableArea())) {
+      tool = {
+        type: 'select',
+        start_x: rx,
+        start_y: ry,
+        end_x: rx,
+        end_y: ry,
+      };
+    }
   }
   editActions.setTool({
     tool,
@@ -334,7 +347,7 @@ export function mouseMove(
       x: sx,
       y: sy,
     });
-  } else if (tool.type === 'rect') {
+  } else if (tool.type === 'rect' || tool.type === 'select') {
     // 四角形の描画
     const { end_x, end_y } = tool;
 
@@ -395,7 +408,8 @@ export function mouseUp(): void {
     editActions.setTool({
       tool: null,
     });
-  } else {
+  } else if (tool.type !== 'select') {
+    // select tool remains, others disappear.
     editActions.setTool({
       tool: null,
     });

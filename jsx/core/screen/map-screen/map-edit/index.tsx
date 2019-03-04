@@ -486,10 +486,10 @@ export default wrapLoadImages(
           ctx.restore();
         }
 
-        if (tool && tool.type === 'rect') {
+        if (tool && (tool.type === 'rect' || tool.type === 'select')) {
           const { start_x, start_y, end_x, end_y } = tool;
 
-          // 四角形ツールのアレを描画
+          // 四角形を描画
           const pcl = util.cssColor(
             util.complementColor(util.stageBackColor(params, edit)),
           );
@@ -515,10 +515,18 @@ export default wrapLoadImages(
           ctx.lineTo(sx, sy + h);
           ctx.closePath();
 
-          ctx.globalAlpha = 0.25;
-          ctx.fill();
-          ctx.globalAlpha = 0.75;
-          ctx.stroke();
+          if (tool.type === 'rect') {
+            ctx.globalAlpha = 0.25;
+            ctx.fill();
+            ctx.globalAlpha = 0.75;
+            ctx.stroke();
+          } else if (tool.type === 'select') {
+            ctx.globalAlpha = 0.15;
+            ctx.fill();
+            ctx.globalAlpha = 0.75;
+            ctx.setLineDash([5, 8]);
+            ctx.stroke();
+          }
 
           ctx.restore();
         }

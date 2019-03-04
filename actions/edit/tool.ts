@@ -48,8 +48,33 @@ export interface RectTool {
    */
   end_y: number;
 }
+/**
+ * 範囲選択をしている状態
+ */
+export interface SelectTool {
+  type: 'select';
+
+  /**
+   * 開始地点x
+   */
+  start_x: number;
+  /**
+   * 開始地点y
+   */
+  start_y: number;
+
+  /**
+   * 終了地点x
+   */
+  end_x: number;
+
+  /**
+   * 終了地点y
+   */
+  end_y: number;
+}
 
 /**
  * ツールの状態
  */
-export type ToolState = PenTool | EraserTool | HandTool | RectTool;
+export type ToolState = PenTool | EraserTool | HandTool | RectTool | SelectTool;
