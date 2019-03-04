@@ -3,20 +3,23 @@ import * as React from 'react';
 
 import * as styles from './select.css';
 
-export interface IPropSelect {
+export interface IPropSelect<K> {
   disabled?: boolean;
   contents: Array<{
-    key: string;
+    key: K;
     label: string;
   }>;
-  value: string;
-  onChange(key: string): void;
+  value: K;
+  onChange(key: K): void;
 }
-export default class Select extends React.Component<IPropSelect, {}> {
+export default class Select<K = string> extends React.Component<
+  IPropSelect<K>,
+  {}
+> {
   static defaultProps = {
     disabled: false,
   };
-  constructor(props: IPropSelect) {
+  constructor(props: IPropSelect<K>) {
     super(props);
     this.handleKey = this.handleKey.bind(this);
   }
@@ -46,7 +49,7 @@ export default class Select extends React.Component<IPropSelect, {}> {
       </div>
     );
   }
-  handleClick<E>(key: string) {
+  handleClick<E>(key: K) {
     return (e: React.MouseEvent<E>) => {
       e.preventDefault();
       this.props.onChange(key);

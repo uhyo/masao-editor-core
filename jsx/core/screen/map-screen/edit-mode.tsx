@@ -22,7 +22,7 @@ export interface IPropEditMode {
 export default class EditMode extends React.Component<IPropEditMode, {}> {
   render() {
     const { edit, params, history } = this.props;
-    const contents = [
+    const contents: Array<{ key: editActions.Mode; label: string }> = [
       {
         key: 'pen',
         label: 'ペンモード',
@@ -46,6 +46,10 @@ export default class EditMode extends React.Component<IPropEditMode, {}> {
       {
         key: 'fill',
         label: '塗りつぶし',
+      },
+      {
+        key: 'select',
+        label: '範囲選択',
       },
     ];
     const contents2 = [];
