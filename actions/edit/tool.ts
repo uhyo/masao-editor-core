@@ -53,6 +53,10 @@ export interface RectTool {
  */
 export interface SelectTool {
   type: 'select';
+  /**
+   * 範囲決定中かどうか
+   */
+  selecting: boolean;
 
   /**
    * 開始地点x
