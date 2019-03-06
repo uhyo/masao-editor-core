@@ -40,8 +40,9 @@ gulp.task('tsc', () => {
 });
 gulp.task(
   'watch-tsc',
-  gulp.series('tsc', () => {
+  gulp.series('tsc', cb => {
     gulp.watch(tsTarget, gulp.task('tsc'));
+    cb();
   }),
 );
 gulp.task('build-files', () => {
@@ -54,8 +55,9 @@ gulp.task('build-files', () => {
 });
 gulp.task(
   'watch-build-files',
-  gulp.series('build-files', () => {
+  gulp.series('build-files', cb => {
     gulp.watch(['images/**/*', 'jsx/**/*.css'], gulp.task('build-files'));
+    cb();
   }),
 );
 
@@ -150,19 +152,21 @@ gulp.task(
     'watch-build-files',
     'watch-bundle',
     'html',
-    () => {
+    cb => {
       //w
       gulp.watch('html/*.html', gulp.task('html'));
       gulp.watch('jsx/**/*.css', gulp.task('tcm'));
+      cb();
     },
   ),
 );
 gulp.task(
   'watch-no-bundle',
-  gulp.series('tcm', 'watch-tsc', 'watch-build-files', 'html', () => {
+  gulp.series('tcm', 'watch-tsc', 'watch-build-files', 'html', cb => {
     //w
     gulp.watch('html/*.html', gulp.task('html'));
     gulp.watch('jsx/**/*.css', gulp.task('tcm'));
+    cb();
   }),
 );
 
