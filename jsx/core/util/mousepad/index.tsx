@@ -3,7 +3,9 @@ import * as React from 'react';
 
 import * as styles from './mousepad.css';
 
-import { getAbsolutePosition } from '../../../scripts/util';
+import { getAbsolutePosition } from '../../../../scripts/util';
+import { useMouseState } from './useMouseState';
+import { useDocumentMouseEvents } from './useDocumentMouseEvent';
 
 /**
  * 抽象化されたマウスイベント
@@ -115,6 +117,8 @@ const MousePad: React.FC<IPropMousepad> = props => {
     initialElementX: 0,
     initialElementY: 0,
   });
+  const [mouseState, mouseStateDispatch] = useMouseState();
+
   const { children } = props;
 
   const abstractDragStartHandler = (
@@ -128,22 +132,23 @@ const MousePad: React.FC<IPropMousepad> = props => {
       elementXCorrection = 0,
       elementYCorrection = 0,
     } = props;
+    const ic = internal.current;
 
     // 要素
     const { x, y } = getAbsolutePosition(target);
 
-    internal.current.abstractMouseDown = true;
-    internal.current.currentTarget = target;
-    internal.current.currentElmX = x;
-    internal.current.currentElmY = y;
-    internal.current.canBeClick = true;
+    ic.abstractMouseDown = true;
+    ic.currentTarget = target;
+    ic.currentElmX = x;
+    ic.currentElmY = y;
+    ic.canBeClick = true;
 
     // マウスイベント開始
     const elementX = pageX - x + elementXCorrection;
     const elementY = pageY - y + elementYCorrection;
 
-    internal.current.initialElementX = elementX;
-    internal.current.initialElementY = elementY;
+    ic.initialElementX = elementX;
+    ic.initialElementY = elementY;
 
     let prevented = false;
     if (onMouseDown) {
@@ -172,25 +177,25 @@ const MousePad: React.FC<IPropMousepad> = props => {
       elementXCorrection = 0,
       elementYCorrection = 0,
     } = props;
-    if (internal.current.currentTarget == null) {
+    const ic = internal.current;
+    if (ic.currentTarget == null) {
       return;
     }
 
-    const elementX = pageX - internal.current.currentElmX + elementXCorrection;
-    const elementY = pageY - internal.current.currentElmY + elementYCorrection;
+    const elementX = pageX - ic.currentElmX + elementXCorrection;
+    const elementY = pageY - ic.currentElmY + elementYCorrection;
 
     // 最初の位置から一定以上離れたらクリックフラグ解消
-    if (
-      (elementX - internal.current.initialElementX) ** 2 +
-        (elementY - internal.current.initialElementY) ** 2 >=
-      25
-    ) {
-      internal.current.canBeClick = false;
+    const distsq =
+      (elementX - ic.initialElementX) ** 2 +
+      (elementY - ic.initialElementY) ** 2;
+    if (distsq >= 25) {
+      ic.canBeClick = false;
     }
 
     if (onMouseMove != null) {
       onMouseMove({
-        target: internal.current.currentTarget,
+        target: ic.currentTarget,
         pageX,
         pageY,
         elementX,
@@ -254,8 +259,10 @@ const MousePad: React.FC<IPropMousepad> = props => {
     const { pageX, pageY, button } = e;
 
     abstractDragEndHandler(pageX, pageY, button);
-    document.removeEventListener('mousemove', mouseMoveHandler, false);
-    document.removeEventListener('mouseup', mouseUpHandler, false);
+    mouseStateDispatch({
+      type: 'mouseIsDown',
+      value: false,
+    });
   };
   const mouseDownHandler = (e: React.MouseEvent<HTMLDivElement>) => {
     const { target, pageX, pageY, button } = e;
@@ -269,8 +276,10 @@ const MousePad: React.FC<IPropMousepad> = props => {
       button,
     );
     if (prevented === false) {
-      document.addEventListener('mousemove', mouseMoveHandler, false);
-      document.addEventListener('mouseup', mouseUpHandler, false);
+      mouseStateDispatch({
+        type: 'mouseIsDown',
+        value: true,
+      });
     }
   };
 
@@ -549,6 +558,13 @@ const MousePad: React.FC<IPropMousepad> = props => {
       }
     }
   };
+
+  useDocumentMouseEvents({
+    mouseMove: props.useMouseMove,
+    mouseUp: mouseState.mouseIsDown,
+    onMouseMove: mouseMoveHandler,
+    onMouseUp: mouseUpHandler,
+  });
 
   return (
     <div
