@@ -26,7 +26,7 @@ export function mouseDown(
   y: number,
 ): editActions.ToolState | null {
   const [logic, tool] = getToolLogic();
-  logic.mouseDown(mode, x, y);
+  logic.mouseDown(mode, x, y, tool);
   return tool;
 }
 

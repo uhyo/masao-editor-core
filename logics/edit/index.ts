@@ -22,7 +22,7 @@ export {
 export { chipList, chipNumber } from './chip';
 
 /**
- * Rectangle defined by two points.
+ * Rectangle defined by two points (inclusive).
  */
 export interface Rect {
   top: number;

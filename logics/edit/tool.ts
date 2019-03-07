@@ -27,7 +27,7 @@ export interface ToolLogic<T> {
   /**
    * Function called when mouse button is pressed.
    */
-  mouseDown(mode: Mode, x: number, y: number): void;
+  mouseDown(mode: Mode, x: number, y: number, tool: T): void;
   /**
    * Function called when mouse moved.
    */
@@ -107,7 +107,7 @@ const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
 
     // 有効範囲内か確認
     if (isInArea(rx, ry, availableArea())) {
-      const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
+      const pen = getCurrentPen();
 
       mapUpdateFillAction(screen)({
         stage,
@@ -160,10 +160,8 @@ function getCurrentMapData(editStore: EditStore) {
   const stageData = mapStore.state.data[stage - 1];
 
   const mapdata = screen === 'layer' ? stageData.layer : stageData.map;
-  const pen = screen === 'layer' ? edit.pen_layer : edit.pen;
   return {
     mapdata,
-    pen,
   };
 }
 /**
@@ -173,11 +171,10 @@ export const toolLogics: ToolLogicCollection = {
   pen: {
     mouseDown: normalMouseDownLogic,
     mouseMove(x, y) {
-      const { mapdata, pen } = getCurrentMapData(editStore);
-      const { screen, scroll_x, scroll_y, stage } = editStore.state;
-
-      const cx = x + scroll_x;
-      const cy = y + scroll_y;
+      const { mapdata } = getCurrentMapData(editStore);
+      const pen = getCurrentPen();
+      const { screen, stage } = editStore.state;
+      const { x: cx, y: cy } = getMapPoint(x, y);
 
       if (!isInArea(cx, cy, availableArea())) {
         // 有効範囲外
@@ -206,10 +203,9 @@ export const toolLogics: ToolLogicCollection = {
     mouseDown: normalMouseDownLogic,
     mouseMove(x, y) {
       const { mapdata } = getCurrentMapData(editStore);
-      const { stage, screen, scroll_x, scroll_y } = editStore.state;
+      const { stage, screen } = editStore.state;
 
-      const cx = x + scroll_x;
-      const cy = y + scroll_y;
+      const { x: cx, y: cy } = getMapPoint(x, y);
 
       if (!isInArea(cx, cy, availableArea())) {
         // 有効範囲外
@@ -257,14 +253,14 @@ export const toolLogics: ToolLogicCollection = {
     mouseDown: normalMouseDownLogic,
     mouseMove: rectLikeMouseMove,
     mouseUp(tool) {
-      const { stage, screen, pen, pen_layer } = editStore.state;
+      const { stage, screen } = editStore.state;
       const { start_x, start_y, end_x, end_y } = tool;
       const [left, right] =
         start_x <= end_x ? [start_x, end_x] : [end_x, start_x];
       const [top, bottom] =
         start_y <= end_y ? [start_y, end_y] : [end_y, start_y];
 
-      const chip = screen === 'layer' ? pen_layer : pen;
+      const chip = getCurrentPen();
 
       updateStore.update();
       mapUpdateRectAction(screen)({
@@ -284,15 +280,34 @@ export const toolLogics: ToolLogicCollection = {
     useMouseMove: () => true,
   },
   select: {
-    mouseDown: normalMouseDownLogic,
+    mouseDown(mode, x, y, tool) {
+      if (mode === 'fill') {
+        // if fill is done on selection, then special treatment.
+        const rect = rectLikeToolToRect(tool);
+        const { x: cx, y: cy } = getMapPoint(x, y);
+        if (isInArea(cx, cy, rect)) {
+          const { screen, stage } = editStore.state;
+          const chip = getCurrentPen();
+          updateStore.update();
+          mapUpdateRectAction(screen)({
+            stage,
+            chip,
+            ...rect,
+          });
+          editActions.setTool({
+            tool: null,
+          });
+          return;
+        }
+      }
+      normalMouseDownLogic(mode, x, y);
+    },
     mouseMove(x, y, tool) {
       if (tool.selecting) {
         rectLikeMouseMove(x, y, tool);
       } else {
         // 選択範囲に入っていればポインタを設定
-        const { scroll_x, scroll_y } = editStore.state;
-        const cx = x + scroll_x;
-        const cy = y + scroll_y;
+        const { x: cx, y: cy } = getMapPoint(x, y);
         const pointer = isInArea(cx, cy, rectLikeToolToRect(tool))
           ? 'move'
           : null;
@@ -335,12 +350,30 @@ function rectLikeToolToRect({
   end_y,
 }: RectTool | SelectTool): Rect {
   const left = Math.min(start_x, end_x);
-  const right = Math.max(start_x, end_x) + 1;
+  const right = Math.max(start_x, end_x);
   const top = Math.min(start_y, end_y);
-  const bottom = Math.max(start_y, end_y) + 1;
+  const bottom = Math.max(start_y, end_y);
   return { left, right, top, bottom };
 }
 
+/**
+ * Get current code of pen.
+ */
+function getCurrentPen(): ChipCode {
+  const { screen, pen, pen_layer } = editStore.state;
+  return screen === 'layer' ? pen_layer : pen;
+}
+
+/**
+ * Convert screen position to map position.
+ */
+function getMapPoint(x: number, y: number) {
+  const { scroll_x, scroll_y } = editStore.state;
+  return {
+    x: x + scroll_x,
+    y: y + scroll_y,
+  };
+}
 /**
  * Handle mosemove for rect-like tool.
  */

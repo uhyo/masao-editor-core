@@ -11,8 +11,8 @@ export function availableArea(): Rect {
 
   const left = Math.max(0, scroll_x);
   const top = Math.max(0, scroll_y);
-  const right = Math.min(stage.size.x, scroll_x + view_width);
-  const bottom = Math.min(stage.size.y, scroll_y + view_height);
+  const right = Math.min(stage.size.x, scroll_x + view_width) - 1;
+  const bottom = Math.min(stage.size.y, scroll_y + view_height) - 1;
 
   return {
     left,
@@ -25,7 +25,7 @@ export function availableArea(): Rect {
  * 点が領域内にあるか判定
  */
 export function isInArea(x: number, y: number, rect: Rect): boolean {
-  return rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom;
+  return rect.left <= x && x <= rect.right && rect.top <= y && y <= rect.bottom;
 }
 
 /**
