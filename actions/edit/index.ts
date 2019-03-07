@@ -24,6 +24,10 @@ export type Screen =
   | 'custom-parts';
 
 export type FocusPlace = 'main' | 'chipselect';
+/**
+ * Current state of pointer.
+ */
+export type PointerState = 'move';
 
 export interface ChangeScreenAction {
   screen: Screen;
@@ -129,6 +133,11 @@ export interface SetFocusAction {
   focus: FocusPlace | null;
 }
 export const setFocus = createAction<SetFocusAction>();
+
+export interface SetPointerAction {
+  pointer: PointerState | null;
+}
+export const setPointer = createAction<SetPointerAction>();
 
 export interface JsConfirmAction {
   confirm: boolean;

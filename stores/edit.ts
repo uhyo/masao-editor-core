@@ -6,6 +6,7 @@ import {
   ToolState,
   CursorState,
   FocusPlace,
+  PointerState,
 } from '../actions/edit';
 import { Store } from '../scripts/reflux-util';
 import { ChipCode } from '../scripts/chip';
@@ -111,6 +112,11 @@ export interface EditState {
   cursor: CursorState | null;
 
   /**
+   * ポインタの状態
+   */
+  pointer: PointerState | null;
+
+  /**
    * JSの警告をOKしたか
    */
   js_confirm: boolean;
@@ -148,6 +154,7 @@ export class EditStore extends Store<EditState> {
       focus: null,
       cursor: null,
       cursorEnabled: false,
+      pointer: null,
       js_confirm: false,
     };
   }
@@ -264,6 +271,13 @@ export class EditStore extends Store<EditState> {
       cursor,
       cursorEnabled: this.state.cursorEnabled || cursor != null,
     });
+  }
+  onSetPointer({ pointer }: editActions.SetPointerAction) {
+    if (pointer !== this.state.pointer) {
+      this.setState({
+        pointer,
+      });
+    }
   }
   onJsConfirm({ confirm }: editActions.JsConfirmAction) {
     this.setState({

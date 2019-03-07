@@ -1,7 +1,13 @@
 // logic
 
 export { scroll, scrollBy } from './scroll';
-export { mouseMove, mouseDown, mouseUp, click } from './mouse';
+export {
+  mouseMove,
+  mouseDown,
+  mouseUp,
+  click,
+  isMouseMoveEnabled,
+} from './mouse';
 export { isEdge, EdgeType } from './area';
 export { resizeMapData, scrollForCurrentMapSize } from './map-size';
 export { changeView } from './view';

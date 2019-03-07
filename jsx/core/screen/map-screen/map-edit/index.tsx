@@ -653,6 +653,7 @@ export default wrapLoadImages(
           scroll_stick_right,
           scroll_stick_bottom,
           grid,
+          pointer,
         },
         stage: { size },
       } = this.props;
@@ -661,6 +662,7 @@ export default wrapLoadImages(
 
       const c2style = {
         opacity: grid ? 1 : 0,
+        cursor: pointer || undefined,
       };
 
       const scrollWidth = Math.max(0, size.x - view_width);
@@ -709,6 +711,7 @@ export default wrapLoadImages(
                       onMouseMove={this.handleMouseMove}
                       onMouseUp={this.handleMouseUp}
                       onClick={this.handleClick}
+                      useMouseMove={editLogics.isMouseMoveEnabled()}
                       elementXCorrection={
                         scroll_stick_right ? view_width_remainder : 0
                       }
