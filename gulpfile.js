@@ -126,8 +126,8 @@ gulp.task('webserver', () => {
   );
 });
 
-gulp.task('clean', cb => {
-  del(['dist', 'dist-es6', 'dist-types'], cb);
+gulp.task('clean', () => {
+  return del(['dist', 'dist-es6', 'dist-types']);
 });
 
 gulp.task(
