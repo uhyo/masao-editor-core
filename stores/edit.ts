@@ -7,6 +7,7 @@ import {
   CursorState,
   FocusPlace,
   PointerState,
+  FloatingState,
 } from '../actions/edit';
 import { Store } from '../scripts/reflux-util';
 import { ChipCode } from '../scripts/chip';
@@ -120,6 +121,11 @@ export interface EditState {
    * JSの警告をOKしたか
    */
   js_confirm: boolean;
+
+  /**
+   * 浮いているマップデータ
+   */
+  floating: FloatingState | null;
 }
 export class EditStore extends Store<EditState> {
   constructor() {
@@ -156,6 +162,7 @@ export class EditStore extends Store<EditState> {
       cursorEnabled: false,
       pointer: null,
       js_confirm: false,
+      floating: null,
     };
   }
   onChangeScreen({ screen }: editActions.ChangeScreenAction) {
@@ -283,6 +290,13 @@ export class EditStore extends Store<EditState> {
     this.setState({
       js_confirm: confirm,
     });
+  }
+  onSetFloating({ floating }: editActions.SetFloatingAction) {
+    if (floating !== this.state.floating) {
+      this.setState({
+        floating,
+      });
+    }
   }
 }
 

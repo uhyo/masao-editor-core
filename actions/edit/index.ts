@@ -3,8 +3,9 @@ import { Action, createAction } from '../../scripts/reflux-util';
 import { ChipCode } from '../../scripts/chip';
 import { ToolState } from './tool';
 import { CursorState } from './cursor';
+import { FloatingState } from './floating';
 
-export { Action, ToolState, CursorState };
+export { Action, ToolState, CursorState, FloatingState };
 
 export type Mode =
   | 'pen'
@@ -138,6 +139,11 @@ export interface SetPointerAction {
   pointer: PointerState | null;
 }
 export const setPointer = createAction<SetPointerAction>();
+
+export interface SetFloatingAction {
+  floating: FloatingState | null;
+}
+export const setFloating = createAction<SetFloatingAction>();
 
 export interface JsConfirmAction {
   confirm: boolean;
