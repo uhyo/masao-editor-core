@@ -32,6 +32,8 @@ import * as editLogics from '../../../../../logics/edit';
 import { Images } from '../../../../../defs/images';
 import { IntoImages, wrapLoadImages } from '../../../../components/load-images';
 import { ThemeConsumer } from '../../../theme/context';
+import { MapCanvas } from './map-canvas';
+import { chipPollution } from './chip-pollution';
 
 type ChipCode = chip.ChipCode;
 
@@ -134,6 +136,7 @@ export default wrapLoadImages(
         this.updator_layer,
         this.drawChipOn.bind(this, 'layer'),
       );
+      this.drawChipOn = this.drawChipOn.bind(this);
 
       // timers
       this.timers = new Timers();
@@ -616,30 +619,8 @@ export default wrapLoadImages(
       type: K,
       c: K extends 'map' ? ChipCode : number,
     ): Rect {
-      if (type === 'layer') {
-        // layerのチップは全部普通
-        return {
-          minX: 0,
-          minY: 0,
-          maxX: 1,
-          maxY: 1,
-        };
-      }
-      const {
-        params,
-        customParts: { customParts },
-      } = this.props;
-      // mapの場合は広い範囲に描画されるかも
-      const renderRect = chip.chipRenderRect(params, customParts, c);
-
-      // タイル単位に変換
-      const updateRect = {
-        minX: Math.floor(renderRect.minX / 32),
-        minY: Math.floor(renderRect.minY / 32),
-        maxX: Math.ceil(renderRect.maxX / 32),
-        maxY: Math.ceil(renderRect.maxY / 32),
-      };
-      return updateRect;
+      const { params, customParts } = this.props;
+      return chipPollution(type, c, params, customParts);
     }
     public render() {
       const {
@@ -705,6 +686,16 @@ export default wrapLoadImages(
                       ref={e => (this.canvas = e)}
                       width={width}
                       height={height}
+                    />
+                    <MapCanvas
+                      width={width}
+                      height={height}
+                      stage={this.props.stage}
+                      edit={this.props.edit}
+                      params={this.props.params}
+                      customParts={this.props.customParts}
+                      lastUpdate={this.props.lastUpdate}
+                      drawChipOn={this.drawChipOn}
                     />
                     <MousePad
                       onMouseDown={this.handleMouseDown}
