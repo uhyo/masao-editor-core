@@ -8,8 +8,14 @@ import {
   LastUpdateData,
 } from '../../../../../stores';
 import { useDraw } from './draw';
+import { IntoImages } from '../../../../components/load-images';
+import { Images } from '../../../../../defs/images';
 
 export interface IPropMapCanvas {
+  /**
+   * images used for the map.
+   */
+  images: IntoImages<Images> | null;
   /**
    * width of canvas.
    */
@@ -38,6 +44,7 @@ export interface IPropMapCanvas {
 }
 
 export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
+  images,
   width,
   height,
   stage,
@@ -49,6 +56,7 @@ export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
 }) => {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const backLayers = useBackLayer(
+    images,
     stage,
     edit,
     params,

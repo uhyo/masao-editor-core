@@ -688,6 +688,7 @@ export default wrapLoadImages(
                       height={height}
                     />
                     <MapCanvas
+                      images={this.props.images}
                       width={width}
                       height={height}
                       stage={this.props.stage}

@@ -12,11 +12,14 @@ import {
 import { ChipCode } from '../../../../../scripts/chip';
 import { useTimers } from '../../../../../scripts/timers';
 import { useUpdateSignal } from '../../../../../scripts/useUpdateSignal';
+import { IntoImages } from '../../../../components/load-images';
+import { Images } from '../../../../../defs/images';
 
 /**
  * Returns a pair of updator and backlayer.
  */
 export function useBackLayer(
+  images: IntoImages<Images> | null,
   stage: StageData,
   edit: EditState,
   params: ParamsState,
@@ -80,14 +83,20 @@ export function useBackLayer(
   );
   // query for resetting backlayer.
   // TODO use `as const`
-  const backLayerResetSignal = useUpdateSignal<[number, LastUpdateData]>(
-    ([prevStage, _], [stage, lastUpdate]) => {
+  const backLayerResetSignal = useUpdateSignal<
+    [number, LastUpdateData, IntoImages<Images> | null]
+  >(
+    ([prevStage, _, prevImages], [stage, lastUpdate, images]) => {
       // mapが刷新された場合（lastUpdateがall）
       // 違うステージに移動した場合
-      // TODO: imagesが変わった場合
-      return prevStage !== stage || lastUpdate.type === 'all';
+      // 画像セットが更新された場合
+      return (
+        prevStage !== stage ||
+        lastUpdate.type === 'all' ||
+        prevImages !== images
+      );
     },
-    [edit.stage, lastUpdate],
+    [edit.stage, lastUpdate, images],
   );
   // reset updator when whole rerendering of map occured.
   useEffect(() => {
