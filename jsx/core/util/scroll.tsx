@@ -264,7 +264,6 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     elementY,
     preventDefault,
   }: MousePadEvent) {
-    console.log('AHH!', target);
     if (target === this.horArea || target === this.verArea) {
       // 瞬間移動
       this.doFreeScroll(target, elementX, elementY);
@@ -279,7 +278,6 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     preventDefault();
   }
   handleMouseMove({ pageX, pageY, elementX, elementY }: MousePadEvent) {
-    console.log('MOO');
     if (this.fsc_target != null) {
       this.doFreeScroll(this.fsc_target, elementX, elementY);
     } else if (this.hsc_target != null) {
