@@ -1,5 +1,10 @@
 import { RefObject, useEffect } from 'react';
-import { EditState, ParamsState, StageData } from '../../../../../../stores';
+import {
+  EditState,
+  ParamsState,
+  StageData,
+  LastUpdateData,
+} from '../../../../../../stores';
 import { BackLayers } from '../useBackLayer';
 import { prerender } from './prerender';
 import { paintBackground } from './paintBackground';
@@ -7,17 +12,62 @@ import { setCorrection } from './correction';
 import { paintMap } from './paintMap';
 import { drawCursor } from './drawCursor';
 import { drawTool } from './drawTool';
+import {
+  useUpdateSignal,
+  compareArrayInequality,
+} from '../../../../../../scripts/useUpdateSignal';
+import { IntoImages } from '../../../../../components/load-images';
+import { Images } from '../../../../../../defs/images';
+import { CursorState } from '../../../../../../actions/edit';
 
 /**
  * Draw on a given canvas.
  */
 export function useDraw(
   canvasRef: RefObject<HTMLCanvasElement | null>,
+  images: IntoImages<Images> | null,
   backLayers: BackLayers,
   stage: StageData,
   edit: EditState,
   params: ParamsState,
+  lastUpdate: LastUpdateData,
 ): void {
+  // check some of values have changed.
+  const drawSignal1 = useUpdateSignal<any[]>(compareArrayInequality, [
+    images,
+    edit.stage,
+    lastUpdate,
+    params,
+    edit.view_width,
+    edit.view_height,
+    edit.view_width_remainder,
+    edit.view_height_remainder,
+    edit.scroll_stick_right,
+    edit.scroll_stick_bottom,
+    edit.screen,
+    edit.render_map,
+    edit.render_layer,
+    edit.scroll_x,
+    edit.scroll_y,
+    edit.tool,
+  ]);
+  const drawSignal2 = useUpdateSignal<[CursorState | null]>(
+    ([c1], [c2]) => {
+      // カーソルが変化したか判定
+      if (c1 === c2) {
+        return false;
+      }
+      if (c1 == null) {
+        return c2!.type === 'main';
+      }
+      if (c2 == null) {
+        return c1.type === 'main';
+      }
+      return c1.type === 'main' || c2.type === 'main';
+    },
+    [edit.cursor],
+  );
+  // check values inside edit.
   useEffect(() => {
     // draw
     const canvas = canvasRef.current;
@@ -61,5 +111,5 @@ export function useDraw(
       }
     });
     return () => cancelAnimationFrame(requestId);
-  });
+  }, [drawSignal1, drawSignal2]);
 }

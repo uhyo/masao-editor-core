@@ -25,3 +25,13 @@ export function useUpdateSignal<T extends ReadonlyArray<any>>(
     return numberRef.current;
   }, deps);
 }
+
+/**
+ * Checks whether any of elements of two arrays are inequal.
+ */
+export function compareArrayInequality<T extends any[]>(
+  prev: T,
+  current: T,
+): boolean {
+  return current.some((elm, i) => prev[i] !== elm);
+}
