@@ -51,8 +51,9 @@ export interface IPropMousepad {
   elementYCorrection?: number;
   /**
    * Whether mouseMove event should be watched.
+   * 'auto' means it should be watched when mouse is down.
    */
-  useMouseMove?: boolean;
+  useMouseMove: boolean | 'auto';
   /**
    * マウス操作開始イベント
    */
@@ -560,7 +561,10 @@ const MousePad: React.FC<IPropMousepad> = props => {
   };
 
   useDocumentMouseEvents({
-    mouseMove: props.useMouseMove,
+    mouseMove:
+      props.useMouseMove === 'auto'
+        ? mouseState.mouseIsDown
+        : props.useMouseMove,
     mouseUp: mouseState.mouseIsDown,
     onMouseMove: mouseMoveHandler,
     onMouseUp: mouseUpHandler,

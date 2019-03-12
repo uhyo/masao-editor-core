@@ -151,6 +151,7 @@ export default class MiniMap extends React.Component<
     return (
       <div className={styles.wrapper}>
         <MousePad
+          useMouseMove="auto"
           onMouseDown={this.handleMouseDown}
           onMouseMove={this.handleMouseMove}
           onMouseUp={this.handleMouseUp}
