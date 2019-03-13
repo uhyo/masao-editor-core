@@ -32,15 +32,6 @@ export interface IPropMapCanvas {
   params: ParamsState;
   customParts: CustomPartsState;
   lastUpdate: LastUpdateData;
-  /**
-   * Temporal: method to draw chip
-   */
-  drawChipOn: (
-    type: 'map' | 'layer',
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-  ) => void;
 }
 
 export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
@@ -52,7 +43,6 @@ export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
   params,
   customParts,
   lastUpdate,
-  drawChipOn,
 }) => {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const backLayers = useBackLayer(
@@ -62,7 +52,6 @@ export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
     params,
     customParts,
     lastUpdate,
-    drawChipOn,
   );
   useDraw(canvasRef, images, backLayers, stage, edit, params, lastUpdate);
   return <canvas width={width} height={height} ref={canvasRef} />;

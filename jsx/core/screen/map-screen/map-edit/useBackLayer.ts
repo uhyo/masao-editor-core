@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 import MapUpdator from './updator';
-import BackLayer from './backlayer';
+import BackLayer, { DrawCallback } from './backlayer';
 import { chipPollution } from './chip-pollution';
 import {
   ParamsState,
@@ -14,6 +14,8 @@ import { useTimers } from '../../../../../scripts/timers';
 import { useUpdateSignal } from '../../../../../scripts/useUpdateSignal';
 import { IntoImages } from '../../../../components/load-images';
 import { Images } from '../../../../../defs/images';
+import { drawMapChip, drawLayerChip } from './draw-chip';
+import { useRefMemo } from '../../../../../scripts/useRefMemo';
 
 /**
  * Returns a pair of updator and backlayer.
@@ -25,19 +27,37 @@ export function useBackLayer(
   params: ParamsState,
   customParts: CustomPartsState,
   lastUpdate: LastUpdateData,
-  drawChipOn: (
-    type: 'map' | 'layer',
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-  ) => void,
 ) {
   const timers = useTimers();
+  /**
+   * Store some objects for use by callbacks.
+   */
+  const savedStates = useRefMemo(
+    () => (
+      console.log('memo'),
+      {
+        stage,
+        images,
+        params,
+        customParts,
+      }
+    ),
+    [stage, images, params, customParts],
+  );
   const result = useMemo(() => {
     const chipPollutionMap = (c: ChipCode) =>
       chipPollution('map', c, params, customParts);
     const chipPollutionLayer = (c: number) =>
       chipPollution('layer', c, params, customParts);
+
+    const drawMapChipCallback: DrawCallback = (ctx, x, y) => {
+      const { stage, images, params, customParts } = savedStates.current;
+      drawMapChip(ctx, x, y, stage, images, params, customParts);
+    };
+    const drawLayerChipCallback: DrawCallback = (ctx, x, y) => {
+      const { stage, images } = savedStates.current;
+      drawLayerChip(ctx, x, y, stage, images);
+    };
     const mapUpdator = new MapUpdator(
       stage.size.x,
       stage.size.y,
@@ -48,7 +68,7 @@ export function useBackLayer(
       stage.size.y,
       32,
       mapUpdator,
-      drawChipOn.bind(null, 'map'),
+      drawMapChipCallback,
     );
     const layerUpdator = new MapUpdator(
       stage.size.x,
@@ -60,7 +80,7 @@ export function useBackLayer(
       stage.size.y,
       32,
       layerUpdator,
-      drawChipOn.bind(null, 'layer'),
+      drawLayerChipCallback,
     );
     mapBacklayer.clear();
     layerBacklayer.clear();
