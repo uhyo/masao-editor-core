@@ -23,6 +23,7 @@ import { Images } from '../../../../../defs/images';
 import { IntoImages, wrapLoadImages } from '../../../../components/load-images';
 import { ThemeConsumer } from '../../../theme/context';
 import { MapCanvas } from './map-canvas';
+import { GridCanvas } from './grid-canvas';
 
 export interface IPropMapEdit {
   images: IntoImages<Images> | null;
@@ -50,10 +51,6 @@ export default wrapLoadImages(
      * Fucusable areaのcontainer
      */
     protected focusarea: HTMLElement | null = null;
-    /**
-     * グリッド用canvasのcontainer
-     */
-    protected grid_canvas: HTMLCanvasElement | null = null;
 
     constructor(props: IPropMapEdit) {
       super(props);
@@ -67,59 +64,8 @@ export default wrapLoadImages(
       this.timers = new Timers();
     }
 
-    componentDidMount() {
-      this.drawGrid();
-    }
     componentWillUnmount() {
       this.timers.clean();
-    }
-    /**
-     * Draw a new grid to the canvas.
-     */
-    protected drawGrid() {
-      const canvas = this.grid_canvas;
-      if (canvas == null) {
-        return;
-      }
-      const ctx = canvas.getContext('2d');
-      if (ctx == null) {
-        return;
-      }
-      const {
-        edit: {
-          scroll_stick_right,
-          scroll_stick_bottom,
-          view_width,
-          view_height,
-          view_width_remainder,
-          view_height_remainder,
-        },
-      } = this.props;
-
-      // 吸い付きによる補正
-      const x_corr = scroll_stick_right ? -view_width_remainder : 0;
-      const y_corr = scroll_stick_bottom ? -view_height_remainder : 0;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.strokeStyle = 'rgba(0, 0, 0, .25)';
-      // y-grids
-      for (let x = 1; x < view_width; x++) {
-        ctx.beginPath();
-        const dx = x * 32 + x_corr;
-        ctx.moveTo(dx, 0);
-        ctx.lineTo(dx, view_height * 32);
-        ctx.stroke();
-      }
-
-      // x-grids
-      for (let y = 1; y < view_height; y++) {
-        ctx.beginPath();
-        const dy = y * 32 + y_corr;
-        ctx.moveTo(0, dy);
-        ctx.lineTo(view_width * 32, dy);
-        ctx.stroke();
-      }
     }
     public render() {
       const {
@@ -132,18 +78,11 @@ export default wrapLoadImages(
           scroll_y,
           scroll_stick_right,
           scroll_stick_bottom,
-          grid,
-          pointer,
         },
         stage: { size },
       } = this.props;
       const width = view_width * 32;
       const height = view_height * 32;
-
-      const c2style = {
-        opacity: grid ? 1 : 0,
-        cursor: pointer || undefined,
-      };
 
       const scrollWidth = Math.max(0, size.x - view_width);
       const scrollHeight = Math.max(0, size.y - view_height);
@@ -204,12 +143,8 @@ export default wrapLoadImages(
                         scroll_stick_bottom ? view_height_remainder : 0
                       }
                     >
-                      <canvas
-                        ref={e => (this.grid_canvas = e)}
-                        className={styles.overlapCanvas}
-                        style={c2style}
-                        width={width}
-                        height={height}
+                      <GridCanvas
+                        edit={this.props.edit}
                         onContextMenu={this.handleContextMenu}
                       />
                     </MousePad>
@@ -242,20 +177,9 @@ export default wrapLoadImages(
         y,
       });
     }
-    protected handleMouseDown({
-      target,
-      elementX,
-      elementY,
-      button,
-      preventDefault,
-    }: MousePadEvent) {
+    protected handleMouseDown({ elementX, elementY, button }: MousePadEvent) {
       //マウスが下がった
 
-      const canvas2 = this.grid_canvas;
-      if (target !== canvas2) {
-        preventDefault();
-        return;
-      }
       if (this.focusarea != null) {
         this.focusarea.focus();
       }
