@@ -8,7 +8,7 @@ import { cssColor, stageBackColor } from '../../../../../../scripts/util';
 import { drawLayerChip, drawMapChip } from '../draw-chip';
 import { IntoImages } from '../../../../../components/load-images';
 import { Images } from '../../../../../../defs/images';
-import { FloatingState } from '../../../../../../actions/edit';
+import { useUpdateSignal } from '../../../../../../scripts/useUpdateSignal';
 
 /**
  * Prepare a canvas with content of floating layer.
@@ -20,17 +20,32 @@ export function useFloatingCanvas(
   customParts: CustomPartsState,
 ): MutableRefObject<HTMLCanvasElement | null> {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const prevFloatingRef = useRef<FloatingState | null>(null);
   const { stage, floating } = edit;
+  const canvasRecreateSignal = useUpdateSignal(
+    ([prevFloating], [floating]) => {
+      return (
+        floating == null ||
+        prevFloating == null ||
+        prevFloating.width !== floating.width ||
+        prevFloating.height !== floating.height
+      );
+    },
+    [floating],
+  );
+  const canvasRedrawSignal = useUpdateSignal(
+    ([prevFloating], [floating]) => {
+      return (
+        prevFloating == null ||
+        (floating != null && prevFloating.data !== floating.data)
+      );
+    },
+    [floating],
+  );
   useEffect(() => {
     if (floating == null) {
       // free current canvas.
       canvasRef.current = null;
-    } else if (
-      prevFloatingRef.current == null ||
-      prevFloatingRef.current.width !== floating.width ||
-      prevFloatingRef.current.height !== floating.height
-    ) {
+    } else {
       // Size of floating is different.
       // newly allocate canvas.
       const canvas = document.createElement('canvas');
@@ -38,7 +53,8 @@ export function useFloatingCanvas(
       canvas.width = floating.width * 32;
       canvas.height = floating.height * 32;
     }
-    prevFloatingRef.current = floating;
+  }, [canvasRecreateSignal]);
+  useEffect(() => {
     if (floating && canvasRef.current != null) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
@@ -67,6 +83,13 @@ export function useFloatingCanvas(
         }
       }
     }
-  }, [floating, images, params, customParts, stage]);
+  }, [
+    canvasRecreateSignal,
+    canvasRedrawSignal,
+    images,
+    params,
+    customParts,
+    stage,
+  ]);
   return canvasRef;
 }
