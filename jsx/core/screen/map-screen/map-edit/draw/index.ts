@@ -4,6 +4,7 @@ import {
   ParamsState,
   StageData,
   LastUpdateData,
+  CustomPartsState,
 } from '../../../../../../stores';
 import { BackLayers } from '../useBackLayer';
 import { prerender } from './prerender';
@@ -19,6 +20,8 @@ import {
 import { IntoImages } from '../../../../../components/load-images';
 import { Images } from '../../../../../../defs/images';
 import { CursorState } from '../../../../../../actions/edit';
+import { useFloatingCanvas } from './useFloatingCanvas';
+import { drawFloating } from './drawFloating';
 
 /**
  * Draw on a given canvas.
@@ -30,8 +33,11 @@ export function useDraw(
   stage: StageData,
   edit: EditState,
   params: ParamsState,
+  customParts: CustomPartsState,
   lastUpdate: LastUpdateData,
 ): void {
+  // prepare canvas whose content is floating.
+  const floatingCanvas = useFloatingCanvas(images, edit, params, customParts);
   // check some of values have changed.
   const drawSignal1 = useUpdateSignal<any[]>(compareArrayInequality, [
     images,
@@ -102,6 +108,8 @@ export function useDraw(
       paintMap(ctx, backLayers, edit);
       // draw tool if exists.
       drawTool(ctx, edit, params);
+      // draw floating if exists.
+      drawFloating(ctx, edit, params, floatingCanvas);
       // draw cursor if exists.
       drawCursor(ctx, edit, params);
 

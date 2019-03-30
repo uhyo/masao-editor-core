@@ -1,17 +1,13 @@
 import { Images } from '../../../../../defs/images';
 import { IntoImages } from '../../../../components/load-images';
-import {
-  ParamsState,
-  CustomPartsState,
-  StageData,
-} from '../../../../../stores';
+import { ParamsState, CustomPartsState } from '../../../../../stores';
 import * as chip from '../../../../../scripts/chip';
 
 export function drawMapChip(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  stage: StageData,
+  c: chip.ChipCode,
   images: IntoImages<Images> | null,
   params: ParamsState,
   customParts: CustomPartsState,
@@ -19,7 +15,6 @@ export function drawMapChip(
   if (images == null) {
     return;
   }
-  const c = stage.map[y][x];
   chip.drawChip(
     ctx,
     images,
@@ -35,11 +30,10 @@ export function drawLayerChip(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  stage: StageData,
+  c: number,
   images: IntoImages<Images> | null,
 ): void {
   //レイヤ
-  const c = stage.layer[y][x];
   if (c === 0 || images == null) {
     return;
   }

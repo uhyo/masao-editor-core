@@ -53,6 +53,15 @@ export const MapCanvas: React.FunctionComponent<IPropMapCanvas> = ({
     customParts,
     lastUpdate,
   );
-  useDraw(canvasRef, images, backLayers, stage, edit, params, lastUpdate);
+  useDraw(
+    canvasRef,
+    images,
+    backLayers,
+    stage,
+    edit,
+    params,
+    customParts,
+    lastUpdate,
+  );
   return <canvas width={width} height={height} ref={canvasRef} />;
 };

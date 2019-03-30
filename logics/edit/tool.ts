@@ -10,6 +10,7 @@ import { isInArea, availableArea } from './area';
 import { scroll } from './scroll';
 import { RectTool, SelectTool } from '../../actions/edit/tool';
 import { Rect } from '.';
+import { FloatingState } from '../../actions/edit/floating';
 
 type Screen = editActions.Screen;
 /**
@@ -50,7 +51,34 @@ type ToolLogicCollection = {
  */
 const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
   const edit = editStore.state;
-  const { scroll_x, scroll_y, screen, stage } = edit;
+  const { scroll_x, scroll_y, screen, stage, tool: currentTool } = edit;
+  if (
+    currentTool != null &&
+    currentTool.type === 'select' &&
+    !currentTool.selecting &&
+    isOverSelection(x, y, currentTool)
+  ) {
+    // 選択範囲の上でマウスを下げたのでつかむ
+    const floating = createFloating(
+      currentTool.start_x,
+      currentTool.start_y,
+      currentTool.end_x,
+      currentTool.end_y,
+    );
+    // つかんだらマップから消去
+    mapUpdateRectAction(edit.screen)({
+      stage: edit.stage,
+      left: currentTool.start_x,
+      top: currentTool.start_y,
+      right: currentTool.end_x,
+      bottom: currentTool.end_y,
+      chip: 0,
+    });
+    editActions.setTool({ tool: null });
+    editActions.setFloating({ floating });
+    return;
+  }
+
   let tool: editActions.ToolState | null = null;
   if (mode === 'pen') {
     tool = {
@@ -307,10 +335,7 @@ export const toolLogics: ToolLogicCollection = {
         rectLikeMouseMove(x, y, tool);
       } else {
         // 選択範囲に入っていればポインタを設定
-        const { x: cx, y: cy } = getMapPoint(x, y);
-        const pointer = isInArea(cx, cy, rectLikeToolToRect(tool))
-          ? 'move'
-          : null;
+        const pointer = isOverSelection(x, y, tool) ? 'move' : null;
         editActions.setPointer({
           pointer,
         });
@@ -362,6 +387,39 @@ function rectLikeToolToRect({
 function getCurrentPen(): ChipCode {
   const { screen, pen, pen_layer } = editStore.state;
   return screen === 'layer' ? pen_layer : pen;
+}
+
+/**
+ * Create a floating from given position and current map.
+ */
+function createFloating(
+  start_x: number,
+  start_y: number,
+  end_x: number,
+  end_y: number,
+): FloatingState {
+  const { screen, stage } = editStore.state;
+  const stageObject = mapStore.state.data[stage - 1];
+  const mapData = screen === 'layer' ? stageObject.layer : stageObject.map;
+  const floatingData = [];
+  for (let cy = start_y; cy <= end_y; cy++) {
+    floatingData.push(mapData[cy].slice(start_x, end_x + 1));
+  }
+  return {
+    x: start_x,
+    y: start_y,
+    width: end_x - start_x + 1,
+    height: end_y - start_y + 1,
+    data: floatingData,
+  };
+}
+
+/**
+ * Returns whether given screen position is over given selection.
+ */
+function isOverSelection(x: number, y: number, tool: SelectTool): boolean {
+  const { x: cx, y: cy } = getMapPoint(x, y);
+  return isInArea(cx, cy, rectLikeToolToRect(tool));
 }
 
 /**

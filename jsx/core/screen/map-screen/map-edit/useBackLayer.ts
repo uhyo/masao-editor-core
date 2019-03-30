@@ -52,11 +52,13 @@ export function useBackLayer(
 
     const drawMapChipCallback: DrawCallback = (ctx, x, y) => {
       const { stage, images, params, customParts } = savedStates.current;
-      drawMapChip(ctx, x, y, stage, images, params, customParts);
+      const c = stage.map[y][x];
+      drawMapChip(ctx, x, y, c, images, params, customParts);
     };
     const drawLayerChipCallback: DrawCallback = (ctx, x, y) => {
       const { stage, images } = savedStates.current;
-      drawLayerChip(ctx, x, y, stage, images);
+      const c = stage.layer[y][x] || 0;
+      drawLayerChip(ctx, x, y, c, images);
     };
     const mapUpdator = new MapUpdator(
       stage.size.x,
