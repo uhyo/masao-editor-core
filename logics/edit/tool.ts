@@ -400,6 +400,11 @@ export const toolLogics: ToolLogicCollection = {
       // floatingの新しい位置を計算
       const newx = cx - tool.hand_x;
       const newy = cy - tool.hand_y;
+      if (floating.x === newx && floating.y === newy) {
+        // do not recreate floating object.
+        // XXX do this inside store?
+        return;
+      }
       const newFloating = {
         ...floating,
         x: newx,
