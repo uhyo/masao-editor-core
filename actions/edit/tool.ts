@@ -77,8 +77,28 @@ export interface SelectTool {
    */
   end_y: number;
 }
+/**
+ * Floatingを掴んでいる状態
+ */
+export interface GrabFloatingTool {
+  type: 'grab-floating';
+  /**
+   * floatingを掴んでいる位置（相対）
+   */
+  hand_x: number;
+  /**
+   * floatingを掴んでいる位置（相対）
+   */
+  hand_y: number;
+}
 
 /**
  * ツールの状態
  */
-export type ToolState = PenTool | EraserTool | HandTool | RectTool | SelectTool;
+export type ToolState =
+  | PenTool
+  | EraserTool
+  | HandTool
+  | RectTool
+  | SelectTool
+  | GrabFloatingTool;

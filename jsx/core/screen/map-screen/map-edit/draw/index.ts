@@ -56,6 +56,7 @@ export function useDraw(
     edit.scroll_x,
     edit.scroll_y,
     edit.tool,
+    edit.floating,
   ]);
   const drawSignal2 = useUpdateSignal<[CursorState | null]>(
     ([c1], [c2]) => {

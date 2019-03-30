@@ -51,31 +51,67 @@ type ToolLogicCollection = {
  */
 const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
   const edit = editStore.state;
-  const { scroll_x, scroll_y, screen, stage, tool: currentTool } = edit;
+  const {
+    scroll_x,
+    scroll_y,
+    screen,
+    stage,
+    tool: currentTool,
+    floating,
+  } = edit;
+  if (floating != null) {
+    const { x: cx, y: cy } = getMapPoint(x, y);
+    if (
+      isInArea(cx, cy, {
+        left: floating.x,
+        top: floating.y,
+        right: floating.x + floating.width - 1,
+        bottom: floating.y + floating.height - 1,
+      })
+    ) {
+      // floatingを掴んだ
+      console.log(cy, floating.y, scroll_y);
+      editActions.setTool({
+        tool: {
+          type: 'grab-floating',
+          hand_x: cx - floating.x,
+          hand_y: cy - floating.y,
+        },
+      });
+      return;
+    }
+  }
   if (
     currentTool != null &&
     currentTool.type === 'select' &&
     !currentTool.selecting &&
     isOverSelection(x, y, currentTool)
   ) {
+    const { start_x, start_y, end_x, end_y } = currentTool;
     // 選択範囲の上でマウスを下げたのでつかむ
-    const floating = createFloating(
-      currentTool.start_x,
-      currentTool.start_y,
-      currentTool.end_x,
-      currentTool.end_y,
-    );
+    const floating = createFloating(start_x, start_y, end_x, end_y);
     // つかんだらマップから消去
     mapUpdateRectAction(edit.screen)({
       stage: edit.stage,
-      left: currentTool.start_x,
-      top: currentTool.start_y,
-      right: currentTool.end_x,
-      bottom: currentTool.end_y,
+      left: start_x,
+      top: start_y,
+      right: end_x,
+      bottom: end_y,
       chip: 0,
     });
-    editActions.setTool({ tool: null });
     editActions.setFloating({ floating });
+    // floatingをつかむ
+    const { x: cx, y: cy } = getMapPoint(x, y);
+    editActions.setTool({
+      tool: {
+        type: 'grab-floating',
+        hand_x: cx - start_x,
+        hand_y: cy - start_y,
+      },
+    });
+    editActions.setPointer({
+      pointer: null,
+    });
     return;
   }
 
@@ -352,6 +388,32 @@ export const toolLogics: ToolLogicCollection = {
     },
     useMouseMove: () => true,
   },
+  'grab-floating': {
+    mouseDown: normalMouseDownLogic,
+    mouseMove(x, y, tool) {
+      const { floating } = editStore.state;
+      if (floating == null) {
+        // floatingがないのに掴んでいる（？）
+        return;
+      }
+      const { x: cx, y: cy } = getMapPoint(x, y);
+      // floatingの新しい位置を計算
+      const newx = cx - tool.hand_x;
+      const newy = cy - tool.hand_y;
+      const newFloating = {
+        ...floating,
+        x: newx,
+        y: newy,
+      };
+      editActions.setFloating({ floating: newFloating });
+    },
+    mouseUp() {
+      editActions.setTool({
+        tool: null,
+      });
+    },
+    useMouseMove: () => true,
+  },
 };
 
 /**
@@ -421,6 +483,10 @@ function isOverSelection(x: number, y: number, tool: SelectTool): boolean {
   const { x: cx, y: cy } = getMapPoint(x, y);
   return isInArea(cx, cy, rectLikeToolToRect(tool));
 }
+
+/**
+ * Returns whe
+ */
 
 /**
  * Convert screen position to map position.
