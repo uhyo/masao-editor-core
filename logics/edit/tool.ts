@@ -51,14 +51,7 @@ type ToolLogicCollection = {
  */
 const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
   const edit = editStore.state;
-  const {
-    scroll_x,
-    scroll_y,
-    screen,
-    stage,
-    tool: currentTool,
-    floating,
-  } = edit;
+  const { scroll_x, scroll_y, screen, stage, floating } = edit;
   if (floating != null) {
     const { x: cx, y: cy } = getMapPoint(x, y);
     if (
@@ -81,40 +74,6 @@ const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
       return;
     }
   }
-  if (
-    currentTool != null &&
-    currentTool.type === 'select' &&
-    !currentTool.selecting &&
-    isOverSelection(x, y, currentTool)
-  ) {
-    const { start_x, start_y, end_x, end_y } = currentTool;
-    // 選択範囲の上でマウスを下げたのでつかむ
-    const floating = createFloating(start_x, start_y, end_x, end_y);
-    // つかんだらマップから消去
-    mapUpdateRectAction(edit.screen)({
-      stage: edit.stage,
-      left: start_x,
-      top: start_y,
-      right: end_x,
-      bottom: end_y,
-      chip: 0,
-    });
-    editActions.setFloating({ floating });
-    // floatingをつかむ
-    const { x: cx, y: cy } = getMapPoint(x, y);
-    editActions.setTool({
-      tool: {
-        type: 'grab-floating',
-        hand_x: cx - start_x,
-        hand_y: cy - start_y,
-      },
-    });
-    editActions.setPointer({
-      pointer: null,
-    });
-    return;
-  }
-
   let tool: editActions.ToolState | null = null;
   if (mode === 'pen') {
     tool = {
@@ -363,6 +322,36 @@ export const toolLogics: ToolLogicCollection = {
           });
           return;
         }
+      }
+      if (!tool.selecting && isOverSelection(x, y, tool)) {
+        // selectをつかんだ
+        const { start_x, start_y, end_x, end_y } = tool;
+        const { stage, screen } = editStore.state;
+        // 選択範囲の上でマウスを下げたのでつかむ
+        const floating = createFloating(start_x, start_y, end_x, end_y);
+        // つかんだらマップから消去
+        mapUpdateRectAction(screen)({
+          stage: stage,
+          left: start_x,
+          top: start_y,
+          right: end_x,
+          bottom: end_y,
+          chip: 0,
+        });
+        editActions.setFloating({ floating });
+        // floatingをつかむ
+        const { x: cx, y: cy } = getMapPoint(x, y);
+        editActions.setTool({
+          tool: {
+            type: 'grab-floating',
+            hand_x: cx - start_x,
+            hand_y: cy - start_y,
+          },
+        });
+        editActions.setPointer({
+          pointer: null,
+        });
+        return;
       }
       normalMouseDownLogic(mode, x, y);
     },
