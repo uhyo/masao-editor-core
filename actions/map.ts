@@ -1,5 +1,6 @@
 import { Action, createAction } from '../scripts/reflux-util';
 import { ChipCode } from '../scripts/chip';
+import { FloatingState } from './edit';
 
 export { Action };
 
@@ -40,6 +41,25 @@ export interface UpdateMapFillAction<C> {
 }
 export const updateMapFill = createAction<UpdateMapFillAction<ChipCode>>();
 export const updateLayerFill = createAction<UpdateMapFillAction<number>>();
+
+/**
+ * floatingをマップに書き込むアクション
+ */
+export interface WriteFloatingToMapAction {
+  /**
+   * stage number (starting from 1)
+   */
+  stage: number;
+  /**
+   * Type of map.
+   */
+  map: 'map' | 'layer';
+  /**
+   * data of floating
+   */
+  floating: FloatingState;
+}
+export const writeFloatingToMap = createAction<WriteFloatingToMapAction>();
 
 export interface SetAdvancedAction {
   advanced: boolean;

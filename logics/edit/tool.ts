@@ -63,7 +63,6 @@ const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
       })
     ) {
       // floatingを掴んだ
-      console.log(cy, floating.y, scroll_y);
       editActions.setTool({
         tool: {
           type: 'grab-floating',
@@ -72,6 +71,21 @@ const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
         },
       });
       return;
+    }
+    if (mode !== 'hand' && (screen === 'map' || screen === 'layer')) {
+      // ハンドモード以外ではフロートを定着させる
+      mapActions.writeFloatingToMap({
+        stage,
+        map: screen,
+        floating,
+      });
+      editActions.setFloating({
+        floating: null,
+      });
+      historyActions.addHistory({
+        stage,
+        stageData: mapStore.state.data[stage - 1],
+      });
     }
   }
   let tool: editActions.ToolState | null = null;
