@@ -10,6 +10,7 @@ export default class Timers {
 
   /**
    * 新しいタイマーを発行
+   * 同じIDの既存のタイマーがあれば既存のものは取り消す
    */
   addTimer(id: string, wait: number, callback: () => void): void {
     const { dict } = this;

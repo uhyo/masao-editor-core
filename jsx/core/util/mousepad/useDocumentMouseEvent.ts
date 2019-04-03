@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useRefMemo } from '../../../../scripts/useRefMemo';
 
 export interface DocumentMouseEvents {
   mouseMove?: boolean;
@@ -15,20 +16,34 @@ export function useDocumentMouseEvents({
   onMouseMove,
   onMouseUp,
 }: DocumentMouseEvents): void {
+  // mouseUp is saved in memo.
+  const mouseUpHandlerRef = useRefMemo<undefined | ((e: MouseEvent) => void)>(
+    () => (mouseUp && onMouseUp != null ? onMouseUp : void 0),
+    [mouseUp, onMouseUp],
+  );
+  // to catch fast click, always register mouseup handler.
+  // (to reduce computing resource, mousemove handler is deferred.)
+  const mouseUpHandler = useCallback(
+    (e: MouseEvent) => {
+      if (mouseUpHandlerRef.current != null) {
+        mouseUpHandlerRef.current(e);
+      }
+    },
+    [mouseUp, onMouseUp],
+  );
+  useEffect(() => {
+    document.addEventListener('mouseup', mouseUpHandler, false);
+    return () => document.removeEventListener('mouseup', mouseUpHandler, false);
+  }, []);
+  // register mousemove handler on demand.
   useEffect(() => {
     if (mouseMove && onMouseMove) {
       document.addEventListener('mousemove', onMouseMove, false);
-    }
-    if (mouseUp && onMouseUp) {
-      document.addEventListener('mouseup', onMouseUp, false);
     }
     return () => {
       if (mouseMove && onMouseMove) {
         document.removeEventListener('mousemove', onMouseMove, false);
       }
-      if (mouseUp && onMouseUp) {
-        document.removeEventListener('mouseup', onMouseUp, false);
-      }
     };
-  }, [mouseMove, mouseUp, onMouseMove, onMouseUp]);
+  }, [mouseMove, onMouseMove]);
 }
