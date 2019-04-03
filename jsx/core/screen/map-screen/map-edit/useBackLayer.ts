@@ -99,7 +99,7 @@ export function useBackLayer(
     ([prevStage, _], [stage, lastUpdate]) => {
       // mapが刷新された場合
       // 違うステージに移動した場合
-      return prevStage !== stage || lastUpdate.type === 'all';
+      return prevStage !== stage || isAllUpdate(lastUpdate);
     },
     [edit.stage, lastUpdate],
   );
@@ -113,9 +113,7 @@ export function useBackLayer(
       // 違うステージに移動した場合
       // 画像セットが更新された場合
       return (
-        prevStage !== stage ||
-        lastUpdate.type === 'all' ||
-        prevImages !== images
+        prevStage !== stage || isAllUpdate(lastUpdate) || prevImages !== images
       );
     },
     [edit.stage, lastUpdate, images],
@@ -158,24 +156,32 @@ export function useBackLayer(
   // update backLayer according to lastUpdate
   useEffect(() => {
     // case type === 'all' is handled separately
-    if (lastUpdate.type === 'map' || lastUpdate.type === 'layer') {
-      const { stage: updatedStage, x, y, width, height } = lastUpdate;
-      if (updatedStage !== edit.stage) {
-        // it's on another stage.
-        return;
-      }
-      if (lastUpdate.type === 'map') {
-        const points = result.mapUpdator.update(x, y, width, height, stage.map);
-        result.mapBacklayer.update(points);
-      } else {
-        const points = result.layerUpdator.update(
-          x,
-          y,
-          width,
-          height,
-          stage.layer,
-        );
-        result.layerBacklayer.update(points);
+    for (const luData of lastUpdate) {
+      if (luData.type === 'map' || luData.type === 'layer') {
+        const { stage: updatedStage, x, y, width, height } = luData;
+        if (updatedStage !== edit.stage) {
+          // it's on another stage.
+          return;
+        }
+        if (luData.type === 'map') {
+          const points = result.mapUpdator.update(
+            x,
+            y,
+            width,
+            height,
+            stage.map,
+          );
+          result.mapBacklayer.update(points);
+        } else {
+          const points = result.layerUpdator.update(
+            x,
+            y,
+            width,
+            height,
+            stage.layer,
+          );
+          result.layerBacklayer.update(points);
+        }
       }
     }
   }, [lastUpdate]);
@@ -183,3 +189,10 @@ export function useBackLayer(
 }
 
 export type BackLayers = ReturnType<typeof useBackLayer>;
+
+/**
+ * Returns whether lastUpdate includes 'all'.
+ */
+function isAllUpdate(lastUpdate: LastUpdateData): boolean {
+  return lastUpdate.some(obj => obj.type === 'all');
+}
