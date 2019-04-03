@@ -10,6 +10,7 @@ const defaultBinding: Record<string, Command> = {
   r: 'mode:spuit',
   t: 'mode:rect',
   y: 'mode:fill',
+  u: 'mode:select',
 
   // スクロール
   'Alt:arrowup': 'scroll:up',

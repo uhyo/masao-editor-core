@@ -52,6 +52,12 @@ export function runMapCommand(command: Command, keydown: boolean): boolean {
         });
         break;
       }
+      case 'mode:select': {
+        editActions.changeMode({
+          mode: 'select',
+        });
+        break;
+      }
       case 'scroll:up': {
         editLogics.scrollBy({
           x: 0,

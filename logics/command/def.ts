@@ -7,6 +7,7 @@ export type Command =
   | 'mode:spuit'
   | 'mode:rect'
   | 'mode:fill'
+  | 'mode:select'
   // scroll command
   | 'scroll:up'
   | 'scroll:right'
@@ -37,6 +38,7 @@ export const commandNames: Record<Command, string> = {
   'mode:spuit': 'スポイトツール',
   'mode:rect': '四角形ツール',
   'mode:fill': '塗りつぶしツール',
+  'mode:select': '範囲選択ツール',
   'scroll:up': '上にスクロール',
   'scroll:right': '右にスクロール',
   'scroll:down': '下にスクロール',
