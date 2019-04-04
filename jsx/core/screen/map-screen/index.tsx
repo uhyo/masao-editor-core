@@ -18,6 +18,7 @@ import * as styles from '../../css/screen/map-screen.css';
 
 import { Toolbar } from '../../../components/toolbar';
 import { Images } from '../../../../defs/images';
+import { ClipboardEvents } from './clipboard-events';
 
 export interface IPropMapScreen {
   /**
@@ -104,6 +105,7 @@ export const MapScreen = (props: IPropMapScreen) => {
           </div>
         </div>
       </div>
+      <ClipboardEvents />
     </>
   );
 };
