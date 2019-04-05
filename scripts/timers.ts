@@ -1,5 +1,7 @@
 'use strict';
 
+import { useMemo, useEffect } from 'react';
+
 /**
  * タイマーを名前で管理していざとなったら全部消せるクラス
  */
@@ -8,6 +10,7 @@ export default class Timers {
 
   /**
    * 新しいタイマーを発行
+   * 同じIDの既存のタイマーがあれば既存のものは取り消す
    */
   addTimer(id: string, wait: number, callback: () => void): void {
     const { dict } = this;
@@ -43,4 +46,15 @@ export default class Timers {
 
     this.dict = {};
   }
+}
+
+/**
+ * React Hooks版
+ */
+export function useTimers() {
+  const timers = useMemo(() => new Timers(), []);
+  useEffect(() => {
+    return () => timers.clean();
+  }, []);
+  return timers;
 }

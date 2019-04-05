@@ -10,6 +10,7 @@ const defaultBinding: Record<string, Command> = {
   r: 'mode:spuit',
   t: 'mode:rect',
   y: 'mode:fill',
+  u: 'mode:select',
 
   // スクロール
   'Alt:arrowup': 'scroll:up',
@@ -38,6 +39,10 @@ const defaultBinding: Record<string, Command> = {
   // 'tab': 'cursor:jump',
   escape: 'cursor:vanish',
   z: 'cursor:button',
+
+  // 削除
+  backspace: 'delete',
+  delete: 'delete',
 
   // Files
   'Ctrl:m': 'file:new',

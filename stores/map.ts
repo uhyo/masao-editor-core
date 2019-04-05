@@ -36,7 +36,7 @@ export interface StageData {
   layer: Array<Array<number>>;
 }
 
-export type LastUpdateData =
+export type LastUpdateOneData =
   | {
       type: 'all';
       size: boolean;
@@ -58,6 +58,8 @@ export type LastUpdateData =
       stage: number;
     };
 
+export type LastUpdateData = LastUpdateOneData[];
+
 export class MapStore extends Store<MapState> {
   constructor() {
     super();
@@ -68,10 +70,7 @@ export class MapStore extends Store<MapState> {
       advanced: false,
       stages: 4,
       data,
-      lastUpdate: {
-        type: 'all',
-        size: true,
-      },
+      lastUpdate: [],
       customParts: {},
     };
   }
@@ -105,9 +104,7 @@ export class MapStore extends Store<MapState> {
       // マップから変なのを消す
       const data = this.state.data.map(({ size, map, layer }) => ({
         size,
-        map: map.map(row =>
-          row.map(c => ('number' === typeof c && 0 <= c && c < 256 ? c : 0)),
-        ),
+        map: map.map(row => row.map(c => (isUnAdvancedChip(c) ? c : 0))),
         layer,
       }));
       this.setState({
@@ -160,14 +157,14 @@ export class MapStore extends Store<MapState> {
         });
         this.setState({
           data: d,
-          lastUpdate: {
+          lastUpdate: addLastUpdateData(this.state.lastUpdate, {
             type: 'map',
             stage,
             x,
             y,
             width: 1,
             height: 1,
-          },
+          }),
         });
       }
     }
@@ -212,14 +209,14 @@ export class MapStore extends Store<MapState> {
         });
         this.setState({
           data: d,
-          lastUpdate: {
+          lastUpdate: addLastUpdateData(this.state.lastUpdate, {
             type: 'layer',
             stage,
             x,
             y,
             width: 1,
             height: 1,
-          },
+          }),
         });
       }
     }
@@ -265,14 +262,14 @@ export class MapStore extends Store<MapState> {
       });
       this.setState({
         data: d,
-        lastUpdate: {
+        lastUpdate: addLastUpdateData(this.state.lastUpdate, {
           type: 'map',
           stage,
           x: left,
           y: top,
           width: right - left + 1,
           height: bottom - top + 1,
-        },
+        }),
       });
     }
   }
@@ -317,14 +314,14 @@ export class MapStore extends Store<MapState> {
       });
       this.setState({
         data: d,
-        lastUpdate: {
+        lastUpdate: addLastUpdateData(this.state.lastUpdate, {
           type: 'layer',
           stage,
           x: left,
           y: top,
           width: right - left + 1,
           height: bottom - top + 1,
-        },
+        }),
       });
     }
   }
@@ -358,14 +355,14 @@ export class MapStore extends Store<MapState> {
     });
     this.setState({
       data,
-      lastUpdate: {
+      lastUpdate: addLastUpdateData(this.state.lastUpdate, {
         type: 'map',
         stage,
         x: left,
         y: top,
         width: right - left + 1,
         height: bottom - top + 1,
-      },
+      }),
     });
   }
   public onUpdateLayerFill({
@@ -398,14 +395,68 @@ export class MapStore extends Store<MapState> {
     });
     this.setState({
       data,
-      lastUpdate: {
+      lastUpdate: addLastUpdateData(this.state.lastUpdate, {
         type: 'layer',
         stage,
         x: left,
         y: top,
         width: right - left + 1,
         height: bottom - top + 1,
-      },
+      }),
+    });
+  }
+  public onWriteFloatingToMap({
+    stage,
+    map,
+    floating,
+  }: mapActions.WriteFloatingToMapAction) {
+    if (stage <= 0 || this.state.stages < stage) {
+      return;
+    }
+    const allowAdvancedChip = map === 'map' && this.state.advanced;
+    const data = this.state.data.map((st, i) => {
+      if (i !== stage - 1) {
+        return st;
+      }
+      const newMap = (st[map] as ChipCode[][]).map((row, y) => {
+        if (y < floating.y || floating.y + floating.height <= y) {
+          return row;
+        }
+        const fy = y - floating.y;
+        const frow = floating.data[fy];
+        const newRow = new Array<ChipCode>(st.size.x);
+        for (let x = 0; x < floating.x; x++) {
+          newRow[x] = row[x];
+        }
+        for (let x = 0; x < floating.width; x++) {
+          const chip = frow[x];
+          if (!allowAdvancedChip && !isUnAdvancedChip(chip)) {
+            newRow[floating.x + x] = 0;
+          } else {
+            newRow[floating.x + x] = frow[x];
+          }
+        }
+        for (let x = floating.x + floating.width; x < st.size.x; x++) {
+          newRow[x] = row[x];
+        }
+        return newRow;
+      });
+      return {
+        ...st,
+        [map]: newMap,
+      };
+    });
+    this.setState({
+      data,
+      lastUpdate: addLastUpdateData(this.state.lastUpdate, {
+        type: map,
+        stage,
+        x: floating.x,
+        y: floating.y,
+        width: floating.width,
+        height: floating.height,
+        // TypeScript can't infer that this is valid
+      } as LastUpdateOneData),
     });
   }
   public onResizeMap({
@@ -465,10 +516,10 @@ export class MapStore extends Store<MapState> {
     });
     this.setState({
       data,
-      lastUpdate: {
+      lastUpdate: addLastUpdateData(this.state.lastUpdate, {
         type: 'all',
         size: true,
-      },
+      }),
     });
   }
   // マップをそのまま受け入れる
@@ -488,12 +539,45 @@ export class MapStore extends Store<MapState> {
     });
     this.setState({
       data,
-      lastUpdate: {
+      lastUpdate: addLastUpdateData(this.state.lastUpdate, {
         type: 'all',
         size: true,
-      },
+      }),
     });
   }
+}
+
+/**
+ * Returns whether given chip is not an advanced chip.
+ */
+function isUnAdvancedChip(c: ChipCode) {
+  return 'number' === typeof c && 0 <= c && c < 256;
+}
+
+/**
+ * Immutably add one lastUpdateData to existing array.
+ */
+function addLastUpdateData(
+  current: LastUpdateData,
+  added: LastUpdateOneData,
+): LastUpdateData {
+  if (current.length > 0) {
+    const f = current[0];
+    if (f.type === 'all') {
+      // allに対して上書きできるのはallのみ
+      if (added.type === 'all') {
+        return [
+          {
+            type: 'all',
+            size: f.size || added.size,
+          },
+        ];
+      }
+    } else if (added.type === 'all') {
+      return [added];
+    }
+  }
+  return [...current, added];
 }
 
 // 塗りつぶし

@@ -164,6 +164,7 @@ export class ChipListMain extends React.PureComponent<
                 onResize={this.handleResize}
               >
                 <MousePad
+                  useMouseMove="auto"
                   onMouseDown={this.handleMouseDown}
                   onMouseMove={this.handleMouseMove}
                 >
@@ -302,11 +303,12 @@ export class ChipListMain extends React.PureComponent<
     prevState: IStateChipListMain,
   ) {
     if (
-      propChanged(
-        prevProps,
-        this.props,
-        ['images', 'chipNumber', 'chipsWidth', 'onDrawChip'],
-      ) ||
+      propChanged(prevProps, this.props, [
+        'images',
+        'chipNumber',
+        'chipsWidth',
+        'onDrawChip',
+      ]) ||
       prevState.areaHeight !== this.state.areaHeight
     ) {
       // Some of information required to render chips is changed.
@@ -426,7 +428,7 @@ function renderChipsTo(
       chipIndex: number,
     ): void;
   },
-): (() => IterableIterator<() => void>) {
+): () => IterableIterator<() => void> {
   const { chipNumber, chipsWidth, onDrawChip } = options;
 
   const ctx = canvas.getContext('2d');

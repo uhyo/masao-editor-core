@@ -7,7 +7,7 @@ import historyStore from '../stores/history';
 import mapStore, { StageData } from '../stores/map';
 import updateStore from '../stores/update';
 
-import { changeMapSize } from './edit';
+import { scrollForCurrentMapSize } from './edit';
 
 export function back(stage: number): void {
   const oldStage = mapStore.state.data[stage - 1];
@@ -51,7 +51,7 @@ function stageChange(
       oldStage.size.y !== newStage.size.y
     ) {
       // ステージサイズの変更があった
-      changeMapSize(newStage.size.x, newStage.size.y);
+      scrollForCurrentMapSize(newStage.size.x, newStage.size.y);
     }
   }
 }

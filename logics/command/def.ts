@@ -7,6 +7,7 @@ export type Command =
   | 'mode:spuit'
   | 'mode:rect'
   | 'mode:fill'
+  | 'mode:select'
   // scroll command
   | 'scroll:up'
   | 'scroll:right'
@@ -23,6 +24,8 @@ export type Command =
   // history command
   | 'back'
   | 'forward'
+  // other command
+  | 'delete'
   // external command
   | 'file:new'
   | 'external:save'
@@ -37,6 +40,7 @@ export const commandNames: Record<Command, string> = {
   'mode:spuit': 'スポイトツール',
   'mode:rect': '四角形ツール',
   'mode:fill': '塗りつぶしツール',
+  'mode:select': '範囲選択ツール',
   'scroll:up': '上にスクロール',
   'scroll:right': '右にスクロール',
   'scroll:down': '下にスクロール',
@@ -50,6 +54,7 @@ export const commandNames: Record<Command, string> = {
   'cursor:jump': 'カーソルフォーカス移動',
   'cursor:vanish': 'カーソル消去',
   'cursor:button': 'カーソルボタン',
+  delete: '削除',
   'file:new': '新規ファイル',
   'external:open': 'ファイルを開く',
   'external:save': '保存',
