@@ -428,7 +428,7 @@ export function addCurrentStageHistory() {
 /**
  * Convert rect-like object to a normalized Rect.
  */
-function rectLikeToolToRect({
+export function rectLikeToolToRect({
   start_x,
   start_y,
   end_x,
@@ -538,7 +538,7 @@ function rectLikeMouseMove(x: number, y: number, tool: RectTool | SelectTool) {
   }
 }
 
-function mapUpdateAction<S extends Screen>(
+export function mapUpdateAction<S extends Screen>(
   screen: S,
 ): Action<mapActions.UpdateMapAction<ChipCodeForScreen<S>>> {
   if (screen === 'layer') {

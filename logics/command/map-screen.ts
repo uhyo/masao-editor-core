@@ -133,6 +133,10 @@ export function runMapCommand(command: Command, keydown: boolean): boolean {
         historyLogics.forward(editStore.state.stage);
         break;
       }
+      case 'delete': {
+        editLogics.deleteLogic();
+        break;
+      }
       default: {
         return false;
       }

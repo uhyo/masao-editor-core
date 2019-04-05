@@ -20,6 +20,7 @@ export {
   cursorButton,
 } from './cursor';
 export { chipList, chipNumber } from './chip';
+export { deleteLogic } from './command';
 
 /**
  * Rectangle defined by two points (inclusive).

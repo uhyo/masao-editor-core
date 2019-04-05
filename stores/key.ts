@@ -40,6 +40,10 @@ const defaultBinding: Record<string, Command> = {
   escape: 'cursor:vanish',
   z: 'cursor:button',
 
+  // 削除
+  backspace: 'delete',
+  delete: 'delete',
+
   // Files
   'Ctrl:m': 'file:new',
   'Ctrl:o': 'external:open',
