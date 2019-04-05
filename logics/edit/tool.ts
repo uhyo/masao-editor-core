@@ -547,7 +547,7 @@ function mapUpdateAction<S extends Screen>(
     return mapActions.updateMap;
   }
 }
-function mapUpdateRectAction<S extends Screen>(
+export function mapUpdateRectAction<S extends Screen>(
   screen: S,
 ): Action<mapActions.UpdateMapRectAction<ChipCodeForScreen<S>>> {
   if (screen === 'layer') {

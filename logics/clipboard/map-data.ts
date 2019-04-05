@@ -9,7 +9,7 @@ import { ChipCode } from '../../scripts/chip';
  * Returns null if no selection exists.
  * @package
  */
-export function getCopiedMapData(): MapFragmentJSONData | null {
+export function getCopiedMapData(): [MapFragmentJSONData, Rect] | null {
   const { stage, screen, tool, floating } = editStore.state;
   const stageData = mapStore.state.data[stage - 1];
   if (screen !== 'map' && screen !== 'layer') {
@@ -19,20 +19,24 @@ export function getCopiedMapData(): MapFragmentJSONData | null {
   const mapData = stageData[screen];
   if (tool != null && tool.type === 'select') {
     // selection on map exists.
-    return extractFromMapData(screen, mapData, {
+    const rect = {
       left: tool.start_x,
       top: tool.start_y,
       right: tool.end_x,
       bottom: tool.end_y,
-    });
+    };
+    const fragment = extractFromMapData(screen, mapData, rect);
+    return [fragment, rect];
   }
   if (floating != null) {
-    return extractFromMapData(screen, mapData, {
+    const rect = {
       left: floating.x,
       top: floating.y,
       right: floating.x + floating.width - 1,
       bottom: floating.y + floating.height - 1,
-    });
+    };
+    const fragment = extractFromMapData(screen, mapData, rect);
+    return [fragment, rect];
   }
   return null;
 }
