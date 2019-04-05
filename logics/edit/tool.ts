@@ -329,18 +329,15 @@ export const toolLogics: ToolLogicCollection = {
       }
       if (!tool.selecting && isOverSelection(x, y, tool)) {
         // selectをつかんだ
-        const { start_x, start_y, end_x, end_y } = tool;
+        const rect = rectLikeToolToRect(tool);
         const { stage, screen } = editStore.state;
         // 選択範囲の上でマウスを下げたのでつかむ
-        const floating = createFloating(start_x, start_y, end_x, end_y);
+        const floating = createFloating(tool);
         // つかんだらマップから消去
         mapUpdateRectAction(screen)({
           stage: stage,
-          left: start_x,
-          top: start_y,
-          right: end_x,
-          bottom: end_y,
           chip: 0,
+          ...rect,
         });
         editActions.setFloating({ floating });
         // floatingをつかむ
@@ -348,8 +345,8 @@ export const toolLogics: ToolLogicCollection = {
         editActions.setTool({
           tool: {
             type: 'grab-floating',
-            hand_x: cx - start_x,
-            hand_y: cy - start_y,
+            hand_x: cx - rect.left,
+            hand_y: cy - rect.top,
           },
         });
         editActions.setPointer({
@@ -442,6 +439,18 @@ export function rectLikeToolToRect({
 }
 
 /**
+ * Convert Rect to x/y, width/height.
+ */
+export function intoStartAndSize(rect: Rect) {
+  return {
+    x: rect.left,
+    y: rect.top,
+    width: rect.right - rect.left + 1,
+    height: rect.bottom - rect.top + 1,
+  };
+}
+
+/**
  * Get current code of pen.
  */
 function getCurrentPen(): ChipCode {
@@ -452,24 +461,17 @@ function getCurrentPen(): ChipCode {
 /**
  * Create a floating from given position and current map.
  */
-function createFloating(
-  start_x: number,
-  start_y: number,
-  end_x: number,
-  end_y: number,
-): FloatingState {
+function createFloating(tool: SelectTool): FloatingState {
   const { screen, stage } = editStore.state;
   const stageObject = mapStore.state.data[stage - 1];
   const mapData = screen === 'layer' ? stageObject.layer : stageObject.map;
   const floatingData = [];
-  for (let cy = start_y; cy <= end_y; cy++) {
-    floatingData.push(mapData[cy].slice(start_x, end_x + 1));
+  const rect = rectLikeToolToRect(tool);
+  for (let cy = rect.top; cy <= rect.bottom; cy++) {
+    floatingData.push(mapData[cy].slice(rect.left, rect.right + 1));
   }
   return {
-    x: start_x,
-    y: start_y,
-    width: end_x - start_x + 1,
-    height: end_y - start_y + 1,
+    ...intoStartAndSize(rect),
     data: floatingData,
   };
 }
