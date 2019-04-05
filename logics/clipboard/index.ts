@@ -3,7 +3,7 @@ import { fragmentToText, fragmentFromText } from './text-data';
 import { checkFragmentJSONFormat } from './fragment';
 import { putFragmentAsFloating } from './paste';
 import editStore from '../../stores/edit';
-import { mapUpdateRectAction } from '../edit/tool';
+import { mapUpdateRectAction, addCurrentStageHistory } from '../edit/tool';
 import { setFloating, setTool } from '../../actions/edit';
 
 /**
@@ -29,6 +29,7 @@ export function copyMapData(
         chip: 0,
         ...rect,
       });
+      addCurrentStageHistory();
       setTool({
         tool: null,
       });

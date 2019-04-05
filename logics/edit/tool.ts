@@ -417,7 +417,7 @@ export const toolLogics: ToolLogicCollection = {
 /**
  * Add to the history current stage.
  */
-function addCurrentStageHistory() {
+export function addCurrentStageHistory() {
   const stage = editStore.state.stage;
   historyActions.addHistory({
     stage,
