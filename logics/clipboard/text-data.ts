@@ -16,7 +16,7 @@ export function fragmentToText(fragment: MapFragmentJSONData): string {
           result += String.fromCharCode(chip);
         }
       }
-      result += '\n';
+      result += '\r\n';
     }
   } else {
     for (const row of fragment.data) {
