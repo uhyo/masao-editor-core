@@ -35,7 +35,12 @@ export function getCopiedMapData(): [MapFragmentJSONData, Rect] | null {
       right: floating.x + floating.width - 1,
       bottom: floating.y + floating.height - 1,
     };
-    const fragment = extractFromMapData(screen, mapData, rect);
+    const fragment = extractFromMapData(screen, floating.data, {
+      left: 0,
+      top: 0,
+      right: floating.width - 1,
+      bottom: floating.height - 1,
+    });
     return [fragment, rect];
   }
   return null;
