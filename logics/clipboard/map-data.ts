@@ -1,4 +1,4 @@
-import { MapFragmentJSONData } from './defs';
+import { MapFragmentJSONData } from './fragment';
 import editStore from '../../stores/edit';
 import mapStore from '../../stores/map';
 import { Rect } from '../edit';

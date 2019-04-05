@@ -11,6 +11,7 @@ import { scroll } from './scroll';
 import { RectTool, SelectTool } from '../../actions/edit/tool';
 import { Rect } from '.';
 import { FloatingState } from '../../actions/edit/floating';
+import { mergeFloatingIntoMap } from './floating';
 
 type Screen = editActions.Screen;
 /**
@@ -74,18 +75,7 @@ const normalMouseDownLogic = (mode: Mode, x: number, y: number) => {
     }
     if (mode !== 'hand' && (screen === 'map' || screen === 'layer')) {
       // ハンドモード以外ではフロートを定着させる
-      mapActions.writeFloatingToMap({
-        stage,
-        map: screen,
-        floating,
-      });
-      editActions.setFloating({
-        floating: null,
-      });
-      historyActions.addHistory({
-        stage,
-        stageData: mapStore.state.data[stage - 1],
-      });
+      mergeFloatingIntoMap(floating);
     }
   }
   let tool: editActions.ToolState | null = null;

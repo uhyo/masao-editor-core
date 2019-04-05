@@ -1,5 +1,8 @@
 import { getCopiedMapData } from './map-data';
-import { fragmentToText } from './text-data';
+import { fragmentToText, fragmentFromText } from './text-data';
+import { checkFragmentJSONFormat } from './fragment';
+import { putFragmentAsFloating } from './paste';
+import editStore from '../../stores/edit';
 
 /**
  * Logic of copying.
@@ -16,4 +19,28 @@ export function copyMapData(clipboardData: DataTransfer): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Logic of pasting.
+ * @returns whether something is pasted.
+ */
+export function pasteMapData(clipboardData: DataTransfer): boolean {
+  const { screen } = editStore.state;
+  if (screen !== 'map' && screen !== 'layer') {
+    return false;
+  }
+  try {
+    const json = JSON.parse(clipboardData.getData('application/json'));
+    if (checkFragmentJSONFormat(json)) {
+      return putFragmentAsFloating(json);
+    }
+  } catch {}
+  // テキストをフラグメントとして解釈
+  const text = clipboardData.getData('text/plain');
+  const fragment = fragmentFromText(screen, text);
+  if (fragment == null) {
+    return false;
+  }
+  return putFragmentAsFloating(fragment);
 }
