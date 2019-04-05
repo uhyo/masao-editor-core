@@ -32,7 +32,8 @@ gulp.task('tsc', () => {
     .src(tsTarget, {
       base: '.',
     })
-    .pipe(tsProject());
+    .pipe(tsProject())
+    .on('error', () => {});
   return merge2([
     stream.js.pipe(gulp.dest('dist-es6/')),
     stream.dts.pipe(gulp.dest('dist-types/')),
