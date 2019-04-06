@@ -405,19 +405,19 @@ export default class Scroll extends React.Component<IPropScroll, {}> {
     const { currentTarget } = e;
     if (currentTarget === this.horWrapper) {
       // 横スクロールバー
-      e.preventDefault();
+      // e.preventDefault();
       const { x, y } = getDelta(e);
       const sc = this.props.x + (y ? y : x);
       this.setScroll(sc, null);
     } else if (currentTarget === this.verWrapper) {
       // 縦スクロールバー
-      e.preventDefault();
+      // e.preventDefault();
       const { x, y } = getDelta(e);
       const sc = this.props.y + (y ? y : x);
       this.setScroll(null, sc);
     } else if (currentTarget === this.mainWrapper) {
       // メイン画面上でのホイール操作
-      e.preventDefault();
+      // e.preventDefault();
       const { x, y } = getDelta(e);
       const scx = this.props.x + x;
       const scy = this.props.y + y;
