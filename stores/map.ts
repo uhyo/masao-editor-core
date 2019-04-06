@@ -558,6 +558,14 @@ export class MapStore extends Store<MapState> {
       }),
     });
   }
+  public onResetLastUpdate() {
+    if (this.state.lastUpdate.length === 0) {
+      return;
+    }
+    this.setState({
+      lastUpdate: [],
+    });
+  }
 }
 
 /**

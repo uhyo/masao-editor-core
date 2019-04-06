@@ -16,6 +16,7 @@ import { IntoImages } from '../../../../components/load-images';
 import { Images } from '../../../../../defs/images';
 import { drawMapChip, drawLayerChip } from './draw-chip';
 import { useRefMemo } from '../../../../../scripts/useRefMemo';
+import { resetLastUpdate } from '../../../../../actions/map';
 
 /**
  * Returns a pair of updator and backlayer.
@@ -184,6 +185,7 @@ export function useBackLayer(
         }
       }
     }
+    resetLastUpdate();
   }, [lastUpdate]);
   return result;
 }

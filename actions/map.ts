@@ -90,3 +90,8 @@ export interface LoadMapAction {
   layer: Array<Array<number>>;
 }
 export const loadMap = createAction<LoadMapAction>();
+
+/**
+ * lastUpdateをリセットするアクション
+ */
+export const resetLastUpdate = createAction<undefined>();

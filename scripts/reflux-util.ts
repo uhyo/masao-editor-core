@@ -3,9 +3,10 @@ import * as React from 'react';
 import * as Reflux from 'reflux';
 
 // ========== Actions ==========
-export interface Action<T> {
-  (arg: T): void;
-}
+export type Action<T> = undefined extends T
+  ? (arg?: T) => void
+  : (arg: T) => void;
+
 export interface ActionDefinition<T> {
   preEmit?(obj: T): T | undefined;
   shouldEmit?(obj: T): boolean;
