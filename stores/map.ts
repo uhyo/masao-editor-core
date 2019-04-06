@@ -410,9 +410,11 @@ export class MapStore extends Store<MapState> {
     map,
     floating,
   }: mapActions.WriteFloatingToMapAction) {
+    // NOTE: floating may not fit within map.
     if (stage <= 0 || this.state.stages < stage) {
       return;
     }
+    const stageData = this.state.data[stage - 1];
     const allowAdvancedChip = map === 'map' && this.state.advanced;
     const data = this.state.data.map((st, i) => {
       if (i !== stage - 1) {
@@ -446,15 +448,26 @@ export class MapStore extends Store<MapState> {
         [map]: newMap,
       };
     });
+    // make lastUpdate data.
+    const x = Math.max(floating.x, 0);
+    const y = Math.max(floating.y, 0);
+    const width = Math.min(
+      floating.width + floating.x - x,
+      stageData.size.x - x,
+    );
+    const height = Math.min(
+      floating.height + floating.y - y,
+      stageData.size.y - y,
+    );
     this.setState({
       data,
       lastUpdate: addLastUpdateData(this.state.lastUpdate, {
         type: map,
         stage,
-        x: floating.x,
-        y: floating.y,
-        width: floating.width,
-        height: floating.height,
+        x,
+        y,
+        width,
+        height,
         // TypeScript can't infer that this is valid
       } as LastUpdateOneData),
     });
