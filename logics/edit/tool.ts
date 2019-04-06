@@ -519,13 +519,13 @@ function rectLikeMouseMove(x: number, y: number, tool: RectTool | SelectTool) {
   // 画面内に収まるように補正
   if (rx < sc_left) {
     rx = sc_left;
-  } else if (rx >= sc_right) {
-    rx = sc_right - 1;
+  } else if (rx > sc_right) {
+    rx = sc_right;
   }
   if (ry < sc_top) {
     ry = sc_top;
-  } else if (ry >= sc_bottom) {
-    ry = sc_bottom - 1;
+  } else if (ry > sc_bottom) {
+    ry = sc_bottom;
   }
 
   if (end_x !== rx || end_y !== ry) {
