@@ -23,19 +23,22 @@ export function copyMapData(
     clipboardData.setData('text/plain', mapText);
     if (isCut) {
       // カットの場合は元のマップから消す
-      const { screen, stage } = editStore.state;
-      mapUpdateRectAction(screen)({
-        stage,
-        chip: 0,
-        ...rect,
-      });
-      addCurrentStageHistory();
-      setTool({
-        tool: null,
-      });
-      setFloating({
-        floating: null,
-      });
+      const { screen, stage, floating } = editStore.state;
+      if (floating == null) {
+        mapUpdateRectAction(screen)({
+          stage,
+          chip: 0,
+          ...rect,
+        });
+        addCurrentStageHistory();
+        setTool({
+          tool: null,
+        });
+      } else {
+        setFloating({
+          floating: null,
+        });
+      }
     }
     return true;
   }
