@@ -35,6 +35,7 @@ import { Toolbar, Toolbox } from '../components/toolbar';
 import './css/init.css';
 import './theme/color.css';
 import * as styles from './css/index.css';
+import Chips from '../../images/chips.png';
 import memoizeOne from 'memoize-one';
 import { Images } from '../../defs/images';
 import { ScreenRouter } from './screen-router';
@@ -237,9 +238,9 @@ export default class MasaoEditorCore extends RefluxComponent<
       },
       state: { map, params, edit, customParts, project, history },
     } = this;
-    const chips: string = require('../../images/chips.png');
 
-    const images = makeImages(filename_pattern, filename_mapchip, chips);
+    console.log('Chips is', Chips);
+    const images = makeImages(filename_pattern, filename_mapchip, Chips);
 
     let external_buttons = null;
     if (externalCommands != null) {
