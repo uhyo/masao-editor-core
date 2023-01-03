@@ -63,7 +63,7 @@
     "style-loader": "^0.20.3",
     "typescript": "^3.3.3333",
     "url-loader": "^0.6.2",
-    "webpack": "^3.12.0"
+    "webpack": "^5.75.0"
   },
   "dependencies": {
     "@types/memoize-one": "^3.1.2",
